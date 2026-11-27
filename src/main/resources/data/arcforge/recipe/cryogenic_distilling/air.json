@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:cryogenic_distilling",
+  "outputs": [
+    {
+      "id": "arcforge:nitrogen",
+      "amount": 780
+    },
+    {
+      "id": "arcforge:oxygen",
+      "amount": 210
+    },
+    {
+      "id": "arcforge:argon",
+      "amount": 10
+    }
+  ],
+  "time": 20
+}

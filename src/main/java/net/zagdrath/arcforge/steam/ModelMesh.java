@@ -271,7 +271,8 @@ public abstract class ModelMesh {
         float[] down = { 0, -1, 0 };
         float[] start = { elbow[0], elbow[1] - h, elbow[2] };
         float drop = collarDepth(start, down);
-        if (drop > 0.01F) {
+        // Under half a pixel is the collar's own bite into the surface: the elbow already sits on it.
+        if (drop > 0.51F) {
             collar(start, down, drop, false);
         }
     }
@@ -393,7 +394,8 @@ public abstract class ModelMesh {
     // A collar COLLAR px across from point along dir for length px; its end at point is left open when that's the port's
     // face (the block model's plate covers it).
     void collar(float[] point, float[] dir, float length, boolean openStart) {
-        float h = COLLAR / 2.0F;
+        // An eighth of a pixel in, so its sides never lie in the faces of parts edged at 3 or 13 px of a block.
+        float h = COLLAR / 2.0F - 0.125F;
         float[] min = new float[3], max = new float[3];
         for (int k = 0; k < 3; k++) {
             float a = point[k], b = point[k] + dir[k] * length;

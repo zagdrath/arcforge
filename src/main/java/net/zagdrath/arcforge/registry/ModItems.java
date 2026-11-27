@@ -747,6 +747,69 @@ public final class ModItems {
         }, p -> p.humanoidArmor(net.zagdrath.arcforge.nuclear.HazmatSuit.ARMOR, type));
     }
 
+    // --- The fusion tier ---
+    public static final DeferredItem<StorageBlockItem> CRYOGENIC_TANK = ITEMS.registerItem("cryogenic_tank",
+            p -> new StorageBlockItem(ModBlocks.CRYOGENIC_TANK.get(), p), p -> p.useBlockDescriptionPrefix());
+    public static final DeferredItem<BlockItem> LITHIUM_ISOTOPE_SEPARATOR = ITEMS.registerSimpleBlockItem(ModBlocks.LITHIUM_ISOTOPE_SEPARATOR);
+    public static final DeferredItem<BlockItem> TRITIUM_EXTRACTION_UNIT = ITEMS.registerSimpleBlockItem(ModBlocks.TRITIUM_EXTRACTION_UNIT);
+    public static final DeferredItem<BlockItem> FUSION_REACTOR_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.FUSION_REACTOR_CONTROLLER);
+    public static final DeferredItem<BlockItem> CRYOSTAT_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.CRYOSTAT_CASING);
+    public static final DeferredItem<BlockItem> VESSEL_PORT = ITEMS.registerSimpleBlockItem(ModBlocks.VESSEL_PORT);
+    public static final DeferredItem<BlockItem> CENTRAL_SOLENOID = ITEMS.registerSimpleBlockItem(ModBlocks.CENTRAL_SOLENOID);
+    public static final DeferredItem<BlockItem> TOROIDAL_FIELD_COIL = ITEMS.registerSimpleBlockItem(ModBlocks.TOROIDAL_FIELD_COIL);
+    public static final DeferredItem<BlockItem> POLOIDAL_FIELD_COIL = ITEMS.registerSimpleBlockItem(ModBlocks.POLOIDAL_FIELD_COIL);
+    public static final DeferredItem<BlockItem> STELLARATOR_COIL = ITEMS.registerSimpleBlockItem(ModBlocks.STELLARATOR_COIL);
+    public static final DeferredItem<BlockItem> FIRST_WALL = ITEMS.registerSimpleBlockItem(ModBlocks.FIRST_WALL);
+    public static final DeferredItem<BlockItem> DIVERTOR_CASSETTE = ITEMS.registerSimpleBlockItem(ModBlocks.DIVERTOR_CASSETTE);
+    public static final DeferredItem<BlockItem> BREEDING_BLANKET = ITEMS.registerSimpleBlockItem(ModBlocks.BREEDING_BLANKET);
+    public static final DeferredItem<BlockItem> NEUTRAL_BEAM_INJECTOR = ITEMS.registerSimpleBlockItem(ModBlocks.NEUTRAL_BEAM_INJECTOR);
+    public static final DeferredItem<BlockItem> GYROTRON = ITEMS.registerSimpleBlockItem(ModBlocks.GYROTRON);
+    public static final DeferredItem<BlockItem> PELLET_INJECTOR = ITEMS.registerSimpleBlockItem(ModBlocks.PELLET_INJECTOR);
+    public static final DeferredItem<BlockItem> GAS_PUFF_VALVE = ITEMS.registerSimpleBlockItem(ModBlocks.GAS_PUFF_VALVE);
+    public static final DeferredItem<BlockItem> CRYOPUMP = ITEMS.registerSimpleBlockItem(ModBlocks.CRYOPUMP);
+    public static final DeferredItem<BlockItem> DIAGNOSTICS_PORT = ITEMS.registerSimpleBlockItem(ModBlocks.DIAGNOSTICS_PORT);
+    public static final DeferredItem<BlockItem> DIRECT_ENERGY_CONVERTER = ITEMS.registerSimpleBlockItem(ModBlocks.DIRECT_ENERGY_CONVERTER);
+    public static final DeferredItem<BlockItem> HELIUM_TURBINE_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.HELIUM_TURBINE_CASING);
+    public static final DeferredItem<BlockItem> QUENCH_PROTECTION_UNIT = ITEMS.registerSimpleBlockItem(ModBlocks.QUENCH_PROTECTION_UNIT);
+    // The fusion tier's materials: lithium-6 (enriched by the Lithium Isotope Separator; see Lithium6), Lead-Lithium,
+    // the Arcite superconductor (Arcite-Tungsten Composite drawn to wire in the Metal Press, then baked to tape), the
+    // coil windings made of it, the Lithium Target Rod (tritium bred in a Fission Reactor), the Tritium Canister and the
+    // Activated Components a Remote Handling Arm takes out of a reactor.
+    public static final DeferredItem<net.zagdrath.arcforge.item.fusion.EnrichedLithiumItem> ENRICHED_LITHIUM_FLUORIDE = ITEMS.registerItem(
+            "enriched_lithium_fluoride", net.zagdrath.arcforge.item.fusion.EnrichedLithiumItem::new);
+    public static final DeferredItem<net.zagdrath.arcforge.item.fusion.EnrichedLithiumItem> LITHIUM_6_FLUORIDE = ITEMS.registerItem(
+            "lithium_6_fluoride", net.zagdrath.arcforge.item.fusion.EnrichedLithiumItem::new);
+    public static final DeferredItem<Item> LEAD_LITHIUM_INGOT = ITEMS.registerSimpleItem("lead_lithium_ingot");
+    public static final DeferredItem<Item> ARCITE_TUNGSTEN_WIRE = ITEMS.registerSimpleItem("arcite_tungsten_wire");
+    public static final DeferredItem<Item> SUPERCONDUCTING_TAPE = ITEMS.registerSimpleItem("superconducting_tape");
+    public static final DeferredItem<Item> SUPERCONDUCTING_COIL = ITEMS.registerSimpleItem("superconducting_coil");
+    public static final DeferredItem<net.zagdrath.arcforge.item.nuclear.FuelRodItem> LITHIUM_TARGET_ROD = ITEMS.registerItem("lithium_target_rod",
+            p -> new net.zagdrath.arcforge.item.nuclear.FuelRodItem(net.zagdrath.arcforge.nuclear.FuelRod.FuelType.LITHIUM, p));
+    public static final DeferredItem<net.zagdrath.arcforge.item.fusion.TritiumCanisterItem> TRITIUM_CANISTER = ITEMS.registerItem("tritium_canister",
+            net.zagdrath.arcforge.item.fusion.TritiumCanisterItem::new, p -> p.stacksTo(1));
+    public static final DeferredItem<net.zagdrath.arcforge.item.fusion.ActivatedComponentItem> ACTIVATED_COMPONENT = ITEMS.registerItem(
+            "activated_component", net.zagdrath.arcforge.item.fusion.ActivatedComponentItem::new, p -> p.stacksTo(16));
+    public static final DeferredItem<BlockItem> REMOTE_HANDLING_ARM = ITEMS.registerSimpleBlockItem(ModBlocks.REMOTE_HANDLING_ARM);
+    public static final DeferredItem<BlockItem> CRYOGENIC_PLANT_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.CRYOGENIC_PLANT_CONTROLLER);
+    public static final DeferredItem<BlockItem> CRYOGENIC_PLANT_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.CRYOGENIC_PLANT_CASING);
+    public static final DeferredItem<BlockItem> CRYOGENIC_COLUMN_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.CRYOGENIC_COLUMN_CONTROLLER);
+    public static final DeferredItem<BlockItem> CRYOGENIC_COLUMN_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.CRYOGENIC_COLUMN_CASING);
+    public static final DeferredItem<BlockItem> TRITIUM_PLANT_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.TRITIUM_PLANT_CONTROLLER);
+    public static final DeferredItem<BlockItem> TRITIUM_PLANT_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.TRITIUM_PLANT_CASING);
+    // (fusion items end)
+
+    // Everything on the Fusion creative tab, in order.
+    public static List<DeferredItem<? extends Item>> fusion() {
+        return List.of(LITHIUM_ISOTOPE_SEPARATOR, ENRICHED_LITHIUM_FLUORIDE, LITHIUM_6_FLUORIDE, TRITIUM_EXTRACTION_UNIT, LEAD_LITHIUM_INGOT, LITHIUM_TARGET_ROD, TRITIUM_CANISTER,
+                ARCITE_TUNGSTEN_WIRE, SUPERCONDUCTING_TAPE, SUPERCONDUCTING_COIL, ACTIVATED_COMPONENT, CRYOGENIC_TANK,
+                CRYOGENIC_PLANT_CONTROLLER, CRYOGENIC_PLANT_CASING, CRYOGENIC_COLUMN_CONTROLLER, CRYOGENIC_COLUMN_CASING, TRITIUM_PLANT_CONTROLLER,
+                TRITIUM_PLANT_CASING,
+                FUSION_REACTOR_CONTROLLER, CRYOSTAT_CASING, VESSEL_PORT, CENTRAL_SOLENOID, TOROIDAL_FIELD_COIL, POLOIDAL_FIELD_COIL, STELLARATOR_COIL,
+                FIRST_WALL, DIVERTOR_CASSETTE, BREEDING_BLANKET, NEUTRAL_BEAM_INJECTOR, GYROTRON, PELLET_INJECTOR, GAS_PUFF_VALVE, CRYOPUMP,
+                DIAGNOSTICS_PORT, DIRECT_ENERGY_CONVERTER, QUENCH_PROTECTION_UNIT, REMOTE_HANDLING_ARM, HELIUM_TURBINE_CASING
+                /* (fusion tab end) */);
+    }
+
     // Everything on the Nuclear creative tab, in order.
     public static List<DeferredItem<? extends Item>> nuclear() {
         return List.of(URANINITE_ORE, DEEPSLATE_URANINITE_ORE, RAW_URANINITE, RAW_URANINITE_BLOCK, URANINITE_DUST,

@@ -75,6 +75,15 @@ public final class ModRecipes {
     public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe>> ISOTOPE_EXCHANGING = RECIPE_TYPES.register(
             "isotope_exchanging", () -> RecipeType.simple(id("isotope_exchanging")));
     // Waste and reprocessing: the Waste Compactor, the Vitrification Plant and the PUREX Plant.
+    // The fusion tier's machines.
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.LithiumEnrichingRecipe>> LITHIUM_ENRICHING = RECIPE_TYPES.register("lithium_enriching",
+            () -> RecipeType.simple(id("lithium_enriching")));
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.TritiumExtractingRecipe>> TRITIUM_EXTRACTING = RECIPE_TYPES.register("tritium_extracting",
+            () -> RecipeType.simple(id("tritium_extracting")));
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.CryogenicDistillingRecipe>> CRYOGENIC_DISTILLING = RECIPE_TYPES.register("cryogenic_distilling",
+            () -> RecipeType.simple(id("cryogenic_distilling")));
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.LiquefyingRecipe>> LIQUEFYING = RECIPE_TYPES.register("liquefying",
+            () -> RecipeType.simple(id("liquefying")));
     public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.CompactingRecipe>> COMPACTING = RECIPE_TYPES.register("compacting",
             () -> RecipeType.simple(id("compacting")));
     public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.VitrifyingRecipe>> VITRIFYING = RECIPE_TYPES.register("vitrifying",
@@ -247,6 +256,15 @@ public final class ModRecipes {
             RECIPE_SERIALIZERS.register("isotope_exchanging", () -> new RecipeSerializer<>(net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe.MAP_CODEC,
                     net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe.STREAM_CODEC));
 
+    // The fusion tier's machines.
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.LithiumEnrichingRecipe>> LITHIUM_ENRICHING_SERIALIZER = RECIPE_SERIALIZERS.register(
+            "lithium_enriching", () -> new RecipeSerializer<>(net.zagdrath.arcforge.recipe.LithiumEnrichingRecipe.MAP_CODEC, net.zagdrath.arcforge.recipe.LithiumEnrichingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.TritiumExtractingRecipe>> TRITIUM_EXTRACTING_SERIALIZER = RECIPE_SERIALIZERS.register(
+            "tritium_extracting", () -> new RecipeSerializer<>(net.zagdrath.arcforge.recipe.TritiumExtractingRecipe.MAP_CODEC, net.zagdrath.arcforge.recipe.TritiumExtractingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.CryogenicDistillingRecipe>> CRYOGENIC_DISTILLING_SERIALIZER = RECIPE_SERIALIZERS.register(
+            "cryogenic_distilling", () -> new RecipeSerializer<>(net.zagdrath.arcforge.recipe.CryogenicDistillingRecipe.MAP_CODEC, net.zagdrath.arcforge.recipe.CryogenicDistillingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.LiquefyingRecipe>> LIQUEFYING_SERIALIZER = RECIPE_SERIALIZERS.register(
+            "liquefying", () -> new RecipeSerializer<>(net.zagdrath.arcforge.recipe.LiquefyingRecipe.MAP_CODEC, net.zagdrath.arcforge.recipe.LiquefyingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.CompactingRecipe>> COMPACTING_SERIALIZER = RECIPE_SERIALIZERS.register(
             "compacting", () -> new RecipeSerializer<>(net.zagdrath.arcforge.recipe.CompactingRecipe.MAP_CODEC,
                     net.zagdrath.arcforge.recipe.CompactingRecipe.STREAM_CODEC));
@@ -296,6 +314,7 @@ public final class ModRecipes {
                 HYDROTHERMAL_CARBONIZING.get(), CARBON_RECLAIMING.get(), GASIFYING.get(), FISCHER_TROPSCH.get(),
                 SIFTING.get(), DIAMOND_PRESSING.get(), CRACKING.get(), REFORMING.get(), COKING.get(), LUBRICANT_BLENDING.get(),
                 HYDROTREATING.get(), SULFUR_RECOVERY.get(), STEAM_REFORMING.get(), STEAM_CRACKING.get(), SINTERING.get(), RETORTING.get(), ISOTOPE_EXCHANGING.get(),
-                COMPACTING.get(), VITRIFYING.get(), REPROCESSING.get(), RecipeType.SMELTING);
+                COMPACTING.get(), VITRIFYING.get(), REPROCESSING.get(), LITHIUM_ENRICHING.get(), TRITIUM_EXTRACTING.get(), CRYOGENIC_DISTILLING.get(),
+                LIQUEFYING.get(), RecipeType.SMELTING);
     }
 }

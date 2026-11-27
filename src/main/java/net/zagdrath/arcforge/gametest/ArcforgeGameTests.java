@@ -649,6 +649,10 @@ public final class ArcforgeGameTests {
         LARGE_TESTS.put("nuclear_turbine_runs_and_trips", NuclearTurbineGameTests::runsAndTrips);
         TESTS.put("nuclear_turbine_rotor_on_shaft", NuclearTurbineGameTests::rotorOnShaft);
         TESTS.put("nuclear_turbine_hitbox_keeps_players_out", NuclearTurbineGameTests::hitboxKeepsPlayersOut);
+        LARGE_TESTS.put("helium_turbine_forms", HeliumTurbineGameTests::forms);
+        LARGE_TESTS.put("helium_turbine_runs_and_returns_helium", HeliumTurbineGameTests::runsAndReturnsHelium);
+        TESTS.put("helium_turbine_rotor_on_shaft", HeliumTurbineGameTests::rotorOnShaft);
+        TESTS.put("helium_turbine_hitbox_keeps_players_out", HeliumTurbineGameTests::hitboxKeepsPlayersOut);
         TESTS.put("fission_fuel_fabrication", FissionGameTests::fuelFabrication);
         TESTS.put("fission_contaminated_steam", FissionGameTests::contaminatedSteam);
         TESTS.put("fission_reactor_model", FissionGameTests::reactorModel);
@@ -656,6 +660,11 @@ public final class ArcforgeGameTests {
         TESTS.put("fission_heavy_water_tower", FissionGameTests::heavyWaterTower);
         LONG_TESTS.put("fission_reactor_forms", FissionGameTests::reactorForms);
         TESTS.put("fission_reactor_buttons", FissionGameTests::reactorButtons);
+        TESTS.put("fusion_plasma", FusionGameTests::plasma);
+        TESTS.put("fusion_layout", FusionGameTests::layout);
+        TESTS.put("fusion_tritium_and_lithium", FusionGameTests::tritiumAndLithium);
+        TESTS.put("fusion_neutron_shielding", FusionGameTests::neutronShielding);
+        TESTS.put("fusion_plants", FusionGameTests::plants);
         TESTS.put("nuclear_failures", NuclearSafetyGameTests::failures);
         TESTS.put("nuclear_decay", NuclearSafetyGameTests::decay);
         TESTS.put("nuclear_spent_fuel", NuclearSafetyGameTests::spentFuel);

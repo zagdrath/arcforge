@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SGS",
+    "RPR",
+    "LBL"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "G": "#c:gears/steel",
+    "R": "#c:rods/steel",
+    "P": "minecraft:piston",
+    "L": "#c:plates/lead",
+    "B": "#c:storage_blocks/redstone"
+  },
+  "result": {
+    "id": "arcforge:remote_handling_arm",
+    "count": 1
+  }
+}

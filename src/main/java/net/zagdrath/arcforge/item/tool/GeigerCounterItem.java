@@ -17,6 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.zagdrath.arcforge.nuclear.RadiationDose;
+import net.zagdrath.arcforge.nuclear.RadiationField;
 import net.zagdrath.arcforge.nuclear.RadiationText;
 import net.zagdrath.arcforge.registry.ModItems;
 
@@ -25,6 +26,8 @@ import net.zagdrath.arcforge.registry.ModItems;
 // see GeigerClient). With a Dosimeter in the other hand it shows their dose too.
 public class GeigerCounterItem extends Item {
     private static final int SHOW_INTERVAL = 10;
+    // Neutron rates under this (mSv/h) aren't shown.
+    private static final double NEUTRON_SHOWN = 0.001;
 
     public GeigerCounterItem(Item.Properties properties) {
         super(properties);
@@ -47,6 +50,12 @@ public class GeigerCounterItem extends Item {
         RadiationDose.Exposure exposure = RadiationDose.exposure(player);
         Component reading = Component.translatable("message.arcforge.geiger_counter.reading", RadiationText.rate(exposure.rate()))
                 .withStyle(color(exposure.rate()));
+        // A fusion plasma's neutrons, counted apart (its neutron detector's channel): part of the rate above.
+        double neutrons = RadiationField.doseAt(level, player.position().add(0.0, player.getBbHeight() * 0.5, 0.0), player).neutron();
+        if (neutrons >= NEUTRON_SHOWN) {
+            reading = Component.translatable("message.arcforge.geiger_counter.with_neutrons", reading,
+                    Component.translatable("message.arcforge.geiger_counter.neutrons", RadiationText.rate(neutrons)).withStyle(ChatFormatting.LIGHT_PURPLE));
+        }
         if (player.getMainHandItem().is(ModItems.DOSIMETER.get()) || player.getOffhandItem().is(ModItems.DOSIMETER.get())) {
             reading = Component.translatable("message.arcforge.geiger_counter.with_dose", reading,
                     Component.translatable("message.arcforge.dosimeter.reading", RadiationText.dose(exposure.dose())).withStyle(ChatFormatting.GRAY));

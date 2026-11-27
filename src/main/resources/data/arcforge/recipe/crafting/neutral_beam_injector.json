@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SHS",
+    "CVC",
+    "SPS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "H": "arcforge:tungsten_heating_coil",
+    "C": "arcforge:superconducting_coil",
+    "V": "arcforge:vessel_port",
+    "P": "arcforge:steel_pipe"
+  },
+  "result": {
+    "id": "arcforge:neutral_beam_injector",
+    "count": 1
+  }
+}

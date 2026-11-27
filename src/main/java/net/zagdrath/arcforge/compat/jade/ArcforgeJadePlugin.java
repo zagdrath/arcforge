@@ -93,6 +93,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(WaterIntakeProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.WaterIntakeBlockEntity.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, SteamTurbineArrayBlockEntity.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity.class);
+        registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.HeliumGasTurbineBlockEntity.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity.class);
         registration.registerBlockDataProvider(GasTurbineProvider.INSTANCE, GasTurbineArrayBlockEntity.class);
         registration.registerBlockDataProvider(MeterProviders.Meter.INSTANCE, net.zagdrath.arcforge.blockentity.logistics.MeterBlockEntity.class);
@@ -157,6 +158,15 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(VesselProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.VesselCasingBlock.class);
         registration.registerBlockDataProvider(VesselProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.VesselGlassBlock.class);
         registration.registerBlockDataProvider(VesselProvider.INSTANCE, net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock.class);
+        // The fusion tier: the reactor from any block of it, its modules, and its single-block machines.
+        for (Class<?> type : List.of(net.zagdrath.arcforge.blockentity.fusion.FusionReactorBlockEntity.class,
+                net.zagdrath.arcforge.block.fusion.TokamakPartBlock.class, net.zagdrath.arcforge.block.multiblock.VesselGlassBlock.class,
+                net.zagdrath.arcforge.blockentity.fusion.FusionModuleBlockEntity.class,
+                net.zagdrath.arcforge.blockentity.fusion.LithiumIsotopeSeparatorBlockEntity.class,
+                net.zagdrath.arcforge.blockentity.fusion.TritiumExtractionUnitBlockEntity.class,
+                net.zagdrath.arcforge.blockentity.fusion.RemoteHandlingArmBlockEntity.class)) {
+            registration.registerBlockDataProvider(FusionProvider.INSTANCE, type);
+        }
         // The containment, safety, spent fuel and waste blocks.
         for (Class<?> type : List.of(net.zagdrath.arcforge.blockentity.nuclear.NuclearBlockEntity.class, net.zagdrath.arcforge.block.nuclear.CoriumBlock.class,
                 net.zagdrath.arcforge.block.nuclear.FalloutBlock.class, net.zagdrath.arcforge.block.nuclear.ContainmentBlock.class,
@@ -241,6 +251,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(WaterIntakeProvider.Client.INSTANCE, net.zagdrath.arcforge.block.multiblock.WaterIntakeCasingBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, SteamTurbineArrayCasingBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, net.zagdrath.arcforge.block.multiblock.NuclearTurbineCasingBlock.class);
+        registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, net.zagdrath.arcforge.block.multiblock.HeliumTurbineCasingBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock.class);
         registration.registerBlockComponent(GasTurbineProvider.Client.INSTANCE, GasTurbineArrayCasingBlock.class);
         registration.registerBlockComponent(MeterProviders.Meter.Client.INSTANCE, net.zagdrath.arcforge.block.logistics.MeterBlock.class);
@@ -302,6 +313,12 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
                 net.zagdrath.arcforge.block.multiblock.VesselCasingBlock.class, net.zagdrath.arcforge.block.multiblock.VesselGlassBlock.class,
                 net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock.class)) {
             registration.registerBlockComponent(VesselProvider.Client.INSTANCE, type);
+        }
+        for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.fusion.FusionReactorControllerBlock.class,
+                net.zagdrath.arcforge.block.fusion.TokamakPartBlock.class, net.zagdrath.arcforge.block.multiblock.VesselGlassBlock.class,
+                net.zagdrath.arcforge.block.fusion.FusionModuleBlock.class, net.zagdrath.arcforge.block.fusion.LithiumIsotopeSeparatorBlock.class,
+                net.zagdrath.arcforge.block.fusion.TritiumExtractionUnitBlock.class, net.zagdrath.arcforge.block.fusion.RemoteHandlingArmBlock.class)) {
+            registration.registerBlockComponent(FusionProvider.Client.INSTANCE, type);
         }
         for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.nuclear.NuclearEntityBlock.class, net.zagdrath.arcforge.block.nuclear.CoriumBlock.class,
                 net.zagdrath.arcforge.block.nuclear.FalloutBlock.class, net.zagdrath.arcforge.block.nuclear.ContainmentBlock.class,

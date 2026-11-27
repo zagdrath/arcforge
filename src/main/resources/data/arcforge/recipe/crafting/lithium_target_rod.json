@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " L ",
+    " T ",
+    " L "
+  ],
+  "key": {
+    "L": "arcforge:lithium_6_fluoride",
+    "T": "arcforge:zircaloy_tube"
+  },
+  "result": {
+    "id": "arcforge:lithium_target_rod",
+    "count": 1
+  }
+}

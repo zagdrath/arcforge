@@ -24,8 +24,8 @@ the creative-only [Creative Fluid Tank, Pressurized Cylinder and Energy Cell](#c
 ## Questline
 
 With [Hibiscus Quests](https://github.com/hibiscus-software/hibiscus-quests) installed (optional), its quest book has
-Arcforge's questline: 20 chapters in six groups under an Arcforge heading (Foundations, Power Generation, Petroleum, Chemistry, Agriculture and
-Nuclear) and 280 quests that follow the recipes from the Wrench to molten salt reactors, covering every item you can
+Arcforge's questline: 21 chapters in seven groups under an Arcforge heading (Foundations, Power Generation, Petroleum, Chemistry, Agriculture,
+Nuclear and Fusion) and 300 quests that follow the recipes from the Wrench to molten salt reactors, covering every item you can
 get in survival. Every chapter shows its whole map from the start; quests stay greyed out until what they need is
 done, and a chapter's first quests wait for the alloy or part it starts from. Every quest is listed in
 [docs/QUESTLINE.md](docs/QUESTLINE.md). A modpack can change or replace the chapters in its own Hibiscus Quests files,
@@ -1039,6 +1039,97 @@ Blend** for **U-233 Fuel Rods**.
   (780 °C, `freezePlugMelt`) or power is lost it melts and the salt drains, so the core can't melt down, and even a
   prompt-critical spike only melts the plug. It runs at about 700 °C, and the Steam Generator makes High-Pressure Steam
   from it.
+
+### Fusion
+
+The fusion tier sits above the Fission Reactor. It is in the **Arcforge: Fusion** creative tab and the Handbook's Fusion
+chapter, and its quest chapter opens after Nuclear Power.
+
+**Fuels.**
+
+- **Deuterium**: the Electrolyzer splits Heavy Water into it.
+- **Tritium**: **Lithium Target Rods** (a Zircaloy Tube and two Lithium-6 Fluoride) breed it in a Fission Reactor,
+  and the **Tritium Extraction Unit** bakes it out with heat. A D-T reactor's **Breeding Blanket** breeds more.
+- **Helium-3**: stored tritium decays into it.
+- **Lithium-6**: the **Lithium Isotope Separator** enriches Lithium Fluoride a step at a time. Lead and Lithium-6
+  Fluoride make **Lead-Lithium**.
+- **Helium**: some gas caps are helium-rich (`world.oilDeposits.heliumRichChance`), and the **Cryogenic Distillation
+  Column** (always 3×3, 6–16 tall) separates it from their gas. With no feed, the column distils air into Nitrogen,
+  Oxygen and Argon instead.
+
+**Cryogenics.** The **Cryogenic Plant** (a cold box 3–7 across) liquefies Nitrogen and Helium; the bigger its inside,
+the faster it runs. Liquid Nitrogen and Liquid Helium boil off out of any tank except a **Cryogenic Tank**
+(`fusion.cryogenics.boilOffPerMinute`).
+
+**Magnets.** Arcite-Tungsten Composite is pressed into wire and sintered into **Superconducting Tape**, which is wound
+into coils. The coils make the Toroidal Field, Poloidal Field and Central Solenoid blocks, or Stellarator Coils.
+
+**The tokamak.** A compact ring round a vertical axis, of major radius R from 3 to 7 (9×9×9 up to 17×17×13). From the
+axis outwards it has these layers:
+
+1. the Central Solenoid, one column;
+2. the plasma chamber, its inner wall and roof **First Wall** and its floor **Divertor Cassettes**;
+3. the **Breeding Blanket** as the chamber's outer wall, and over and under it;
+4. the Toroidal Field Coils closing the ring top and bottom, with the Poloidal Field Coils set into those layers;
+5. a cylindrical **Cryostat** wall of Cryostat Casing.
+
+The cryostat wall takes the controller, **Vessel Ports** and Reactor Glass windows. The Handbook has a blueprint for
+every layer.
+
+Port modules go on Vessel Ports, and Quench Protection Units go against the cryostat:
+
+- the **Neutral Beam Injector** and **Gyrotron** heat the plasma;
+- the **Pellet Injector** and **Gas Puff Valve** fuel it;
+- the **Cryopump** holds the vacuum and pumps out the exhaust;
+- the **Diagnostics Port** gives exact readings;
+- the **Direct Energy Converter** turns the charged particles streaming out of the plasma straight into FE (up to
+  250 MW each, at 15,000 FE/t a MW, half again the thermal route), which matters most on D-He3.
+
+Formed, it draws as a plated cryostat. While it burns, the plasma glows pink through its windows. With Stellarator
+Coils in place of the solenoid and toroidal coils it is a **Stellarator**: steady, with no current to drive and nothing
+to disrupt, but it confines less well.
+
+**Running it.** The controller's desk shows the plasma, the plant and the controls. The start-up checklist must be
+complete before Run starts a pulse:
+
+1. the vessel pumped down;
+2. the magnets cold (Liquid Helium for the full field, Liquid Nitrogen for 40% of it);
+3. the field up;
+4. the solenoid charged;
+5. heating ready;
+6. fuelling ready.
+
+The plasma is a 0-D model stepped once a second: confinement from IPB98(y,2), fusion from the D-T and D-He3
+reactivities, and the Greenwald density, beta and q95 limits. A pulse lasts as long as the solenoid's flux. Its heat
+leaves as Hot Coolant and Hot Lead-Lithium for Steam Generators (High-Pressure Steam, for Nuclear Steam Turbines): about
+3.5M FE/t at R3 (two full-size turbines) and 23.5M FE/t at R7 (ten), on 50 MW of heating (`fusion.reactor.huPerMegawatt`).
+
+**The helium loop.** Fill the coolant tank with Helium instead of Water and the wall comes out as **Hot Helium** (100 HU
+a mB), which also takes the blanket heat the Lead-Lithium can't. A **Helium Gas Turbine** runs on it straight: a hollow
+5×5 tube of Helium Turbine Casings (Arcforged tier), 15 to 31 long, taking up to 116 mB/t a section at 800 FE a mB
+(about 8M FE/t at full size) and sending the Helium back out of its Output ports. The largest reactor runs on four.
+
+Repeat restarts a pulse when the last one ends. **Fast Shutdown** ends the plasma at once. Redstone and the machine
+control API (docs/API.md) can drive it too.
+
+**What goes wrong.**
+
+- **Disruptions** from too much density, beta or current, or from vertical drift. They wear the First Wall and
+  Divertor, and runaway electrons can open a vacuum leak.
+- **Quenches** if the coils warm up. Quench Protection Units spare the coils.
+- **Overheating** when the coolant runs short.
+- **Tritium release**, which lands as fallout.
+- **Neutrons**, a radiation channel of their own. Water, concrete and the blanket stop them, lead hardly does, and no
+  Hazmat Suit does.
+- **Activation**: worn parts become radioactive.
+
+The **Remote Handling Arm**, mounted facing a Vessel Port, swaps worn parts for spares while the reactor is shut down.
+It returns **Activated Components** for the Geological Repository.
+
+**The Tritium Plant** (3–7 across, 3–5 tall) separates the Cryopumps' **Fusion Exhaust** back into Deuterium, Tritium,
+Helium-3 and Helium. Tritium permeates out of ordinary tanks and cylinders; the **Tritium Canister** keeps it.
+
+Damage, quench damage and contamination can each be switched off under `fusion.reactor`.
 
 ### Fermenting
 

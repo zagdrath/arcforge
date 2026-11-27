@@ -157,6 +157,15 @@ public class PressurizedCylinderBlockEntity extends StorageBlockEntity {
         if (cylinder.isAutoEject() && cylinder.isRedstoneEnabled()) {
             cylinder.pushGas(level, pos);
         }
+        // Tritium permeates out of it (see Tritium.leak); a creative cylinder keeps it.
+        if (level.getGameTime() % 20 == 0 && !cylinder.isCreative() && cylinder.tank.getAmount() > 0) {
+            int lost = net.zagdrath.arcforge.fusion.Tritium.leak(level, net.minecraft.world.phys.Vec3.atCenterOf(pos), cylinder.tank.getResource(0),
+                    cylinder.tank.getAmount());
+            if (lost > 0) {
+                int left = cylinder.tank.getAmount() - lost;
+                cylinder.tank.set(0, left > 0 ? cylinder.tank.getResource(0) : FluidResource.EMPTY, Math.max(0, left));
+            }
+        }
         cylinder.updateState(level, pos, state);
     }
 

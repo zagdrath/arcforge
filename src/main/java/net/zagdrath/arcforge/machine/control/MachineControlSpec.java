@@ -282,6 +282,12 @@ public final class MachineControlSpec<T extends BlockEntity> {
             return this;
         }
 
+        // A reading the machine reports, as an integer option no write changes (setOption returns REJECTED): fixed-point
+        // values whose scale docs/API.md gives.
+        public Builder<T> reading(String id, ToIntFunction<T> get) {
+            return intOption(id, Integer.MIN_VALUE, Integer.MAX_VALUE, get, (be, value) -> {});
+        }
+
         // For a machine without a redstone mode.
         public Builder<T> noRedstone() {
             redstone = false;

@@ -1,0 +1,22 @@
+{
+  "title": "Fusion Maintenance",
+  "icon": "arcforge:remote_handling_arm",
+  "items": [
+    "arcforge:remote_handling_arm",
+    "arcforge:activated_component"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "# Wear\nThe First Wall and the Divertor wear with the heat through them (the divertor four times faster), and a worn wall dirties the plasma. The blanket wears with its neutrons, breeding less as it goes. A reactor won't start with its wall or divertor worn out.\n# Activation\nNeutrons make the reactor's steel radioactive. It glows strongly for a minute after a pulse, then settles to a long-lived level that builds up with every pulse."
+    },
+    {
+      "type": "text",
+      "text": "# Remote Handling Arm\nSet it against a Vessel Port, facing the reactor, with spare First Wall, Divertor Cassettes, Breeding Blanket and coils in its nine input slots. While the reactor is shut down (no plasma, the field off) it works through the port, one job every 2 seconds at 80 FE/t: it reseals a leak, repairs damaged coils, then replaces the most worn parts. What it takes out comes out as Activated Components."
+    },
+    {
+      "type": "text",
+      "text": "# Activated Components\nRadioactive by the neutrons they took; their activity falls with time. Keep them shielded, or send them to a Geological Repository with the rest of your waste.\n# Neutron radiation\nWhile it burns, a reactor sends out neutrons (D-T far more than D-He3). Lead hardly stops them: water, concrete and the lithium blanket do. A Hazmat Suit doesn't, and the Geiger Counter shows them on a line of their own. Surround the hall with concrete or water."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/fusion/tritium_extraction_unit_front",
+    "south": "arcforge:block/fusion/tritium_extraction_unit_side",
+    "east": "arcforge:block/fusion/tritium_extraction_unit_side",
+    "west": "arcforge:block/fusion/tritium_extraction_unit_side",
+    "up": "arcforge:block/fusion/tritium_extraction_unit_top",
+    "down": "arcforge:block/fusion/tritium_extraction_unit_top",
+    "particle": "arcforge:block/fusion/tritium_extraction_unit_side"
+  }
+}

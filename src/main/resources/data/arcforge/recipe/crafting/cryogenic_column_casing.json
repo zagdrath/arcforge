@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SAS",
+    "APA",
+    "SAS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "A": "#c:plates/nickel",
+    "P": "arcforge:steel_pipe"
+  },
+  "result": {
+    "id": "arcforge:cryogenic_column_casing",
+    "count": 4
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "GVG",
+    "SRS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "P": "minecraft:piston",
+    "G": "#c:gears/steel",
+    "V": "arcforge:vessel_port",
+    "R": "arcforge:steel_pipe"
+  },
+  "result": {
+    "id": "arcforge:pellet_injector",
+    "count": 1
+  }
+}

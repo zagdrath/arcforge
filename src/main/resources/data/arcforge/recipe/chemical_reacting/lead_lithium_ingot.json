@@ -1,0 +1,27 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "#c:ingots/lead",
+    "count": 4
+  },
+  "second_item_input": {
+    "ingredient": "arcforge:lithium_6_fluoride",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:hydrogen",
+      "amount": 100
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:lead_lithium_ingot",
+    "count": 4
+  },
+  "fluid_byproduct": {
+    "id": "arcforge:hydrofluoric_acid",
+    "amount": 100
+  },
+  "time": 200,
+  "energy_per_tick": 120
+}

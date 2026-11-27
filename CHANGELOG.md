@@ -22,11 +22,69 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
-Suggested version: **2.10.0** (minor: the mercury line, from vanilla Cinnabar to Mercury, amalgams and the Mercury
-Vapour Lamp, plus the Long Fall Boots slot, carried Battery charging and the Quantum Tunnel Upgrades tab).
+Suggested version: **2.10.0** (minor: the fusion tier with its cryogenics, tritium and helium loop, and the mercury
+line, from vanilla Cinnabar to Mercury, amalgams and the Mercury Vapour Lamp, plus the Long Fall Boots slot, carried
+Battery charging and the Quantum Tunnel Upgrades tab).
 
 ### Added
 
+- **The fusion tier** (the **Arcforge: Fusion** creative tab, the Handbook's Fusion chapter and a Fusion quest chapter
+  after Nuclear Power). A tokamak **Fusion Reactor** one tier above the Fission Reactor, run by a 0-D plasma model
+  stepped once a second (IPB98(y,2) confinement, D-T and D-He3 reactivities, the Greenwald, beta and q95 limits,
+  vertical stability, flux-limited pulses), giving about 3.5M FE/t at the smallest size (two Nuclear Steam Turbines) and
+  23.5M FE/t at the largest (ten) through Steam Generators.
+  - **Fuels and gases**: Deuterium (electrolysed from Heavy Water), Tritium, Helium, Helium-3, Argon and Fusion
+    Exhaust. Some natural gas caps are **helium-rich** (`world.oilDeposits.heliumRichChance`): their wellheads give Helium-Rich
+    Natural Gas.
+  - **Lithium-6**: the **Lithium Isotope Separator** enriches Lithium Fluoride a step a pass (Enriched Lithium
+    Fluoride, then **Lithium-6 Fluoride**). It makes **Lithium Target Rods** for the Fission Reactor, which breed
+    tritium (a mild poison). The **Tritium Extraction Unit** bakes them out with heat. Lead and Lithium-6 Fluoride make
+    **Lead-Lithium**, the blanket's coolant and breeder.
+  - **Cryogenics**: the **Cryogenic Plant** (a 3–7 cold box) liquefies Nitrogen and Helium. The **Cryogenic
+    Distillation Column** (3×3, 6–16 tall, a refinery-style tower with platforms) distils air into Nitrogen, Oxygen and Argon, and Helium-Rich Natural
+    Gas into Natural Gas and Helium. Liquid Nitrogen and Liquid Helium boil off out of every tank except the new
+    **Cryogenic Tank**.
+  - **Superconducting magnets**: Arcite-Tungsten Wire (pressed), Superconducting Tape (sintered) and Superconducting
+    Coils. These make the Toroidal Field, Poloidal Field and Central Solenoid coils and the Stellarator Coil.
+  - **The tokamak**: a compact ring of major radius 3 to 7, laid out in layers round its axis: the Central Solenoid, the
+    First Wall and Divertor round the plasma chamber, the Breeding Blanket as its outer wall, the field coils closing it
+    top and bottom, and a Cryostat wall of Cryostat Casing with Vessel Ports and Reactor Glass viewports. The footprint
+    runs from 9×9×9 to 17×17×13. Its model shows the plated cryostat, and the plasma glows
+    through the windows while it burns. Built with Stellarator Coils, it is a **Stellarator** instead: steady, with
+    no current and no disruptions, but weaker confinement.
+  - **Port modules** on Vessel Ports: the Neutral Beam Injector, Gyrotron, Pellet Injector, Gas Puff Valve, Cryopump,
+    Diagnostics Port and **Direct Energy Converter** (it catches the plasma's charged-particle outflow, up to 250 MW, and
+    makes FE of it at half again the thermal route's rate; D-He3 sends almost all its power that way).
+  - **Running it**: a control desk with three pages (Plasma, Plant, Control), a start-up checklist, setpoints,
+    D-T or D-He3, Repeat, redstone, the machine control API, and **Fast Shutdown**. Alarms cover density, beta,
+    vertical drift, pulse end, vacuum, coolant, magnets, wear, disruptions, quenches and tritium release.
+  - **Failures and maintenance**:
+    - **Disruptions** wear the wall, and runaway electrons can burn through and leak the vacuum.
+    - **Quenches** damage coils unless **Quench Protection Units** take the energy.
+    - Loss of coolant overheats the reactor, and tritium can be released.
+    - Parts wear and become neutron-activated. The **Remote Handling Arm** swaps worn parts through a Vessel Port while
+      the reactor is shut down and gives back **Activated Components**, which the Geological Repository stores.
+  - **The Tritium Plant** (3–7 across, 3–5 tall) separates Fusion Exhaust into Deuterium, Tritium, Helium-3 and
+    Helium. Tritium decays to Helium-3 wherever it's stored. It permeates out of ordinary tanks, Pressurized
+    Cylinders, canisters and cartridges as contamination; the double-walled **Tritium Canister** keeps it.
+  - **Neutrons** from a burning plasma are their own radiation channel. Light nuclei shield them (water, concrete, a
+    breeding blanket), lead hardly does, and a Hazmat Suit doesn't stop them. The Geiger Counter shows them on a line
+    of their own. `fusion.reactor.neutronEffectsOnMobs` decides whether mobs take the dose.
+  - **Power and balance**: each MW of fusion heat is 1,500 HU/t (`huPerMegawatt`), and the blanket's Hot Lead-Lithium
+    boils High-Pressure Steam, so a plant runs on Nuclear Steam Turbines like a Fission Reactor. On 50 MW of heating:
+    about 270 MW of fusion at major radius 3 (Q 5, 3.5M FE/t, a pulse about 6 minutes) to 2,050 MW at 7 (Q 40, 23.5M
+    FE/t, a pulse over 100 minutes). The largest tokamak's field is 6 T (`fieldLarge`), so every size makes more than the one below it.
+    A pulse's planned ramp-down ends it cleanly instead of reading as a radiative collapse.
+    The magnets cost about 260 Superconducting Coils (1,060 arcite) for the smallest tokamak and 1,130 (4,500) for the
+    largest: a coil is four tapes, three coils make a Toroidal or Poloidal Field Coil, six a Central Solenoid block.
+  - **The helium loop and the Helium Gas Turbine**: Helium in the reactor's coolant tank comes out as the new **Hot
+    Helium** gas (100 HU a mB, `fusion.hotHeliumHeat`), taking the wall's heat and whatever of the blanket's the
+    Lead-Lithium can't. The **Helium Gas Turbine** (a hollow 5×5 tube of Arcforged-tier Helium Turbine Casings, 15–31
+    long, drawn as a closed-cycle turbine-generator set with its compressor, precooler, recuperator and power turbines)
+    takes up to 116 mB/t a section at 800 FE a mB (about 8M FE/t at full size) and sends the Helium back out. The
+    largest reactor runs on four of them where the steam route needs ten Nuclear Steam Turbines. Config under
+    `heliumGasTurbine`.
+  - JEI categories, Jade lines, machine control API options (docs/API.md), config under `fusion`, and GameTests.
 - **The mercury line: a use for vanilla Cinnabar.** The Arc Crusher (and its Array) crushes Cinnabar into 2 Cinnabar Dust
   and its other blocks into 1; one dust crafts into 2 Red Dye. Roasted with Oxygen in the Chemical Reactor at 600°C or
   more, Cinnabar Dust gives **Mercury** and **Sulfur Dioxide**, and Sulfur Dioxide, Oxygen and Water make Sulfuric Acid
@@ -63,6 +121,9 @@ Vapour Lamp, plus the Long Fall Boots slot, carried Battery charging and the Qua
   Trichlorosilane, Sulfur Dioxide from roasting) can be piped away as well as pushed out.
 - The Chunk Loader's radius − and + buttons are smaller, with the Show area button beside them.
 - Long Fall Boots' charge bar is the Arcforged gear's cyan.
+- `arcforge:radiation_shielding` entries take an optional `neutron_transmission`. Lead, concrete, water, steel and
+  the reactor blocks have neutron figures.
+- Seismic surveys report helium-rich gas caps.
 
 ### Changed
 

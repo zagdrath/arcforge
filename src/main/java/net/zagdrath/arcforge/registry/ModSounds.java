@@ -72,6 +72,12 @@ public final class ModSounds {
     // A Fission Reactor's alarm klaxon (see ReactorAlarm): heard a long way off.
     public static final DeferredHolder<SoundEvent, SoundEvent> REACTOR_ALARM = loop("reactor_alarm", 48.0F);
 
+    // A Fusion Reactor's plasma: the magnets' and power supplies' deep hum under the heating's whine (see
+    // FusionReactorSound), louder with its fusion power.
+    public static final DeferredHolder<SoundEvent, SoundEvent> FUSION_REACTOR_RUN = loop("fusion_reactor_run", 32.0F);
+    // The cryogenic machines' compressors and cold boxes (the Cryogenic Plant, the Cryogenic Distillation Column).
+    public static final DeferredHolder<SoundEvent, SoundEvent> CRYOGENIC_PLANT_RUN = loop("cryogenic_plant_run", 24.0F);
+
     private ModSounds() {}
 
     private static DeferredHolder<SoundEvent, SoundEvent> loop(String name, float range) {

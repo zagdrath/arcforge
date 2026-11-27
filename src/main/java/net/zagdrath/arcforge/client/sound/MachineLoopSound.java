@@ -84,6 +84,9 @@ public class MachineLoopSound extends AbstractTickableSoundInstance {
         LOOPS.put(ModBlocks.OIL_DERRICK_CONTROLLER.get(), new Loop(ModSounds.OIL_DERRICK_RUN::get, 0.9F));
         LOOPS.put(ModBlocks.PUMPJACK_CONTROLLER.get(), new Loop(ModSounds.PUMPJACK_RUN::get, 0.8F));
         LOOPS.put(ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(), new Loop(ModSounds.DISTILLATION_ARRAY_RUN::get, 0.8F));
+        LOOPS.put(ModBlocks.CRYOGENIC_PLANT_CONTROLLER.get(), new Loop(ModSounds.CRYOGENIC_PLANT_RUN::get, 0.7F));
+        LOOPS.put(ModBlocks.CRYOGENIC_COLUMN_CONTROLLER.get(), new Loop(ModSounds.CRYOGENIC_PLANT_RUN::get, 0.5F));
+        LOOPS.put(ModBlocks.TRITIUM_PLANT_CONTROLLER.get(), new Loop(ModSounds.CRYOGENIC_PLANT_RUN::get, 0.5F));
     }
 
     // Called every client tick by each machine that has a loop (see MachineSounds.clientHook).

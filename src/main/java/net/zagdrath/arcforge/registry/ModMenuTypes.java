@@ -154,12 +154,28 @@ public final class ModMenuTypes {
             MENU_TYPES.register("battery_array", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.BatteryArrayMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.CentrifugeCascadeMenu>> CENTRIFUGE_CASCADE =
             MENU_TYPES.register("centrifuge_cascade", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.CentrifugeCascadeMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.fusion.LithiumIsotopeSeparatorMenu>> LITHIUM_ISOTOPE_SEPARATOR =
+            MENU_TYPES.register("lithium_isotope_separator", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.fusion.LithiumIsotopeSeparatorMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.fusion.TritiumExtractionUnitMenu>> TRITIUM_EXTRACTION_UNIT =
+            MENU_TYPES.register("tritium_extraction_unit", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.fusion.TritiumExtractionUnitMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.fusion.RemoteHandlingArmMenu>> REMOTE_HANDLING_ARM =
+            MENU_TYPES.register("remote_handling_arm", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.fusion.RemoteHandlingArmMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.fusion.FusionPlantMenu>> CRYOGENIC_PLANT = MENU_TYPES.register("cryogenic_plant", () -> IMenuTypeExtension.create(
+            (id, inventory, buf) -> net.zagdrath.arcforge.menu.fusion.FusionPlantMenu.client(net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity.Kind.CRYOGENIC_PLANT, id, inventory, buf)));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.fusion.FusionPlantMenu>> CRYOGENIC_COLUMN = MENU_TYPES.register("cryogenic_column", () -> IMenuTypeExtension.create(
+            (id, inventory, buf) -> net.zagdrath.arcforge.menu.fusion.FusionPlantMenu.client(net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity.Kind.CRYOGENIC_COLUMN, id, inventory, buf)));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.fusion.FusionPlantMenu>> TRITIUM_PLANT = MENU_TYPES.register("tritium_plant", () -> IMenuTypeExtension.create(
+            (id, inventory, buf) -> net.zagdrath.arcforge.menu.fusion.FusionPlantMenu.client(net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity.Kind.TRITIUM_PLANT, id, inventory, buf)));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.fusion.FusionReactorMenu>> FUSION_REACTOR =
+            MENU_TYPES.register("fusion_reactor", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.fusion.FusionReactorMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.FissionReactorMenu>> FISSION_REACTOR =
             MENU_TYPES.register("fission_reactor", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.FissionReactorMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.SteamGeneratorMenu>> STEAM_GENERATOR =
             MENU_TYPES.register("steam_generator", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.SteamGeneratorMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.NuclearSteamTurbineMenu>> NUCLEAR_STEAM_TURBINE =
             MENU_TYPES.register("nuclear_steam_turbine", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.NuclearSteamTurbineMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.HeliumGasTurbineMenu>> HELIUM_GAS_TURBINE =
+            MENU_TYPES.register("helium_gas_turbine", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.HeliumGasTurbineMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.HeavyWaterTowerMenu>> HEAVY_WATER_TOWER =
             MENU_TYPES.register("heavy_water_tower", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.HeavyWaterTowerMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.PurexMenu>> PUREX_PLANT =

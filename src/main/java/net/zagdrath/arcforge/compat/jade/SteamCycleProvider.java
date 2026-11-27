@@ -19,12 +19,14 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.CondenserArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SuperheaterArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.CondenserArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.HeliumGasTurbineBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SuperheaterArrayBlockEntity;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
+import net.zagdrath.arcforge.steam.HeliumTurbineLayout;
 import net.zagdrath.arcforge.steam.NuclearTurbineLayout;
 import net.zagdrath.arcforge.steam.SteamGrade;
 import net.zagdrath.arcforge.steam.TurbineLayout;
@@ -48,7 +50,7 @@ public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor
 
     public static final Identifier UID = Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_cycle");
 
-    public enum Kind { SUPERHEATER, CONDENSER, TURBINE, BOILER, NUCLEAR_TURBINE }
+    public enum Kind { SUPERHEATER, CONDENSER, TURBINE, BOILER, NUCLEAR_TURBINE, HELIUM_TURBINE }
 
     // Superheater: a = the input grade (-1 none), b = the grade made (-1 passing through), c = mB/t, d = °C.
     // Condenser: c = mB/t condensed. Turbine: a = 1 with an Exhaust port, b = 1 with the vacuum bonus, c = mB of exhaust,
@@ -57,6 +59,8 @@ public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor
     // Nuclear turbine: a = 1 with an Exhaust port, plus 2 while tripped; b = the steam coming in (mB/t), c = its minimum
     // flow (mB/t), d = the NuclearTurbineLayout.Part the block shows, plus 1 (0 unknown), its Spot times 16, its
     // low-pressure casing's number times 256 and how many there are times 4096.
+    // Helium turbine: b = the Hot Helium coming in (mB/t), c = its rated flow (mB/t), d = the HeliumTurbineLayout.Part the
+    // block shows, plus 1 (0 unknown), its Spot times 16, its power turbine's number times 256 and how many times 4096.
     public record Data(int kind, int a, int b, int c, int d) {
         public static final StreamCodec<RegistryFriendlyByteBuf, Data> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, Data::kind,
@@ -110,6 +114,18 @@ public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor
             }
             return new Data(Kind.NUCLEAR_TURBINE.ordinal(), (turbine.hasExhaust() ? 1 : 0) | (turbine.isTripped() ? 2 : 0),
                     (int) Math.round(turbine.getInflow()), turbine.minFlow(), where);
+        }
+        var heliumMaster = blockEntity instanceof HeliumGasTurbineBlockEntity casing ? casing.getMaster() : null;
+        if (heliumMaster instanceof HeliumGasTurbineBlockEntity turbine) {
+            int where = 0;
+            ShellStructure.Shell shell = turbine.getShell();
+            if (shell != null && shell.contains(accessor.getPosition())) {
+                HeliumTurbineLayout layout = HeliumTurbineLayout.of(shell, turbine.getFacing());
+                int u = TurbineLayout.blockU(shell, accessor.getPosition());
+                where = layout.partAt(shell, accessor.getPosition()).ordinal() + 1 | layout.spotAt(shell, accessor.getPosition()).ordinal() << 4
+                        | layout.turbineNumberAt(u) << 8 | layout.turbineCount() << 12;
+            }
+            return new Data(Kind.HELIUM_TURBINE.ordinal(), 0, (int) Math.round(turbine.getInflow()), turbine.maxFlow(), where);
         }
         return null;
     }
@@ -173,6 +189,23 @@ public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor
                         if ((data.a() & 1) == 0) {
                             tooltip.add(Component.translatable("gui.arcforge.turbine.venting").withStyle(ChatFormatting.GRAY));
                         }
+                    }
+                    case HELIUM_TURBINE -> {
+                        int part = (data.d() & 15) - 1;
+                        if (part >= 0 && part < HeliumTurbineLayout.Part.values().length) {
+                            int number = data.d() >> 8 & 15, of = data.d() >> 12 & 15;
+                            HeliumTurbineLayout.Part named = HeliumTurbineLayout.Part.values()[part];
+                            Component name = number > 0 && of > 1 && named == HeliumTurbineLayout.Part.POWER_TURBINE
+                                    ? Component.translatable("arcforge.helium_gas_turbine.part.power_turbine_numbered", number, of)
+                                    : Component.translatable(named.translationKey());
+                            tooltip.add(Component.translatable("jade.arcforge.turbine.section", name).withStyle(ChatFormatting.GRAY));
+                        }
+                        int spot = data.d() >> 4 & 15;
+                        if (spot > 0 && spot < HeliumTurbineLayout.Spot.values().length) {
+                            tooltip.add(Component.translatable(HeliumTurbineLayout.Spot.values()[spot].translationKey()).withStyle(ChatFormatting.GRAY));
+                        }
+                        tooltip.add(Component.translatable("jade.arcforge.helium_turbine.inflow", display.humanReadableNumber(data.b(), "", false),
+                                display.humanReadableNumber(data.c(), "", false)).withStyle(ChatFormatting.GRAY));
                     }
                     case TURBINE -> {
                         int part = (data.d() & 15) - 1;

@@ -43,6 +43,8 @@ public final class ReactorSim {
         public double fissionProducts; // 0 .. 1 (their absorption scales with it)
         public double power;           // its relative power now (for decay heat when it comes out)
         public boolean thorium;
+        // A Lithium Target Rod: no fuel, a mild poison; its burnup is the share of its lithium-6 bred to tritium.
+        public boolean lithium;
 
         public Rod(double enrichment) {
             this.enrichment = enrichment;
@@ -370,6 +372,9 @@ public final class ReactorSim {
             if (rod == null) {
                 lattice.set(cell, CoreLattice.Cell.COOLANT, -1);
                 lattice.setFuel(cell, 0.0, 0.0);
+            } else if (rod.lithium) {
+                lattice.set(cell, CoreLattice.Cell.FUEL, -1);
+                lattice.setFuel(cell, 0.0, p.fissionProductWorth * p.lithiumAbsorption * (1.0 - rod.burnup));
             } else {
                 lattice.set(cell, CoreLattice.Cell.FUEL, -1);
                 lattice.setFuel(cell, rod.fissile(p), p.fissionProductWorth * rod.fissionProducts);
@@ -687,6 +692,11 @@ public final class ReactorSim {
                 }
                 // A rod's fission products stay in it; a salt's build up until the Salt Processing Unit takes them out.
                 rod.fissionProducts = lattice.saltCore ? Math.min(1.0, rod.fissionProducts + db) : rod.burnup;
+            }
+            // A Lithium Target Rod breeds tritium from the flux it sits in, its lithium-6 used up as it does.
+            if (rod.lithium && power > 0.0 && !rod.isSpent()) {
+                double flux = meanFlux > 0.0 ? lattice.flux(cell) / meanFlux : 0.0;
+                rod.burnup = Math.min(1.0, rod.burnup + p.lithiumBreeding * power * flux);
             }
             // Thorium breeds U-233 from the flux it sits in (more in a fast core), up to a few percent.
             if (rod.thorium && power > 0.0) {

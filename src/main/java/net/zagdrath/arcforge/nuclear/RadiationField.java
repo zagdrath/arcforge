@@ -61,14 +61,31 @@ import net.zagdrath.arcforge.registry.ModDataMaps;
 //    count;
 //  - an entity's own inventory (and armour) counts as being radiation.inventoryDistance away (half a block: four times
 //    the rate at one block), unshielded; a Hazmat Suit cuts only what comes from outside.
+//  - a running fusion plasma's neutrons (RadiationSource.neutronRate) are a source of their own, shielded by each
+//    block's neutron transmission instead (light nuclei stop them: water, concrete, a breeding blanket; lead hardly),
+//    and no Hazmat Suit stops them;
 // Each chunk's sources are found when first asked for and kept for radiation.chunkCacheTicks: radioactive blocks only
 // in sections whose palette holds one, grouped into 4x4x4 cells (their summed rate at their centroid) so a vein is one
 // source; block entities one each (a reservoir's blocks a share each of what it holds). The strongest
 // radiation.maxSources (by unshielded rate) are traced through the blocks; the rest are left out.
 public final class RadiationField {
     // A source: its middle (block coordinates), its rate at a block, and what holds it (a block entity's handler or
-    // container, so one store seen from two chunks counts once; null for blocks and entities).
-    public record Source(double x, double y, double z, double rate, @Nullable Object owner) {}
+    // container, so one store seen from two chunks counts once; null for blocks and entities). neutron: a fusion
+    // plasma's neutrons, shielded by the blocks' neutron transmission.
+    public record Source(double x, double y, double z, double rate, @Nullable Object owner, boolean neutron) {
+        public Source(double x, double y, double z, double rate, @Nullable Object owner) {
+            this(x, y, z, rate, owner, false);
+        }
+    }
+
+    // A dose rate split into what a Hazmat Suit cuts (gamma and beta) and what it doesn't (neutrons).
+    public record Dose(double gamma, double neutron) {
+        public static final Dose NONE = new Dose(0.0, 0.0);
+
+        public double total() {
+            return gamma + neutron;
+        }
+    }
 
     private record Cached(long time, List<Source> sources) {}
 
@@ -178,19 +195,24 @@ public final class RadiationField {
 
     // What one block lets through (0 to 1).
     public static double transmission(BlockGetter level, BlockPos pos) {
+        return transmission(level, pos, false);
+    }
+
+    // The same, of neutrons (see RadiationShielding.neutronTransmission) or gamma.
+    public static double transmission(BlockGetter level, BlockPos pos, boolean neutron) {
         BlockState state = level.getBlockState(pos);
         if (state.isAir()) {
             return 1.0;
         }
         RadiationShielding shielding = shielding(state.getBlock());
         if (shielding != null) {
-            return shielding.transmission();
+            return shielding.transmission(neutron);
         }
         // A waterlogged block, or a liquid: the liquid's block's entry (water's for water).
         if (!state.getFluidState().isEmpty()) {
             RadiationShielding liquid = shielding(state.getFluidState().createLegacyBlock().getBlock());
             if (liquid != null) {
-                return liquid.transmission();
+                return liquid.transmission(neutron);
             }
         }
         return state.isSolid() ? ArcforgeConfig.RADIATION_DEFAULT_SHIELDING.getAsDouble() : 1.0;
@@ -203,6 +225,10 @@ public final class RadiationField {
     // What gets through every block on the straight line from a to b, leaving out the blocks a and b are in. Walks the
     // blocks the line passes through (Amanatides and Woo).
     public static double shielding(BlockGetter level, Vec3 a, Vec3 b) {
+        return shielding(level, a, b, false);
+    }
+
+    public static double shielding(BlockGetter level, Vec3 a, Vec3 b, boolean neutron) {
         int x = floor(a.x), y = floor(a.y), z = floor(a.z);
         int endX = floor(b.x), endY = floor(b.y), endZ = floor(b.z);
         double dx = b.x - a.x, dy = b.y - a.y, dz = b.z - a.z;
@@ -230,7 +256,7 @@ public final class RadiationField {
             if (x == endX && y == endY && z == endZ) {
                 break;
             }
-            through *= transmission(level, pos.set(x, y, z));
+            through *= transmission(level, pos.set(x, y, z), neutron);
             if (through < OPAQUE) {
                 return 0.0;
             }
@@ -244,10 +270,13 @@ public final class RadiationField {
 
     // --- The field ---
 
-    // The dose rate (mSv/h) an entity takes now: what's round it, cut by its Hazmat Suit, plus what it carries.
+    // The dose rate (mSv/h) an entity takes now: what's round it, cut by its Hazmat Suit (neutrons go through it), plus
+    // what it carries. Mobs take a fusion plasma's neutrons only with fusion.reactor.neutronEffectsOnMobs.
     public static double doseRate(ServerLevel level, LivingEntity entity) {
         Vec3 at = entity.position().add(0.0, entity.getBbHeight() * 0.5, 0.0);
-        double outside = doseRateAt(level, at, entity) * HazmatSuit.transmission(entity);
+        Dose round = doseAt(level, at, entity);
+        double neutron = entity instanceof Player || ArcforgeConfig.FUSION_NEUTRON_MOBS.getAsBoolean() ? round.neutron() : 0.0;
+        double outside = round.gamma() * HazmatSuit.transmission(entity) + neutron;
         double distance = ArcforgeConfig.RADIATION_INVENTORY_DISTANCE.getAsDouble();
         return outside + carried(entity) / Math.max(MIN_DISTANCE_SQR, distance * distance);
     }
@@ -256,11 +285,17 @@ public final class RadiationField {
     // sources round it, the fallout on the ground there (see Fallout) and a containment's radioactive air (see
     // Containments).
     public static double doseRateAt(ServerLevel level, Vec3 at, @Nullable LivingEntity self) {
-        return sourcesAt(level, at, self) + net.zagdrath.arcforge.nuclear.safety.Fallout.ambient(level, at)
-                + net.zagdrath.arcforge.nuclear.safety.Containments.airDose(level, BlockPos.containing(at));
+        return doseAt(level, at, self).total();
     }
 
-    private static double sourcesAt(ServerLevel level, Vec3 at, @Nullable LivingEntity self) {
+    // The same, its neutrons apart (what the Geiger Counter shows on its second line).
+    public static Dose doseAt(ServerLevel level, Vec3 at, @Nullable LivingEntity self) {
+        Dose sources = sourcesAt(level, at, self);
+        return new Dose(sources.gamma() + net.zagdrath.arcforge.nuclear.safety.Fallout.ambient(level, at)
+                + net.zagdrath.arcforge.nuclear.safety.Containments.airDose(level, BlockPos.containing(at)), sources.neutron());
+    }
+
+    private static Dose sourcesAt(ServerLevel level, Vec3 at, @Nullable LivingEntity self) {
         int radius = ArcforgeConfig.RADIATION_RADIUS.getAsInt();
         double radiusSqr = (double) radius * radius;
         List<Source> sources = new ArrayList<>();
@@ -297,7 +332,7 @@ public final class RadiationField {
             }
         }
         if (sources.isEmpty()) {
-            return 0.0;
+            return Dose.NONE;
         }
         // The strongest first, by their unshielded rate here.
         int most = ArcforgeConfig.RADIATION_MAX_SOURCES.getAsInt();
@@ -305,14 +340,19 @@ public final class RadiationField {
             sources.sort((p, q) -> Double.compare(unshielded(at, q), unshielded(at, p)));
             sources = sources.subList(0, most);
         }
-        double total = 0.0;
+        double gamma = 0.0, neutron = 0.0;
         for (Source source : sources) {
             double unshielded = unshielded(at, source);
             if (unshielded > 0.0) {
-                total += unshielded * shielding(level, at, new Vec3(source.x(), source.y(), source.z()));
+                double through = unshielded * shielding(level, at, new Vec3(source.x(), source.y(), source.z()), source.neutron());
+                if (source.neutron()) {
+                    neutron += through;
+                } else {
+                    gamma += through;
+                }
             }
         }
-        return total;
+        return new Dose(gamma, neutron);
     }
 
     private static double distanceSqr(Vec3 at, Source source) {
@@ -387,6 +427,11 @@ public final class RadiationField {
             Source source = source(level, blockEntity);
             if (source != null) {
                 found.add(source);
+            }
+            // A fusion plasma's neutrons, a source of their own (see RadiationSource.neutronRate).
+            if (blockEntity instanceof RadiationSource own && own.neutronRate() > 0.0) {
+                Vec3 at = own.radiationCentre();
+                found.add(new Source(at.x, at.y, at.z, own.neutronRate(), null, true));
             }
         }
         return List.copyOf(found);

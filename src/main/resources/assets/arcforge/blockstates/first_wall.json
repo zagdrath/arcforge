@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/fusion/first_wall"
+    },
+    "formed=true": {
+      "model": "arcforge:block/fusion/tokamak_hidden"
+    }
+  }
+}

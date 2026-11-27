@@ -55,8 +55,9 @@ import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 // cooled coolant (Water or Heavy Water again) goes back out of Output ports to the reactor's cold leg, the steam out of
 // Steam ports to Steam Turbine Arrays. Both are pushed into what touches the ports. The advanced cores' loops work it
 // the same way: a lead-bismuth fast reactor's Hot Lead-Bismuth (about 900 °C) boils it into Superheated Steam
-// (SUPERHEATED_FACTOR times the heat a mB), and a molten salt reactor's Hot Fuel Salt into High-Pressure Steam, each
-// going back out as Lead-Bismuth or Fuel Salt.
+// (SUPERHEATED_FACTOR times the heat a mB), and a molten salt reactor's Hot Fuel Salt and a fusion blanket's Hot
+// Lead-Lithium (fusion.reactor.hotLeadLithiumHeat HU a mB) into High-Pressure Steam, each going back out as Lead-Bismuth,
+// Fuel Salt or Lead-Lithium.
 public class SteamGeneratorBlockEntity extends VesselControllerBlockEntity {
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.STEAM);
     private static final Set<SideMode> PUSHED = EnumSet.of(SideMode.OUTPUT, SideMode.STEAM);
@@ -124,7 +125,7 @@ public class SteamGeneratorBlockEntity extends VesselControllerBlockEntity {
     // What comes in hot: a pressurized core's coolant, or an advanced core's loop.
     public static boolean isHot(FluidResource resource) {
         return resource.is(ModFluids.HOT_COOLANT.get()) || resource.is(ModFluids.HOT_HEAVY_WATER.get()) || resource.is(ModFluids.HOT_LEAD_BISMUTH.get())
-                || resource.is(ModFluids.HOT_FUEL_SALT.get());
+                || resource.is(ModFluids.HOT_FUEL_SALT.get()) || resource.is(ModFluids.HOT_LEAD_LITHIUM.get());
     }
 
     // What a hot fluid goes back out as, cooled.
@@ -138,12 +139,22 @@ public class SteamGeneratorBlockEntity extends VesselControllerBlockEntity {
         if (hot.isSame(ModFluids.HOT_FUEL_SALT.get())) {
             return ModFluids.FUEL_SALT.get();
         }
+        if (hot.isSame(ModFluids.HOT_LEAD_LITHIUM.get())) {
+            return ModFluids.LEAD_LITHIUM.get();
+        }
         return Fluids.WATER;
     }
 
-    // The steam a hot fluid boils feedwater into: Superheated from lead-bismuth, else High-Pressure.
+    // The steam a hot fluid boils feedwater into: Superheated from lead-bismuth, else High-Pressure (a fusion blanket's
+    // Hot Lead-Lithium too: its steam goes to the Nuclear Steam Turbine, which takes High-Pressure Steam only).
     public static Fluid steamFrom(Fluid hot) {
         return hot.isSame(ModFluids.HOT_LEAD_BISMUTH.get()) ? ModFluids.SUPERHEATED_STEAM.get() : ModFluids.HIGH_PRESSURE_STEAM.get();
+    }
+
+    // HU a mB of a hot fluid carries: the fission loops' hotCoolantHeat, a fusion blanket's Lead-Lithium its own.
+    public static double heatPerMb(Fluid hot) {
+        return hot.isSame(ModFluids.HOT_LEAD_LITHIUM.get()) ? ArcforgeConfig.FUSION_LEAD_LITHIUM_HEAT.getAsDouble()
+                : ArcforgeConfig.REACTOR_HOT_COOLANT_HEAT.getAsDouble();
     }
 
     public static MachineItemHandler clientItems() {
@@ -244,7 +255,7 @@ public class SteamGeneratorBlockEntity extends VesselControllerBlockEntity {
         if (steam.getAmount() > 0 && !steam.getResource(0).is(made)) {
             return MachineStatus.STEAM_FULL;
         }
-        double perHot = ArcforgeConfig.REACTOR_HOT_COOLANT_HEAT.getAsDouble();
+        double perHot = heatPerMb(hotFluid);
         double perSteam = ArcforgeConfig.STEAM_GENERATOR_STEAM_HEAT.getAsDouble() * (made == ModFluids.SUPERHEATED_STEAM.get() ? SUPERHEATED_FACTOR : 1.0);
         int amount = Math.min(Math.min(hot.getAmount(), maxHotPerTick()), cooled.getSpace());
         // Only as much as the feedwater and the steam tank can take.

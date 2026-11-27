@@ -71,6 +71,9 @@ public enum RefineryProvider implements StreamServerDataProvider<BlockAccessor, 
                 lines.add(left > 0 ? Component.translatable("jade.arcforge.gas_wellhead.left",
                         String.format(Locale.ROOT, "%,d", net.zagdrath.arcforge.oil.OilDeposits.roughBuckets(left)))
                         .withStyle(ChatFormatting.GRAY) : Component.translatable("jade.arcforge.gas_wellhead.spent").withStyle(ChatFormatting.GRAY));
+                if (deposit.heliumRich()) {
+                    lines.add(Component.translatable("jade.arcforge.gas_wellhead.helium").withStyle(ChatFormatting.AQUA));
+                }
             }
             return lines;
         }

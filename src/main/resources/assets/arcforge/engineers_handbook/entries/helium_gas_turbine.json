@@ -1,0 +1,25 @@
+{
+  "title": "Helium Gas Turbine",
+  "icon": "arcforge:helium_turbine_casing",
+  "items": [
+    "arcforge:helium_turbine_casing"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A closed-cycle gas turbine-generator for a helium-cooled Fusion Reactor: the hot gas drives it straight, with no boiler between, and goes back to the reactor to be heated again. It's smaller than a Nuclear Steam Turbine and makes more from each mB.\n# Building it\nA hollow 5×5 tube of Helium Turbine Casings (Arcforged tier), 15 to 31 blocks long along either horizontal axis, every block of its outside a casing. Form it and set its ports with the Wrench. Its front is a long side, with the walkway along it."
+    },
+    {
+      "type": "multiblock",
+      "structure": "helium_gas_turbine"
+    },
+    {
+      "type": "text",
+      "text": "# Gas and power\nIt takes Hot Helium only. Count its sections as for the Steam Turbine Array (a 5×5×15 is 41.7, a 5×5×31 86.1): it takes up to 116 mB/t a section (4,833 mB/t for a 5×5×15, 9,989 for a 5×5×31) at {fe:800} FE a mB, so a full-size one makes about 8M FE/t.\nEvery mB it takes leaves through its Output ports as Helium, for the reactor's coolant tank. It can't vent it: with nowhere for the Helium to go it stops, and the reactor's Hot Helium backs up behind it.\n# Speed\nIts shaft runs at 3,000 RPM whatever the load. It rolls up in about fifteen seconds and coasts down in about a minute. A gas turbine has no minimum flow: it runs on whatever comes."
+    },
+    {
+      "type": "text",
+      "text": "# Sizing\nA mB of Hot Helium carries 100 HU, so each MW of fusion heat (1,500 HU/t) is 15 mB/t. The smallest reactor's 355 MW is about 5,300 mB/t, a 5×5×17's worth; the largest, at about 2,350 MW, makes about 35,000 mB/t and wants four full-size turbines. Through steam the same heat would take ten Nuclear Steam Turbines.\n# The set\nFormed, it's one set on a raised deck: the front standard and starting motor, the compressor's plenum and the finned precooler beside it, the compressor narrowing stage by stage, a power turbine for every eight blocks of length (each fed by an insulated duct rising through the deck), the recuperator along the back with a crossover arching into it from each power turbine, and the generator.\n# Ports\nA new turbine starts with a Hot Helium port under each inlet duct, the Helium outlet under the compressor's discharge and an energy port under the terminal box, all on its underside."
+    }
+  ]
+}

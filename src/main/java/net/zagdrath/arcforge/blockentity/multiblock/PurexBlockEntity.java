@@ -99,7 +99,8 @@ public class PurexBlockEntity extends VesselControllerBlockEntity implements Rad
     public static Consumer<PurexBlockEntity> clientHook = plant -> {};
 
     public PurexBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntityTypes.PUREX_PLANT.get(), pos, state, MACHINE_SLOTS, (slot, resource) -> slot < INPUT_SLOTS && FuelRodItem.isFuelRod(resource.toStack(1)),
+        super(ModBlockEntityTypes.PUREX_PLANT.get(), pos, state, MACHINE_SLOTS, (slot, resource) -> slot < INPUT_SLOTS && FuelRodItem.isFuelRod(resource.toStack(1))
+                && !FuelRod.of(resource.toStack(1)).isLithiumTarget(),
                 SIDE_MODES);
         int fe = Math.max(1, ArcforgeConfig.PUREX_ENERGY.getAsInt());
         this.energy = new ConsumerEnergyHandler(fe * 1_000, fe * 10, this::setChanged);

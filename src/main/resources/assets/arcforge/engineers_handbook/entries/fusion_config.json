@@ -1,0 +1,13 @@
+{
+  "title": "Fusion Settings",
+  "icon": "arcforge:fusion_reactor_controller",
+  "items": [
+    "arcforge:fusion_reactor_controller"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Server settings (in the fusion section of the Arcforge config) change how hard fusion is:\n- reactor.disruptionBlockDamage: whether disruptions and runaways melt blocks out of the vessel.\n- reactor.quenchDamage: whether a quench without a Quench Protection Unit damages coils.\n- reactor.tritiumContamination: whether tritium releases contaminate their surroundings.\n- reactor.neutronEffectsOnMobs: whether neutrons dose mobs (players always).\n- reactor.huPerMegawatt: the heat each MW gives (the reactor's FE output).\n- reactor.dhe3Boost: how easily D-He3 burns.\n- tritium.halfLifeDays and tritium.leakPerMinute; cryogenics.boilOffPerMinute."
+    }
+  ]
+}

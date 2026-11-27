@@ -254,6 +254,29 @@
         "fast_reactor",
         "molten_salt_reactor"
       ]
+    },
+    {
+      "id": "fusion",
+      "title": "Fusion",
+      "icon": "arcforge:fusion_reactor_controller",
+      "description": "The tier above fission: fusion fuels and lithium-6, cryogenics, superconducting magnets, the tokamak and the stellarator, the tritium cycle, failures and maintenance.",
+      "entries": [
+        "fusion_overview",
+        "fusion_fuels",
+        "lithium_6",
+        "cryogenics",
+        "superconducting_magnets",
+        "fusion_reactor",
+        "stellarator",
+        "fusion_modules",
+        "fusion_operation",
+        "helium_gas_turbine",
+        "plasma_physics",
+        "tritium_plant",
+        "fusion_failures",
+        "fusion_maintenance",
+        "fusion_config"
+      ]
     }
   ]
 }

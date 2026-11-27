@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SCS",
+    "CTC",
+    "SCS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "C": "arcforge:superconducting_coil",
+    "T": "arcforge:toroidal_field_coil"
+  },
+  "result": {
+    "id": "arcforge:stellarator_coil",
+    "count": 2
+  }
+}

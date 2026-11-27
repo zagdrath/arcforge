@@ -1,0 +1,23 @@
+{
+  "title": "Fusion Fuels",
+  "icon": "arcforge:tritium_canister",
+  "items": [
+    "arcforge:tritium_canister",
+    "arcforge:lithium_target_rod",
+    "arcforge:tritium_extraction_unit"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "# Deuterium\nElectrolyse Heavy Water: 100 mB gives 200 mB of Deuterium and 100 mB of Oxygen.\n# Tritium\nRadioactive hydrogen; there is none in nature, so it's bred from lithium-6 by neutrons:\n- Lithium Target Rods in a running Fission Reactor (they sit in Fuel Channels and absorb neutrons like a weak control rod), baked out in the Tritium Extraction Unit.\n- The fusion reactor's own Breeding Blanket, once it runs: each tritium burnt breeds about 1.15 back."
+    },
+    {
+      "type": "text",
+      "text": "# Helium-3\nTritium decays to Helium-3 with a half-life of 120 days (in game). Stored tritium slowly turns into it, and the Tritium Plant and Tritium Canisters keep it apart. Burnt with deuterium it gives almost no neutrons.\n# Helium and Argon\nHelium comes from helium-rich natural gas, split in the Cryogenic Distillation Column; it's liquefied for the magnets. The same column splits air into Nitrogen, Oxygen and a little Argon.\n# Keeping tritium\nTritium seeps through ordinary walls: tanks, Pressurized Cylinders, canisters and Gas Cartridges lose 0.2% of it a minute into the air, contaminating it like fallout. The double-walled Tritium Canister (nickel and steel) keeps it, and keeps the Helium-3 it decays to apart."
+    },
+    {
+      "type": "text",
+      "text": "# Lithium Target Rod\nA Zircaloy Tube between two Lithium-6 Fluoride. Load it into a Fission Reactor's Fuel Channel like a fuel rod: at full power it is fully bred in about 20 minutes, and the reactor feels it as a mild poison.\n# Tritium Extraction Unit\nBakes the tritium out of a bred rod with heat: it must reach 600°C and uses 400 HU/t, 20 seconds a rod. A fully bred rod gives 1,000 mB of Tritium and 250 mB of Helium (less if partly bred), and its empty Zircaloy Tube back. Tritium leaves Gas Output faces, Helium By-product faces. It is double-walled: its tritium doesn't leak."
+    }
+  ]
+}

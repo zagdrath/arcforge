@@ -43,9 +43,10 @@ CHAPTERS = [
     ("ch_reactor_safety", "nuclear",    ["nuclear_power/fission_reactor"],        "Containment, emergency cooling and fallout"),
     ("ch_fuel_cycle",    "nuclear",     ["nuclear_power/fission_reactor"],        "Spent fuel, PUREX, MOX, thorium and waste"),
     ("ch_advanced_cores", "nuclear",    ["nuclear_power/fission_reactor"],        "Lead-bismuth fast reactors and molten salt"),
+    ("ch_fusion",        "fusion",      ["nuclear_power/fission_reactor"],        "Tokamaks, stellarators and the tritium cycle"),
 ]
 # Every group nests under one "Arcforge" heading (parent, from Hibiscus Quests' nested groups). A version without them
-# ignores parent and leaves the empty heading out, so the six groups show at the top level there.
+# ignores parent and leaves the empty heading out, so the seven groups show at the top level there.
 ROOT_GROUP = ("arcforge", "Arcforge", "arcforge:wrench")
 GROUPS = [
     ("foundations", "Foundations", "arcforge:steel_ingot"),
@@ -54,6 +55,7 @@ GROUPS = [
     ("chemistry", "Chemistry", "arcforge:chemical_reactor"),
     ("agriculture", "Agriculture", "arcforge:compost_bin"),
     ("nuclear", "Nuclear", "arcforge:reactor_controller"),
+    ("fusion", "Fusion", "arcforge:fusion_reactor_controller"),
 ]
 CREATIVE_ONLY = {"creative_fluid_tank", "creative_pressurized_cylinder", "creative_energy_cell", "creative_vault"}
 # Node shape and size per frame; circle at 1.0 is the chapter's default, so it's left out of the files.

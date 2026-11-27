@@ -65,6 +65,24 @@
     },
     "arcforge:flowing_hot_lead_bismuth": {
       "dose_rate": 0.3
+    },
+    "arcforge:tritium": {
+      "dose_rate": 0.05
+    },
+    "arcforge:flowing_tritium": {
+      "dose_rate": 0.05
+    },
+    "arcforge:fusion_exhaust": {
+      "dose_rate": 0.02
+    },
+    "arcforge:flowing_fusion_exhaust": {
+      "dose_rate": 0.02
+    },
+    "arcforge:hot_lead_lithium": {
+      "dose_rate": 0.1
+    },
+    "arcforge:flowing_hot_lead_lithium": {
+      "dose_rate": 0.1
     }
   }
 }

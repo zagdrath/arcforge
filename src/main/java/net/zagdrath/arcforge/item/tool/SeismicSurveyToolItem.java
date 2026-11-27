@@ -94,7 +94,7 @@ public class SeismicSurveyToolItem extends Item {
         int top = cavern != null ? cavern.topAt(pos.getX(), pos.getZ()) : Integer.MIN_VALUE;
         int y = top != Integer.MIN_VALUE ? top : deposit.y();
         return new SurveyRecord(dimension, pos.getX(), pos.getZ(), Optional.of(deposit.kind()), left > 0 ? OilDeposits.roughBuckets(left) : 0L, y,
-                caverns && deposit.sour(), caverns && deposit.gasCap());
+                caverns && deposit.sour(), caverns && deposit.gasCap(), caverns && deposit.gasCap() && deposit.heliumRich());
     }
 
     // The survey as a chat line.
@@ -111,11 +111,11 @@ public class SeismicSurveyToolItem extends Item {
                 .withStyle(ChatFormatting.GOLD);
     }
 
-    // "sweet" or "sour", and ", gas cap" when it has one.
+    // "sweet" or "sour", and ", gas cap" when it has one (", helium-rich gas cap" when its gas carries helium).
     public static Component traits(SurveyRecord survey) {
         MutableComponent traits = Component.translatable(survey.sour() ? "message.arcforge.survey.sour" : "message.arcforge.survey.sweet");
         if (survey.gasCap()) {
-            traits.append(Component.translatable("message.arcforge.survey.gas_cap"));
+            traits.append(Component.translatable(survey.helium() ? "message.arcforge.survey.helium_gas_cap" : "message.arcforge.survey.gas_cap"));
         }
         return traits;
     }

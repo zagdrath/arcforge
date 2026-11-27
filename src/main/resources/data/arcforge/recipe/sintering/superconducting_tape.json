@@ -1,0 +1,9 @@
+{
+  "type": "arcforge:sintering",
+  "ingredient": "arcforge:arcite_tungsten_wire",
+  "result": {
+    "id": "arcforge:superconducting_tape"
+  },
+  "time": 300,
+  "experience": 0.3
+}

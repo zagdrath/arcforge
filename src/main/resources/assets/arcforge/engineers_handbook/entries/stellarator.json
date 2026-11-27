@@ -1,0 +1,17 @@
+{
+  "title": "Stellarator",
+  "icon": "arcforge:stellarator_coil",
+  "items": [
+    "arcforge:stellarator_coil"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Build the same ring with Stellarator Coils where the Central Solenoid and the Toroidal Field Coils go: twisted coils that make the plasma's whole field themselves. The block on the axis at the midplane decides which kind of reactor it is.\n# Differences\n- No plasma current: no Central Solenoid to charge, no pulses (it runs as long as it's fed and heated), no disruptions and no vertical instability.\n- Its field is 90% of a tokamak's and it confines less well: about 60 to 70% of the power of a tokamak the same size.\n- Past its density or beta limit it doesn't disrupt; the plasma simply goes out."
+    },
+    {
+      "type": "multiblock",
+      "structure": "stellarator"
+    }
+  ]
+}

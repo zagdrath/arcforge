@@ -183,6 +183,12 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.Reprocessing(gui),
                 new MachineCategories.BatteryComponents(gui),
                 new MachineCategories.ElectricEnchanting(gui),
+                new FusionCategories.LithiumEnriching(gui),
+                new FusionCategories.TritiumExtracting(gui),
+                new FusionCategories.CryogenicDistilling(gui),
+                new FusionCategories.Liquefying(gui),
+                new FusionCategories.FusionFuels(gui),
+                new FusionCategories.ExhaustSeparating(gui),
                 new MultiblockCategory(gui));
     }
 
@@ -279,7 +285,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.SteamGeneratingRecipe(ModFluids.HOT_COOLANT.get(), net.minecraft.world.level.material.Fluids.WATER),
                 new MachineCategories.SteamGeneratingRecipe(ModFluids.HOT_HEAVY_WATER.get(), ModFluids.HEAVY_WATER.get()),
                 new MachineCategories.SteamGeneratingRecipe(ModFluids.HOT_LEAD_BISMUTH.get(), ModFluids.LEAD_BISMUTH.get(), ModFluids.SUPERHEATED_STEAM.get()),
-                new MachineCategories.SteamGeneratingRecipe(ModFluids.HOT_FUEL_SALT.get(), ModFluids.FUEL_SALT.get())));
+                new MachineCategories.SteamGeneratingRecipe(ModFluids.HOT_FUEL_SALT.get(), ModFluids.FUEL_SALT.get()),
+                new MachineCategories.SteamGeneratingRecipe(ModFluids.HOT_LEAD_LITHIUM.get(), ModFluids.LEAD_LITHIUM.get(), ModFluids.HIGH_PRESSURE_STEAM.get())));
         registration.addRecipes(MachineCategories.Compacting.TYPE, recipes(ModRecipes.COMPACTING.get()));
         registration.addRecipes(MachineCategories.Vitrifying.TYPE, recipes(ModRecipes.VITRIFYING.get()));
         registration.addRecipes(MachineCategories.Reprocessing.TYPE, recipes(ModRecipes.REPROCESSING.get()));
@@ -301,6 +308,14 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                     .candidates(level.registryAccess(), ItemStack.EMPTY, net.zagdrath.arcforge.config.ArcforgeConfig.ENCHANTER_ALLOW_TREASURE.getAsBoolean()).stream()
                     .map(enchantment -> new MachineCategories.EnchantingRecipe(enchantment, enchantment.value().getMaxLevel())).toList());
         }
+
+        // The fusion tier.
+        registration.addRecipes(FusionCategories.LithiumEnriching.TYPE, recipes(ModRecipes.LITHIUM_ENRICHING.get()));
+        registration.addRecipes(FusionCategories.TritiumExtracting.TYPE, recipes(ModRecipes.TRITIUM_EXTRACTING.get()));
+        registration.addRecipes(FusionCategories.CryogenicDistilling.TYPE, recipes(ModRecipes.CRYOGENIC_DISTILLING.get()));
+        registration.addRecipes(FusionCategories.Liquefying.TYPE, recipes(ModRecipes.LIQUEFYING.get()));
+        registration.addRecipes(FusionCategories.FusionFuels.TYPE, FusionCategories.FusionFuel.all());
+        registration.addRecipes(FusionCategories.ExhaustSeparating.TYPE, List.of(new FusionCategories.ExhaustSeparation()));
 
         registration.addRecipes(MultiblockCategory.TYPE, MultiblockBlueprints.all().stream().map(MultiblockCategory.Build::new).toList());
 
@@ -395,6 +410,10 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         }
         registration.addRecipeClickArea(ElectrolyzerScreen.class, 98, 35, ARROW_W, ARROW_H, MachineCategories.Electrolyzing.TYPE);
         registration.addRecipeClickArea(FiberizerScreen.class, 68, 35, ARROW_W, ARROW_H, MachineCategories.Fiberizing.TYPE);
+        registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.fusion.LithiumIsotopeSeparatorScreen.class, 78, 35, ARROW_W, ARROW_H,
+                FusionCategories.LithiumEnriching.TYPE);
+        registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.fusion.TritiumExtractionUnitScreen.class, 68, 35, ARROW_W, ARROW_H,
+                FusionCategories.TritiumExtracting.TYPE);
         registration.addRecipeClickArea(InductionFurnaceScreen.class, 78, 35, ARROW_W, ARROW_H, RecipeTypes.SMELTING);
         registration.addRecipeClickArea(InfuserScreen.class, 96, 35, ARROW_W, ARROW_H, MachineCategories.Infusing.TYPE);
         registration.addRecipeClickArea(MetalPressScreen.class, 78, 35, ARROW_W, ARROW_H, MachineCategories.Pressing.TYPE);
@@ -468,6 +487,15 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Reprocessing.TYPE, ModBlocks.PUREX_CONTROLLER.get(), ModBlocks.HOT_CELL_CASING.get(),
                 ModBlocks.HOT_CELL_WINDOW.get());
         registration.addCraftingStation(MachineCategories.Vulcanizing.TYPE, ModBlocks.VULCANIZER.get());
+        registration.addCraftingStation(FusionCategories.LithiumEnriching.TYPE, ModBlocks.LITHIUM_ISOTOPE_SEPARATOR.get());
+        registration.addCraftingStation(FusionCategories.TritiumExtracting.TYPE, ModBlocks.TRITIUM_EXTRACTION_UNIT.get());
+        registration.addCraftingStation(FusionCategories.CryogenicDistilling.TYPE, ModBlocks.CRYOGENIC_COLUMN_CONTROLLER.get(),
+                ModBlocks.CRYOGENIC_COLUMN_CASING.get());
+        registration.addCraftingStation(FusionCategories.Liquefying.TYPE, ModBlocks.CRYOGENIC_PLANT_CONTROLLER.get(), ModBlocks.CRYOGENIC_PLANT_CASING.get());
+        registration.addCraftingStation(FusionCategories.FusionFuels.TYPE, ModBlocks.FUSION_REACTOR_CONTROLLER.get(), ModBlocks.PELLET_INJECTOR.get(),
+                ModBlocks.GAS_PUFF_VALVE.get());
+        registration.addCraftingStation(FusionCategories.ExhaustSeparating.TYPE, ModBlocks.TRITIUM_PLANT_CONTROLLER.get(), ModBlocks.TRITIUM_PLANT_CASING.get(),
+                ModBlocks.CRYOPUMP.get());
         registration.addCraftingStation(MachineCategories.ResinTap.TYPE, ModBlocks.RESIN_TAP.get());
         registration.addCraftingStation(MachineCategories.AirSeparating.TYPE, ModBlocks.AIR_SEPARATOR.get());
         registration.addCraftingStation(MachineCategories.Synthesizing.TYPE, ModBlocks.HABER_REACTOR.get());

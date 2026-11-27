@@ -873,6 +873,10 @@ public final class ModBlocks {
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.NuclearTurbineCasingBlock> NUCLEAR_TURBINE_CASING = BLOCKS.registerBlock(
             "nuclear_turbine_casing", net.zagdrath.arcforge.block.multiblock.NuclearTurbineCasingBlock::new,
             p -> steamCasingProperties(p).strength(5.0F, 9.0F).dynamicShape().forceSolidOn());
+    // The Helium Gas Turbine (Arcforged tier), shaped by its model as the Nuclear Steam Turbine is (see HeliumTurbineHitbox).
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.HeliumTurbineCasingBlock> HELIUM_TURBINE_CASING = BLOCKS.registerBlock(
+            "helium_turbine_casing", net.zagdrath.arcforge.block.multiblock.HeliumTurbineCasingBlock::new,
+            p -> steamCasingProperties(p).strength(6.0F, 12.0F).dynamicShape().forceSolidOn());
     // The Heavy Water Tower: casings round its Exchange Trays.
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselCasingBlock> HEAVY_WATER_TOWER_CASING = BLOCKS.registerBlock("heavy_water_tower_casing",
             p -> new net.zagdrath.arcforge.block.multiblock.VesselCasingBlock(() -> net.zagdrath.arcforge.multiblock.VesselStructures.HEAVY_WATER_TOWER, p),
@@ -968,6 +972,85 @@ public final class ModBlocks {
             p -> new net.zagdrath.arcforge.block.nuclear.FreezePlugBlock(ModBlockEntityTypes.FREEZE_PLUG, p), p -> columnProperties(p).strength(5.0F, 24.0F));
     public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.NuclearEntityBlock> DRAIN_TANK = BLOCKS.registerBlock("drain_tank",
             p -> new net.zagdrath.arcforge.block.nuclear.NuclearEntityBlock(ModBlockEntityTypes.DRAIN_TANK, p), p -> columnProperties(p).strength(6.0F, 60.0F));
+    // --- The fusion tier ---
+    // The Cryogenic Tank: a Fluid Tank (Hardened's size) with a vacuum jacket, so Liquid Nitrogen and Liquid Helium don't
+    // boil off in it (see Cryogenics).
+    public static final DeferredBlock<FluidTankBlock> CRYOGENIC_TANK = BLOCKS.registerBlock("cryogenic_tank",
+            p -> new FluidTankBlock(p, ConduitTier.HARDENED),
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(2.0F)
+                    .sound(ModBlocks.TANK_SOUND)
+                    .noOcclusion()
+                    .isSuffocating((state, level, pos) -> false)
+                    .isViewBlocking((state, level, pos, box) -> false)
+                    .isRedstoneConductor((state, level, pos) -> false));
+    // The Fusion Reactor (see TokamakStructure): its cryostat (Cryostat Casing, with Vessel Ports for its modules), the
+    // coils, First Wall, Divertor Cassettes and Breeding Blanket inside, and its controller; a stellarator's coils.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.TokamakPartBlock> CRYOSTAT_CASING = BLOCKS.registerBlock("cryostat_casing",
+            p -> new net.zagdrath.arcforge.block.fusion.TokamakPartBlock(true, p), p -> columnProperties(p).strength(6.0F, 30.0F).forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.TokamakPartBlock> VESSEL_PORT = BLOCKS.registerBlock("vessel_port",
+            p -> new net.zagdrath.arcforge.block.fusion.TokamakPartBlock(true, p), p -> columnProperties(p).strength(6.0F, 30.0F).forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.TokamakPartBlock> CENTRAL_SOLENOID = BLOCKS.registerBlock("central_solenoid",
+            p -> new net.zagdrath.arcforge.block.fusion.TokamakPartBlock(false, p), p -> columnProperties(p).strength(6.0F, 30.0F));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.TokamakPartBlock> TOROIDAL_FIELD_COIL = BLOCKS.registerBlock("toroidal_field_coil",
+            p -> new net.zagdrath.arcforge.block.fusion.TokamakPartBlock(false, p), p -> columnProperties(p).strength(6.0F, 30.0F));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.TokamakPartBlock> POLOIDAL_FIELD_COIL = BLOCKS.registerBlock("poloidal_field_coil",
+            p -> new net.zagdrath.arcforge.block.fusion.TokamakPartBlock(false, p), p -> columnProperties(p).strength(6.0F, 30.0F));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.TokamakPartBlock> STELLARATOR_COIL = BLOCKS.registerBlock("stellarator_coil",
+            p -> new net.zagdrath.arcforge.block.fusion.TokamakPartBlock(false, p), p -> columnProperties(p).strength(6.0F, 30.0F));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.TokamakPartBlock> FIRST_WALL = BLOCKS.registerBlock("first_wall",
+            p -> new net.zagdrath.arcforge.block.fusion.TokamakPartBlock(false, p), p -> columnProperties(p).strength(8.0F, 40.0F));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.TokamakPartBlock> DIVERTOR_CASSETTE = BLOCKS.registerBlock("divertor_cassette",
+            p -> new net.zagdrath.arcforge.block.fusion.TokamakPartBlock(false, p), p -> columnProperties(p).strength(8.0F, 40.0F));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.TokamakPartBlock> BREEDING_BLANKET = BLOCKS.registerBlock("breeding_blanket",
+            p -> new net.zagdrath.arcforge.block.fusion.TokamakPartBlock(false, p), p -> columnProperties(p).strength(6.0F, 30.0F));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.FusionReactorControllerBlock> FUSION_REACTOR_CONTROLLER = BLOCKS.registerBlock("fusion_reactor_controller",
+            net.zagdrath.arcforge.block.fusion.FusionReactorControllerBlock::new, p -> columnProperties(p).strength(6.0F, 30.0F).forceSolidOn()
+                    .lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.fusion.FusionReactorControllerBlock.LIT) ? 9 : 0));
+    // Its port modules (see FusionModuleBlockEntity), set against Vessel Ports; and the Quench Protection Unit, against
+    // the cryostat.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.FusionModuleBlock> NEUTRAL_BEAM_INJECTOR = module(net.zagdrath.arcforge.block.fusion.FusionModuleBlock.Kind.NEUTRAL_BEAM_INJECTOR);
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.FusionModuleBlock> GYROTRON = module(net.zagdrath.arcforge.block.fusion.FusionModuleBlock.Kind.GYROTRON);
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.FusionModuleBlock> PELLET_INJECTOR = module(net.zagdrath.arcforge.block.fusion.FusionModuleBlock.Kind.PELLET_INJECTOR);
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.FusionModuleBlock> GAS_PUFF_VALVE = module(net.zagdrath.arcforge.block.fusion.FusionModuleBlock.Kind.GAS_PUFF_VALVE);
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.FusionModuleBlock> CRYOPUMP = module(net.zagdrath.arcforge.block.fusion.FusionModuleBlock.Kind.CRYOPUMP);
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.FusionModuleBlock> DIAGNOSTICS_PORT = module(net.zagdrath.arcforge.block.fusion.FusionModuleBlock.Kind.DIAGNOSTICS);
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.FusionModuleBlock> DIRECT_ENERGY_CONVERTER = module(net.zagdrath.arcforge.block.fusion.FusionModuleBlock.Kind.DIRECT_CONVERTER);
+    public static final DeferredBlock<Block> QUENCH_PROTECTION_UNIT = BLOCKS.registerBlock("quench_protection_unit", Block::new,
+            p -> columnProperties(p).strength(5.0F, 24.0F));
+    // The Lithium Isotope Separator (FE) and the Tritium Extraction Unit (heat).
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.LithiumIsotopeSeparatorBlock> LITHIUM_ISOTOPE_SEPARATOR = BLOCKS.registerBlock(
+            "lithium_isotope_separator", net.zagdrath.arcforge.block.fusion.LithiumIsotopeSeparatorBlock::new, p -> machineProperties(p, 9));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.TritiumExtractionUnitBlock> TRITIUM_EXTRACTION_UNIT = BLOCKS.registerBlock(
+            "tritium_extraction_unit", net.zagdrath.arcforge.block.fusion.TritiumExtractionUnitBlock::new, p -> machineProperties(p, 9));
+    // The Remote Handling Arm: mounted on a Vessel Port, it swaps worn parts while the reactor is shut down.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fusion.RemoteHandlingArmBlock> REMOTE_HANDLING_ARM = BLOCKS.registerBlock(
+            "remote_handling_arm", net.zagdrath.arcforge.block.fusion.RemoteHandlingArmBlock::new, p -> machineProperties(p, 9).noOcclusion());
+    // The Cryogenic Plant: a cold box that liquefies Nitrogen and Helium.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselCasingBlock> CRYOGENIC_PLANT_CASING = BLOCKS.registerBlock("cryogenic_plant_casing",
+            p -> new net.zagdrath.arcforge.block.multiblock.VesselCasingBlock(() -> net.zagdrath.arcforge.multiblock.FusionPlants.CRYOGENIC_PLANT, p),
+            p -> columnProperties(p).forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselControllerBlock<net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity>> CRYOGENIC_PLANT_CONTROLLER = BLOCKS.registerBlock(
+            "cryogenic_plant_controller", p -> new net.zagdrath.arcforge.block.multiblock.VesselControllerBlock<>(() -> net.zagdrath.arcforge.multiblock.FusionPlants.CRYOGENIC_PLANT,
+                    ModBlockEntityTypes.CRYOGENIC_PLANT, net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity::cryogenicPlant, p),
+            p -> columnProperties(p).forceSolidOn().lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.multiblock.VesselControllerBlock.LIT) ? 7 : 0));
+    // The Cryogenic Distillation Column: air or Helium-Rich Natural Gas, split by boiling point.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselCasingBlock> CRYOGENIC_COLUMN_CASING = BLOCKS.registerBlock("cryogenic_column_casing",
+            p -> new net.zagdrath.arcforge.block.multiblock.VesselCasingBlock(() -> net.zagdrath.arcforge.multiblock.FusionPlants.CRYOGENIC_COLUMN, p),
+            p -> columnProperties(p).forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselControllerBlock<net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity>> CRYOGENIC_COLUMN_CONTROLLER = BLOCKS.registerBlock(
+            "cryogenic_column_controller", p -> new net.zagdrath.arcforge.block.multiblock.VesselControllerBlock<>(() -> net.zagdrath.arcforge.multiblock.FusionPlants.CRYOGENIC_COLUMN,
+                    ModBlockEntityTypes.CRYOGENIC_COLUMN, net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity::cryogenicColumn, p),
+            p -> columnProperties(p).forceSolidOn().lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.multiblock.VesselControllerBlock.LIT) ? 7 : 0));
+    // The Tritium Plant: Fusion Exhaust back into Deuterium, Tritium, Helium-3 and Helium.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselCasingBlock> TRITIUM_PLANT_CASING = BLOCKS.registerBlock("tritium_plant_casing",
+            p -> new net.zagdrath.arcforge.block.multiblock.VesselCasingBlock(() -> net.zagdrath.arcforge.multiblock.FusionPlants.TRITIUM_PLANT, p),
+            p -> columnProperties(p).forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselControllerBlock<net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity>> TRITIUM_PLANT_CONTROLLER = BLOCKS.registerBlock(
+            "tritium_plant_controller", p -> new net.zagdrath.arcforge.block.multiblock.VesselControllerBlock<>(() -> net.zagdrath.arcforge.multiblock.FusionPlants.TRITIUM_PLANT,
+                    ModBlockEntityTypes.TRITIUM_PLANT, net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity::tritiumPlant, p),
+            p -> columnProperties(p).forceSolidOn().lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.multiblock.VesselControllerBlock.LIT) ? 7 : 0));
+    // (fusion blocks end)
     public static final DeferredBlock<LiquidBlock> NITRIC_ACID = BLOCKS.registerBlock("nitric_acid",
             p -> new SulfuricAcidBlock(ModFluids.NITRIC_ACID.get(), ModDamageTypes.NITRIC_ACID, p),
             p -> liquidProperties(p, MapColor.COLOR_YELLOW));
@@ -1406,6 +1489,12 @@ public final class ModBlocks {
                 .noLootTable()
                 .liquid()
                 .sound(SoundType.EMPTY);
+    }
+
+    // A fusion port module's block (FusionModuleBlock), facing the Vessel Port it's set against.
+    private static DeferredBlock<net.zagdrath.arcforge.block.fusion.FusionModuleBlock> module(net.zagdrath.arcforge.block.fusion.FusionModuleBlock.Kind kind) {
+        return BLOCKS.registerBlock(kind.getSerializedName(), p -> new net.zagdrath.arcforge.block.fusion.FusionModuleBlock(kind, ModBlockEntityTypes.FUSION_MODULE,
+                net.minecraft.world.phys.shapes.Shapes.block(), p), p -> columnProperties(p).strength(5.0F, 24.0F).noOcclusion());
     }
 
     private static BlockBehaviour.Properties columnProperties(BlockBehaviour.Properties p) {

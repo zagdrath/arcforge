@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CSC",
+    "CRC",
+    "CSC"
+  ],
+  "key": {
+    "C": "arcforge:superconducting_coil",
+    "S": "#c:plates/steel",
+    "R": "#c:rods/steel"
+  },
+  "result": {
+    "id": "arcforge:central_solenoid",
+    "count": 1
+  }
+}

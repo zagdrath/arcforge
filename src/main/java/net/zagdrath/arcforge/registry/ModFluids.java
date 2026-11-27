@@ -515,6 +515,78 @@ public final class ModFluids {
             () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.HOT_FUEL_SALT_TYPE, ModFluids.HOT_FUEL_SALT, ModFluids.FLOWING_HOT_FUEL_SALT)));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HOT_FUEL_SALT = FLUIDS.register("flowing_hot_fuel_salt",
             () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.HOT_FUEL_SALT_TYPE, ModFluids.HOT_FUEL_SALT, ModFluids.FLOWING_HOT_FUEL_SALT)));
+    // The fusion tier. Gases: Deuterium (Heavy Water split in the Electrolyzer), Tritium (bred from lithium-6; weakly
+    // radioactive, and it decays to Helium-3), Helium (from helium-rich Natural Gas in the Cryogenic Distillation
+    // Column), Helium-3, Argon (a little of the air), Helium-Rich Natural Gas (from helium-rich deposits) and Fusion
+    // Exhaust (what the Cryopumps take out of a fusion reactor: unburnt fuel and helium ash, mixed; its make-up is kept by
+    // FusionExhaustPool, per dimension).
+    public static final DeferredHolder<FluidType, FluidType> DEUTERIUM_TYPE = gasType("deuterium", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> DEUTERIUM = FLUIDS.register("deuterium",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.DEUTERIUM_TYPE, ModFluids.DEUTERIUM, ModFluids.FLOWING_DEUTERIUM)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_DEUTERIUM = FLUIDS.register("flowing_deuterium",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.DEUTERIUM_TYPE, ModFluids.DEUTERIUM, ModFluids.FLOWING_DEUTERIUM)));
+    public static final DeferredHolder<FluidType, FluidType> TRITIUM_TYPE = gasType("tritium", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> TRITIUM = FLUIDS.register("tritium",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.TRITIUM_TYPE, ModFluids.TRITIUM, ModFluids.FLOWING_TRITIUM)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_TRITIUM = FLUIDS.register("flowing_tritium",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.TRITIUM_TYPE, ModFluids.TRITIUM, ModFluids.FLOWING_TRITIUM)));
+    public static final DeferredHolder<FluidType, FluidType> HELIUM_TYPE = gasType("helium", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HELIUM = FLUIDS.register("helium",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.HELIUM_TYPE, ModFluids.HELIUM, ModFluids.FLOWING_HELIUM)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HELIUM = FLUIDS.register("flowing_helium",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.HELIUM_TYPE, ModFluids.HELIUM, ModFluids.FLOWING_HELIUM)));
+    // Hot Helium: a fusion reactor's helium coolant on its way out of the wall and blanket (about 900 °C) to a Helium Gas
+    // Turbine, which sends it back cooled as Helium.
+    public static final DeferredHolder<FluidType, FluidType> HOT_HELIUM_TYPE = gasType("hot_helium", 1_173);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HOT_HELIUM = FLUIDS.register("hot_helium",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.HOT_HELIUM_TYPE, ModFluids.HOT_HELIUM, ModFluids.FLOWING_HOT_HELIUM)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HOT_HELIUM = FLUIDS.register("flowing_hot_helium",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.HOT_HELIUM_TYPE, ModFluids.HOT_HELIUM, ModFluids.FLOWING_HOT_HELIUM)));
+    public static final DeferredHolder<FluidType, FluidType> HELIUM_3_TYPE = gasType("helium_3", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HELIUM_3 = FLUIDS.register("helium_3",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.HELIUM_3_TYPE, ModFluids.HELIUM_3, ModFluids.FLOWING_HELIUM_3)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HELIUM_3 = FLUIDS.register("flowing_helium_3",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.HELIUM_3_TYPE, ModFluids.HELIUM_3, ModFluids.FLOWING_HELIUM_3)));
+    public static final DeferredHolder<FluidType, FluidType> ARGON_TYPE = gasType("argon", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> ARGON = FLUIDS.register("argon",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.ARGON_TYPE, ModFluids.ARGON, ModFluids.FLOWING_ARGON)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_ARGON = FLUIDS.register("flowing_argon",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.ARGON_TYPE, ModFluids.ARGON, ModFluids.FLOWING_ARGON)));
+    public static final DeferredHolder<FluidType, FluidType> HELIUM_RICH_NATURAL_GAS_TYPE = gasType("helium_rich_natural_gas", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HELIUM_RICH_NATURAL_GAS = FLUIDS.register("helium_rich_natural_gas",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.HELIUM_RICH_NATURAL_GAS_TYPE, ModFluids.HELIUM_RICH_NATURAL_GAS, ModFluids.FLOWING_HELIUM_RICH_NATURAL_GAS)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HELIUM_RICH_NATURAL_GAS = FLUIDS.register("flowing_helium_rich_natural_gas",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.HELIUM_RICH_NATURAL_GAS_TYPE, ModFluids.HELIUM_RICH_NATURAL_GAS, ModFluids.FLOWING_HELIUM_RICH_NATURAL_GAS)));
+    public static final DeferredHolder<FluidType, FluidType> FUSION_EXHAUST_TYPE = gasType("fusion_exhaust", 400);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> FUSION_EXHAUST = FLUIDS.register("fusion_exhaust",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.FUSION_EXHAUST_TYPE, ModFluids.FUSION_EXHAUST, ModFluids.FLOWING_FUSION_EXHAUST)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_FUSION_EXHAUST = FLUIDS.register("flowing_fusion_exhaust",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.FUSION_EXHAUST_TYPE, ModFluids.FUSION_EXHAUST, ModFluids.FLOWING_FUSION_EXHAUST)));
+    // Cryogenic liquids (the Cryogenic Plant's): Liquid Nitrogen at 77 K and Liquid Helium at 4 K. Kept in tanks and pipes
+    // only; ordinary tanks lose them as they boil off (#arcforge:cryogenic, see CryogenicBoilOff), Cryogenic Tanks don't.
+    public static final DeferredHolder<FluidType, FluidType> LIQUID_NITROGEN_TYPE = cryogenicType("liquid_nitrogen", 808, 160, 77);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> LIQUID_NITROGEN = FLUIDS.register("liquid_nitrogen",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.LIQUID_NITROGEN_TYPE, ModFluids.LIQUID_NITROGEN, ModFluids.FLOWING_LIQUID_NITROGEN)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_LIQUID_NITROGEN = FLUIDS.register("flowing_liquid_nitrogen",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.LIQUID_NITROGEN_TYPE, ModFluids.LIQUID_NITROGEN, ModFluids.FLOWING_LIQUID_NITROGEN)));
+    public static final DeferredHolder<FluidType, FluidType> LIQUID_HELIUM_TYPE = cryogenicType("liquid_helium", 125, 30, 4);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> LIQUID_HELIUM = FLUIDS.register("liquid_helium",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.LIQUID_HELIUM_TYPE, ModFluids.LIQUID_HELIUM, ModFluids.FLOWING_LIQUID_HELIUM)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_LIQUID_HELIUM = FLUIDS.register("flowing_liquid_helium",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.LIQUID_HELIUM_TYPE, ModFluids.LIQUID_HELIUM, ModFluids.FLOWING_LIQUID_HELIUM)));
+    // Lead-Lithium: lead with lithium-6 melted into it (it melts at 235 °C), the fusion reactor's breeding blanket's
+    // breeder and coolant; Hot Lead-Lithium is it on its way out of the blanket to the Steam Generator. Kept in tanks and
+    // pipes only.
+    public static final DeferredHolder<FluidType, FluidType> LEAD_LITHIUM_TYPE = liquidType("lead_lithium", 9_700, 1_700, 0.004F, 0.4, 0.5);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> LEAD_LITHIUM = FLUIDS.register("lead_lithium",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.LEAD_LITHIUM_TYPE, ModFluids.LEAD_LITHIUM, ModFluids.FLOWING_LEAD_LITHIUM)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_LEAD_LITHIUM = FLUIDS.register("flowing_lead_lithium",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.LEAD_LITHIUM_TYPE, ModFluids.LEAD_LITHIUM, ModFluids.FLOWING_LEAD_LITHIUM)));
+    public static final DeferredHolder<FluidType, FluidType> HOT_LEAD_LITHIUM_TYPE = liquidType("hot_lead_lithium", 9_300, 1_300, 0.004F, 0.4, 0.5);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HOT_LEAD_LITHIUM = FLUIDS.register("hot_lead_lithium",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.HOT_LEAD_LITHIUM_TYPE, ModFluids.HOT_LEAD_LITHIUM, ModFluids.FLOWING_HOT_LEAD_LITHIUM)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HOT_LEAD_LITHIUM = FLUIDS.register("flowing_hot_lead_lithium",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.HOT_LEAD_LITHIUM_TYPE, ModFluids.HOT_LEAD_LITHIUM, ModFluids.FLOWING_HOT_LEAD_LITHIUM)));
     // Corium: a melted core (see CoriumBlock). It glows (light 15), runs like slow lava, can't be picked up in a bucket.
     public static final DeferredHolder<FluidType, FluidType> CORIUM_TYPE = FLUID_TYPES.register("corium", () -> new LiquidType(FluidType.Properties.create()
             .descriptionId("fluid_type.arcforge.corium")
@@ -660,6 +732,21 @@ public final class ModFluids {
                 .canDrown(false)
                 .canPushEntity(false)
                 .canExtinguish(false)
+                .canConvertToSource(false)
+                .supportsBoating(false)));
+    }
+
+    // A cryogenic liquid: thin, cold, kept in tanks (no block or bucket).
+    private static DeferredHolder<FluidType, FluidType> cryogenicType(String name, int density, int viscosity, int kelvin) {
+        return FLUID_TYPES.register(name, () -> new FluidType(FluidType.Properties.create()
+                .descriptionId("fluid_type.arcforge." + name)
+                .density(density)
+                .viscosity(viscosity)
+                .temperature(kelvin)
+                .canSwim(false)
+                .canDrown(false)
+                .canPushEntity(false)
+                .canExtinguish(true)
                 .canConvertToSource(false)
                 .supportsBoating(false)));
     }

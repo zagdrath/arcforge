@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " T ",
+    "TRT",
+    " T "
+  ],
+  "key": {
+    "T": "arcforge:superconducting_tape",
+    "R": "#c:rods/steel"
+  },
+  "result": {
+    "id": "arcforge:superconducting_coil",
+    "count": 1
+  }
+}

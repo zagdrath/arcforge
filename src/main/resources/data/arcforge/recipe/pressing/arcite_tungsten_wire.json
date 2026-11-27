@@ -1,0 +1,11 @@
+{
+  "type": "arcforge:pressing",
+  "die": "arcforge:rod_die",
+  "ingredient": "arcforge:arcite_tungsten_composite",
+  "count": 1,
+  "result": {
+    "id": "arcforge:arcite_tungsten_wire",
+    "count": 2
+  },
+  "time": 160
+}

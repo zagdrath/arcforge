@@ -47,6 +47,13 @@
             icon: "arcforge:reactor_controller",
             order: 5,
             parent: "arcforge"
+        },
+        {
+            id: "arcforge_fusion",
+            title: "Fusion",
+            icon: "arcforge:fusion_reactor_controller",
+            order: 6,
+            parent: "arcforge"
         }
     ]
 }

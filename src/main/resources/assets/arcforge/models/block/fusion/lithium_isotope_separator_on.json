@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/fusion/lithium_isotope_separator_front_on",
+    "south": "arcforge:block/fusion/lithium_isotope_separator_side",
+    "east": "arcforge:block/fusion/lithium_isotope_separator_side",
+    "west": "arcforge:block/fusion/lithium_isotope_separator_side",
+    "up": "arcforge:block/fusion/lithium_isotope_separator_top",
+    "down": "arcforge:block/fusion/lithium_isotope_separator_bottom",
+    "particle": "arcforge:block/fusion/lithium_isotope_separator_side"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "arcforge:block/fusion/gas_puff_valve"
+    },
+    "facing=east": {
+      "model": "arcforge:block/fusion/gas_puff_valve",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "arcforge:block/fusion/gas_puff_valve",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "arcforge:block/fusion/gas_puff_valve",
+      "y": 270
+    }
+  }
+}

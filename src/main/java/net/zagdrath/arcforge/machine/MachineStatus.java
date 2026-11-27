@@ -191,7 +191,15 @@ public enum MachineStatus {
     NO_EXPERIENCE("no_experience", "led_blocked"),
     NO_TARGET("no_target", "led_idle"),
     // The Nuclear Steam Turbine: tripped on low steam flow, coasting down until the steam holds over its minimum.
-    TRIPPED("tripped", "led_blocked");
+    TRIPPED("tripped", "led_blocked"),
+    // The fusion tier: a plasma burning, a reactor working through its start-up, and the cryogenic and tritium machines.
+    FUSING("fusing", "led_running"),
+    STARTING("starting", "led_idle"),
+    LIQUEFYING("liquefying", "led_running"),
+    DISTILLING("distilling", "led_running"),
+    BAKING("baking", "led_running"),
+    NO_ROD("no_rod", "led_blocked"),
+    WAITING_SHUTDOWN("waiting_shutdown", "led_idle");
 
     private final String name;
     private final String led;

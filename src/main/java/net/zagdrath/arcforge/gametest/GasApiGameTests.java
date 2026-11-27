@@ -100,6 +100,14 @@ public final class GasApiGameTests {
         gases.put(ModFluids.CONTAMINATED_STEAM.get(), GasTints.CONTAMINATED_STEAM);
         gases.put(ModFluids.NITROGEN_DIOXIDE.get(), GasTints.NITROGEN_DIOXIDE);
         gases.put(ModFluids.SULFUR_DIOXIDE.get(), GasTints.SULFUR_DIOXIDE);
+        gases.put(ModFluids.DEUTERIUM.get(), GasTints.DEUTERIUM);
+        gases.put(ModFluids.TRITIUM.get(), GasTints.TRITIUM);
+        gases.put(ModFluids.HELIUM.get(), GasTints.HELIUM);
+        gases.put(ModFluids.HOT_HELIUM.get(), GasTints.HOT_HELIUM);
+        gases.put(ModFluids.HELIUM_3.get(), GasTints.HELIUM_3);
+        gases.put(ModFluids.ARGON.get(), GasTints.ARGON);
+        gases.put(ModFluids.HELIUM_RICH_NATURAL_GAS.get(), GasTints.HELIUM_RICH_NATURAL_GAS);
+        gases.put(ModFluids.FUSION_EXHAUST.get(), GasTints.FUSION_EXHAUST);
         return gases;
     }
 

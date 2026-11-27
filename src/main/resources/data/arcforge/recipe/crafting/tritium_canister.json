@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "NSN",
+    "S S",
+    "NSN"
+  ],
+  "key": {
+    "N": "#c:plates/nickel",
+    "S": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:tritium_canister",
+    "count": 1
+  }
+}

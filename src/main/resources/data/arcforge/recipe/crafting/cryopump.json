@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SNS",
+    "PVP",
+    "SCS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "N": "#c:plates/nickel",
+    "P": "arcforge:steel_pipe",
+    "V": "arcforge:vessel_port",
+    "C": "arcforge:cryogenic_tank"
+  },
+  "result": {
+    "id": "arcforge:cryopump",
+    "count": 1
+  }
+}

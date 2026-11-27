@@ -306,6 +306,8 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         p.burstFactor = ArcforgeConfig.VESSEL_BURST_FACTOR.getAsDouble();
         p.excursionPower = ArcforgeConfig.EXCURSION_POWER.getAsDouble();
         p.reliefPerValve = ArcforgeConfig.RELIEF_PER_VALVE.getAsDouble();
+        p.lithiumAbsorption = ArcforgeConfig.TARGET_ROD_ABSORPTION.getAsDouble();
+        p.lithiumBreeding = ArcforgeConfig.TARGET_ROD_BREEDING.getAsDouble();
         return p;
     }
 

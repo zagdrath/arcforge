@@ -1,73 +1,96 @@
 {
   "values": {
     "arcforge:lead_block": {
-      "transmission": 0.1
+      "transmission": 0.1,
+      "neutron_transmission": 0.85
     },
     "arcforge:lead_bricks": {
-      "transmission": 0.1
+      "transmission": 0.1,
+      "neutron_transmission": 0.85
     },
     "arcforge:depleted_uranium_block": {
-      "transmission": 0.05
+      "transmission": 0.05,
+      "neutron_transmission": 0.7
     },
     "arcforge:concrete_shielding": {
-      "transmission": 0.25
+      "transmission": 0.25,
+      "neutron_transmission": 0.3
     },
     "minecraft:white_concrete": {
-      "transmission": 0.3
+      "transmission": 0.3,
+      "neutron_transmission": 0.35
     },
     "minecraft:orange_concrete": {
-      "transmission": 0.3
+      "transmission": 0.3,
+      "neutron_transmission": 0.35
     },
     "minecraft:magenta_concrete": {
-      "transmission": 0.3
+      "transmission": 0.3,
+      "neutron_transmission": 0.35
     },
     "minecraft:light_blue_concrete": {
-      "transmission": 0.3
+      "transmission": 0.3,
+      "neutron_transmission": 0.35
     },
     "minecraft:yellow_concrete": {
-      "transmission": 0.3
+      "transmission": 0.3,
+      "neutron_transmission": 0.35
     },
     "minecraft:lime_concrete": {
-      "transmission": 0.3
+      "transmission": 0.3,
+      "neutron_transmission": 0.35
     },
     "minecraft:pink_concrete": {
-      "transmission": 0.3
+      "transmission": 0.3,
+      "neutron_transmission": 0.35
     },
     "minecraft:gray_concrete": {
-      "transmission": 0.3
+      "transmission": 0.3,
+      "neutron_transmission": 0.35
     },
     "minecraft:light_gray_concrete": {
-      "transmission": 0.3
+      "transmission": 0.3,
+      "neutron_transmission": 0.35
     },
     "minecraft:cyan_concrete": {
-      "transmission": 0.3
+      "transmission": 0.3,
+      "neutron_transmission": 0.35
     },
     "minecraft:purple_concrete": {
-      "transmission": 0.3
+      "transmission": 0.3,
+      "neutron_transmission": 0.35
     },
     "minecraft:blue_concrete": {
-      "transmission": 0.3
+      "transmission": 0.3,
+      "neutron_transmission": 0.35
     },
     "minecraft:brown_concrete": {
-      "transmission": 0.3
+      "transmission": 0.3,
+      "neutron_transmission": 0.35
     },
     "minecraft:green_concrete": {
-      "transmission": 0.3
+      "transmission": 0.3,
+      "neutron_transmission": 0.35
     },
     "minecraft:red_concrete": {
-      "transmission": 0.3
+      "transmission": 0.3,
+      "neutron_transmission": 0.35
     },
     "minecraft:black_concrete": {
-      "transmission": 0.3
+      "transmission": 0.3,
+      "neutron_transmission": 0.35
     },
     "minecraft:water": {
-      "transmission": 0.5
+      "transmission": 0.5,
+      "neutron_transmission": 0.3
     },
     "minecraft:iron_block": {
-      "transmission": 0.4
+      "transmission": 0.4,
+      "neutron_transmission": 0.7
     },
     "arcforge:steel_block": {
-      "transmission": 0.4
+      "transmission": 0.4,
+      "neutron_transmission": 0.7
     },
     "#minecraft:base_stone_overworld": {
       "transmission": 0.6
@@ -121,7 +144,8 @@
       "transmission": 0.6
     },
     "arcforge:reactor_casing": {
-      "transmission": 0.25
+      "transmission": 0.25,
+      "neutron_transmission": 0.6
     },
     "arcforge:reactor_controller": {
       "transmission": 0.25
@@ -130,19 +154,24 @@
       "transmission": 0.5
     },
     "arcforge:graphite_moderator": {
-      "transmission": 0.7
+      "transmission": 0.7,
+      "neutron_transmission": 0.5
     },
     "arcforge:steel_reflector": {
-      "transmission": 0.4
+      "transmission": 0.4,
+      "neutron_transmission": 0.7
     },
     "arcforge:heavy_water": {
-      "transmission": 0.5
+      "transmission": 0.5,
+      "neutron_transmission": 0.4
     },
     "arcforge:containment_concrete": {
-      "transmission": 0.1
+      "transmission": 0.1,
+      "neutron_transmission": 0.35
     },
     "arcforge:containment_dome": {
-      "transmission": 0.1
+      "transmission": 0.1,
+      "neutron_transmission": 0.3
     },
     "arcforge:steel_liner": {
       "transmission": 0.5
@@ -179,6 +208,46 @@
     },
     "arcforge:geological_repository": {
       "transmission": 0.01
+    },
+    "arcforge:cryostat_casing": {
+      "transmission": 0.4,
+      "neutron_transmission": 0.6
+    },
+    "arcforge:vessel_port": {
+      "transmission": 0.4,
+      "neutron_transmission": 0.6
+    },
+    "arcforge:fusion_reactor_controller": {
+      "transmission": 0.4,
+      "neutron_transmission": 0.6
+    },
+    "arcforge:first_wall": {
+      "transmission": 0.5,
+      "neutron_transmission": 0.85
+    },
+    "arcforge:divertor_cassette": {
+      "transmission": 0.3,
+      "neutron_transmission": 0.8
+    },
+    "arcforge:breeding_blanket": {
+      "transmission": 0.5,
+      "neutron_transmission": 0.25
+    },
+    "arcforge:toroidal_field_coil": {
+      "transmission": 0.4,
+      "neutron_transmission": 0.7
+    },
+    "arcforge:poloidal_field_coil": {
+      "transmission": 0.4,
+      "neutron_transmission": 0.7
+    },
+    "arcforge:central_solenoid": {
+      "transmission": 0.4,
+      "neutron_transmission": 0.7
+    },
+    "arcforge:stellarator_coil": {
+      "transmission": 0.4,
+      "neutron_transmission": 0.7
     }
   }
 }

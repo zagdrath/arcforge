@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SLS",
+    "PXP",
+    "SHS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "L": "#c:plates/lead",
+    "P": "arcforge:steel_pipe",
+    "X": "arcforge:induction_furnace",
+    "H": "arcforge:thermocouple"
+  },
+  "result": {
+    "id": "arcforge:tritium_extraction_unit",
+    "count": 1
+  }
+}

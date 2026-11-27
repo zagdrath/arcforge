@@ -216,6 +216,12 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.NUCLEAR_STEAM_TURBINE.get(), (casing, side) ->
                 casing.getMaster() instanceof net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity turbine
                         ? turbine.energyHandlerAt(casing.getBlockPos(), side) : null);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.HELIUM_GAS_TURBINE.get(), (casing, side) ->
+                casing.getMaster() instanceof net.zagdrath.arcforge.blockentity.multiblock.HeliumGasTurbineBlockEntity turbine
+                        ? turbine.fluidHandlerAt(casing.getBlockPos(), side) : null);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.HELIUM_GAS_TURBINE.get(), (casing, side) ->
+                casing.getMaster() instanceof net.zagdrath.arcforge.blockentity.multiblock.HeliumGasTurbineBlockEntity turbine
+                        ? turbine.energyHandlerAt(casing.getBlockPos(), side) : null);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.GAS_TURBINE_ARRAY.get(), (casing, side) ->
                 casing.getMaster() instanceof GasTurbineArrayBlockEntity turbine ? turbine.fluidHandlerAt(casing.getBlockPos(), side) : null);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.GAS_TURBINE_ARRAY.get(), (casing, side) ->
@@ -520,6 +526,14 @@ public final class ModCapabilities {
             }
         }
 
+        // A Tritium Canister: its tritium and the Helium-3 it has decayed to, as two tanks (see TritiumCanisterHandler).
+        event.registerItem(Capabilities.Fluid.ITEM, (stack, access) -> new net.neoforged.neoforge.transfer.CombinedResourceHandler<>(
+                net.zagdrath.arcforge.item.fusion.TritiumCanisterHandler.tritium(access), net.zagdrath.arcforge.item.fusion.TritiumCanisterHandler.helium3(access)),
+                ModItems.TRITIUM_CANISTER.get());
+        event.registerItem(GasCapabilities.ITEM, (stack, access) -> FluidGasHandler.of(new net.neoforged.neoforge.transfer.CombinedResourceHandler<>(
+                net.zagdrath.arcforge.item.fusion.TritiumCanisterHandler.tritium(access), net.zagdrath.arcforge.item.fusion.TritiumCanisterHandler.helium3(access))),
+                ModItems.TRITIUM_CANISTER.get());
+
         // Jetpacks hold a jetpack fuel gas; Arc Drills and Saws charge like a battery but can't be drained.
         event.registerItem(Capabilities.Energy.ITEM,
                 (stack, access) -> new ItemAccessEnergyHandler(access, ModDataComponents.ENERGY.get(),
@@ -637,6 +651,24 @@ public final class ModCapabilities {
             return tower instanceof net.zagdrath.arcforge.blockentity.multiblock.HeavyWaterTowerBlockEntity heavyWater && tower.isPart(pos)
                     ? heavyWater.energyHandlerAt(pos, side) : null;
         }, towerParts);
+        // The Cryogenic Plant, the Cryogenic Distillation Column and the Tritium Plant: a fluid in, products out, FE in.
+        for (var plant : List.of(net.zagdrath.arcforge.multiblock.FusionPlants.CRYOGENIC_PLANT, net.zagdrath.arcforge.multiblock.FusionPlants.CRYOGENIC_COLUMN,
+                net.zagdrath.arcforge.multiblock.FusionPlants.TRITIUM_PLANT)) {
+            Block[] plantParts = plant == net.zagdrath.arcforge.multiblock.FusionPlants.CRYOGENIC_PLANT
+                    ? new Block[] { ModBlocks.CRYOGENIC_PLANT_CONTROLLER.get(), ModBlocks.CRYOGENIC_PLANT_CASING.get() }
+                    : plant == net.zagdrath.arcforge.multiblock.FusionPlants.CRYOGENIC_COLUMN
+                            ? new Block[] { ModBlocks.CRYOGENIC_COLUMN_CONTROLLER.get(), ModBlocks.CRYOGENIC_COLUMN_CASING.get() }
+                            : new Block[] { ModBlocks.TRITIUM_PLANT_CONTROLLER.get(), ModBlocks.TRITIUM_PLANT_CASING.get() };
+            event.registerBlock(Capabilities.Fluid.BLOCK, (level, pos, state, blockEntity, side) -> {
+                var controller = plant.findController(level, pos);
+                return controller != null && controller.isPart(pos) ? controller.fluidHandlerAt(pos, side) : null;
+            }, plantParts);
+            event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, blockEntity, side) -> {
+                var controller = plant.findController(level, pos);
+                return controller instanceof net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity fusionPlant && controller.isPart(pos)
+                        ? fusionPlant.energyHandlerAt(pos, side) : null;
+            }, plantParts);
+        }
         // The PUREX Plant: rods, Nitric Acid and solvent in (Input), products and waste out (Output), FE in.
         Block[] purexParts = { ModBlocks.PUREX_CONTROLLER.get(), ModBlocks.HOT_CELL_CASING.get() };
         event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {
@@ -652,6 +684,35 @@ public final class ModCapabilities {
             return plant instanceof net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity purex && plant.isPart(pos)
                     ? purex.energyHandlerAt(pos, side) : null;
         }, purexParts);
+        // The Fusion Reactor: coolant, Lead-Lithium and cryogens in (Input), Hot Coolant (Output) and Hot Lead-Lithium (Hot
+        // Leg) out, FE in, through ports on its cryostat and controller; its modules each hold their own.
+        Block[] fusionParts = { ModBlocks.FUSION_REACTOR_CONTROLLER.get(), ModBlocks.CRYOSTAT_CASING.get(), ModBlocks.VESSEL_PORT.get() };
+        event.registerBlock(Capabilities.Fluid.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var reactor = net.zagdrath.arcforge.fusion.TokamakStructure.findController(level, pos);
+            return reactor != null && reactor.isPart(pos) ? reactor.fluidHandlerAt(pos, side) : null;
+        }, fusionParts);
+        event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var reactor = net.zagdrath.arcforge.fusion.TokamakStructure.findController(level, pos);
+            return reactor != null && reactor.isPart(pos) ? reactor.energyHandlerAt(pos, side) : null;
+        }, fusionParts);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.FUSION_MODULE.get(),
+                net.zagdrath.arcforge.blockentity.fusion.FusionModuleBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.FUSION_MODULE.get(),
+                net.zagdrath.arcforge.blockentity.fusion.FusionModuleBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.LITHIUM_ISOTOPE_SEPARATOR.get(),
+                net.zagdrath.arcforge.blockentity.fusion.LithiumIsotopeSeparatorBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.LITHIUM_ISOTOPE_SEPARATOR.get(),
+                net.zagdrath.arcforge.blockentity.fusion.LithiumIsotopeSeparatorBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.TRITIUM_EXTRACTION_UNIT.get(),
+                net.zagdrath.arcforge.blockentity.fusion.TritiumExtractionUnitBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.TRITIUM_EXTRACTION_UNIT.get(),
+                net.zagdrath.arcforge.blockentity.fusion.TritiumExtractionUnitBlockEntity::getFluidHandler);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.TRITIUM_EXTRACTION_UNIT.get(),
+                net.zagdrath.arcforge.blockentity.fusion.TritiumExtractionUnitBlockEntity::getHeatHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.REMOTE_HANDLING_ARM.get(),
+                net.zagdrath.arcforge.blockentity.fusion.RemoteHandlingArmBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.REMOTE_HANDLING_ARM.get(),
+                net.zagdrath.arcforge.blockentity.fusion.RemoteHandlingArmBlockEntity::getItemHandler);
         // The waste machines.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.WASTE_COMPACTOR.get(),
                 net.zagdrath.arcforge.blockentity.machine.WasteCompactorBlockEntity::getEnergyHandler);

@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:tritium_extracting",
+  "ingredient": "arcforge:lithium_target_rod",
+  "result": {
+    "id": "arcforge:zircaloy_tube"
+  },
+  "tritium": 1000,
+  "helium": 250,
+  "time": 400,
+  "heat_per_tick": 400,
+  "min_temp": 600
+}

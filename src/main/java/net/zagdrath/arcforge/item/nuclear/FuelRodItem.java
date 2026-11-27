@@ -83,6 +83,13 @@ public class FuelRodItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag flag) {
         FuelRod rod = FuelRod.of(stack);
+        if (rod.isLithiumTarget()) {
+            // A Lithium Target Rod: no fuel, only how much of its lithium-6 has been bred to tritium.
+            builder.accept(Component.translatable("tooltip.arcforge.lithium_target_rod.bred", rod.burnupText()).withStyle(rod.isSpent() ? ChatFormatting.GREEN
+                    : ChatFormatting.GRAY));
+            builder.accept(Component.translatable("tooltip.arcforge.lithium_target_rod.hint").withStyle(ChatFormatting.DARK_GRAY));
+            return;
+        }
         builder.accept(Component.translatable("tooltip.arcforge.fuel_rod.fuel", Component.translatable("tooltip.arcforge.fuel_rod.type." + rod.type().getSerializedName()),
                 Enrichment.percent(rod.enrichment())).withStyle(ChatFormatting.GRAY));
         if (rod.damaged()) {

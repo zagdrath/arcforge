@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "arcforge:block/fusion/tritium_plant_casing_top",
+    "bottom": "arcforge:block/fusion/tritium_plant_casing_top",
+    "side": "arcforge:block/fusion/tritium_plant_casing"
+  }
+}

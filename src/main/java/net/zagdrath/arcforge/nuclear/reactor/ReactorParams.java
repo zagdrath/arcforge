@@ -102,6 +102,10 @@ public final class ReactorParams {
     public double plutoniumUse = 0.40;          // of a MOX rod's plutonium used when spent
     public double breeding = 0.06;              // fissile bred in a blanket rod at full flux over a rod's life
     public double fastBreeding = 2.5;           // breeding's multiple in a fast core (more neutrons spare)
+    // A Lithium Target Rod: how strongly its lithium-6 absorbs (against fissionProductWorth, a spent rod's poison) and
+    // the share of it bred to tritium a tick at full power in an average flux.
+    public double lithiumAbsorption = 0.6;
+    public double lithiumBreeding = 0.00004;
 
     // --- Rods ---
     public double rodSpeed = 0.02;              // insertion a second

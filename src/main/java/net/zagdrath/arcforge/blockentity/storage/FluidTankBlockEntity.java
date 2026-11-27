@@ -149,10 +149,40 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
 
     public static void serverTick(ServerLevel level, BlockPos pos, BlockState state, FluidTankBlockEntity tank) {
         tank.processContainer();
+        if (level.getGameTime() % 20 == 0) {
+            tank.boilOff(level, pos, state);
+            tank.leakTritium(level, pos);
+        }
         if (tank.isAutoEject()) {
             tank.pushFluid(level, pos);
         }
         tank.updateState(level, pos, state);
+    }
+
+    // A cryogenic liquid (Liquid Nitrogen, Liquid Helium) boils off out of any tank but a Cryogenic Tank, with a wisp of
+    // vapour off its top (see Cryogenics).
+    private void boilOff(ServerLevel level, BlockPos pos, BlockState state) {
+        if (creative || state.is(net.zagdrath.arcforge.registry.ModBlocks.CRYOGENIC_TANK.get()) || tank.getAmount() <= 0
+                || !net.zagdrath.arcforge.fusion.Cryogenics.isCryogenic(tank.getResource(0))) {
+            return;
+        }
+        int lost = net.zagdrath.arcforge.fusion.Cryogenics.boilOffPerSecond(tank.getAmount());
+        int left = tank.getAmount() - lost;
+        tank.set(0, left > 0 ? tank.getResource(0) : FluidResource.EMPTY, Math.max(0, left));
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.CLOUD, pos.getX() + 0.5, pos.getY() + 1.02, pos.getZ() + 0.5, 1, 0.12, 0.02, 0.12,
+                0.005);
+    }
+
+    // Tritium permeates out of a single-walled tank (see Tritium.leak); a creative tank keeps it.
+    private void leakTritium(ServerLevel level, BlockPos pos) {
+        if (creative || tank.getAmount() <= 0) {
+            return;
+        }
+        int lost = net.zagdrath.arcforge.fusion.Tritium.leak(level, net.minecraft.world.phys.Vec3.atCenterOf(pos), tank.getResource(0), tank.getAmount());
+        if (lost > 0) {
+            int left = tank.getAmount() - lost;
+            tank.set(0, left > 0 ? tank.getResource(0) : FluidResource.EMPTY, Math.max(0, left));
+        }
     }
 
     // Moves fluid between the container in the input slot and the tank, and the used container to the

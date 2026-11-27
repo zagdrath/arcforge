@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "misc",
+  "pattern": [
+    "SIS",
+    "IXI",
+    "SIS"
+  ],
+  "key": {
+    "X": "arcforge:hardened_fluid_tank",
+    "S": "arcforge:steel_plate",
+    "I": "arcforge:invar_plate"
+  },
+  "result": {
+    "id": "arcforge:cryogenic_tank",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

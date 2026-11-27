@@ -1,0 +1,23 @@
+{
+  "title": "Tritium Plant",
+  "icon": "arcforge:tritium_plant_controller",
+  "items": [
+    "arcforge:tritium_plant_controller",
+    "arcforge:tritium_plant_casing",
+    "arcforge:tritium_canister"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Fusion Exhaust is every reactor's unburnt fuel, ash and bred tritium together. The world keeps track of what's in it; the Tritium Plant takes it apart.\n# Building it\nA box of Tritium Plant Casing, 3 to 7 across and 3 to 5 tall, empty inside, the controller in a wall."
+    },
+    {
+      "type": "multiblock",
+      "structure": "tritium_plant"
+    },
+    {
+      "type": "text",
+      "text": "# Running it\nExhaust in through Input ports. It processes 8 mB a tick for every block inside it, at 20 FE a mB, and splits it into Deuterium (Output ports), Tritium (By-product), Helium-3 (Tails) and Helium ash (Gas Output). The tritium it holds decays into its Helium-3 tank.\n# Closing the loop\nPipe Deuterium and Tritium back to the Pellet Injectors. With a whole blanket a reactor breeds a little more tritium than it burns."
+    }
+  ]
+}

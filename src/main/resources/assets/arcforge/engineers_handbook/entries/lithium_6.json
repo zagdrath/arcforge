@@ -1,0 +1,20 @@
+{
+  "title": "Lithium-6 and Lead-Lithium",
+  "icon": "arcforge:lithium_6_fluoride",
+  "items": [
+    "arcforge:lithium_isotope_separator",
+    "arcforge:enriched_lithium_fluoride",
+    "arcforge:lithium_6_fluoride",
+    "arcforge:lead_lithium_ingot"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Natural lithium is 7.5% lithium-6, the isotope that breeds tritium. Both the Breeding Blanket and Lithium Target Rods need it enriched to at least 60%.\n# Lithium Isotope Separator\nTakes two Lithium Fluoride of one enrichment and gives one 20 points richer (the rest leaves as tails), 10 seconds a pass at 160 FE/t. Below 60% it makes Enriched Lithium Fluoride, which shows its assay; feed that back in. At 60% and above it makes Lithium-6 Fluoride. Three passes take natural lithium to 67.5%, so one Lithium-6 Fluoride costs eight Lithium Fluoride. Speed and Energy upgrades fit."
+    },
+    {
+      "type": "text",
+      "text": "# Lead-Lithium\nThe blanket's breeder and coolant: a liquid metal that carries heat and breeds tritium in one.\n- Chemical Reactor: four Lead Ingots, one Lithium-6 Fluoride and 100 mB of Hydrogen make four Lead-Lithium Ingots and 100 mB of Hydrofluoric Acid.\n- Arc Melter: each ingot melts to 250 mB of Lead-Lithium.\nThe reactor takes it through Input ports and gives it back as Hot Lead-Lithium out of Hot Leg ports."
+    }
+  ]
+}

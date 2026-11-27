@@ -1,0 +1,25 @@
+{
+  "title": "Running a Fusion Reactor",
+  "icon": "arcforge:fusion_reactor_controller",
+  "items": [
+    "arcforge:fusion_reactor_controller"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The controller's GUI has three pages: Plasma (its readings and trends), Plant (temperatures, wear, tanks, fuel cycle) and Control (setpoints and the start-up checklist).\n# Start-up checklist\n1. Vacuum: the Cryopumps pump the vessel to 10^-5 atm. One pump takes 30 seconds on the smallest vessel; bigger vessels take longer, more pumps less.\n2. Cold: the coils below 85 K (Liquid Helium or Nitrogen flowing).\n3. Field: energised to the field setpoint.\n4. Solenoid: the Central Solenoid charged with FE (not on a stellarator).\n5. Heating: a Gyrotron or Neutral Beam Injector fitted and a heating setpoint.\n6. Fuel: a Pellet Injector or Gas Puff Valve fitted.\nThen press Run."
+    },
+    {
+      "type": "text",
+      "text": "# Setpoints\n- Heating (MW): shared among the Gyrotrons, then the Neutral Beam Injectors.\n- Density: as a share of the Greenwald limit. Fuelling holds it there, the mix kept even, and thins it near the beta limit.\n- Current: as a share of the most the field allows.\n- Field: as a share of the full field.\n- Fuel: D-T, or D-He3.\n- Repeat: start the next pulse by itself when one ends.\n# Control\nRun in the GUI or the machine control API. Redstone: High runs it while there's a signal; Low runs it unless there is one. Fast Shutdown ends the plasma at once, cleanly; it doesn't disrupt."
+    },
+    {
+      "type": "text",
+      "text": "# Pulses\nA tokamak's pulse lasts as long as its solenoid's flux: about six minutes on the smallest. When it's spent the current ramps down and the plasma ends, and the solenoid recharges for the next.\n# Power\nQ is fusion power over heating power. On 50 MW of heating the smallest reactor runs at Q around 5 (about 270 MW); each size up makes more, to Q near 40 (about 2,000 MW) on the largest. Ignited means the alpha heating alone holds the plasma's temperature.\nEach MW of fusion heat is 1,500 HU/t. The blanket takes the neutrons' share (80%, raised by lithium-6) as Hot Lead-Lithium for Steam Generators (High-Pressure Steam, for Nuclear Steam Turbines); the rest lands on the wall and divertor, carried off by Water as Hot Coolant.\n# The helium loop\nFill the coolant tank with Helium instead of Water and the wall comes out as Hot Helium, 100 HU a mB, for Helium Gas Turbines; the gas also takes whatever blanket heat the Lead-Lithium can't, so the Lead-Lithium only needs to breed. A Helium Gas Turbine gets a little more from each HU (8 FE against steam's 6.7) and sends the Helium back. Drain one loop's fluid before switching to the other."
+    },
+    {
+      "type": "text",
+      "text": "# D-He3\nSwitch the fuel to D-He3 with Helium-3 in the Pellet Injectors. It gives almost no neutrons: little activation, little wear on the blanket, no tritium to breed. It needs a large, hot plasma and plenty of heating: on 100 MW it burns from major radius 6 up (about 1,600 MW from the largest, with almost no neutrons), and smaller reactors can't hold it."
+    }
+  ]
+}

@@ -118,6 +118,19 @@ public final class ModDataComponents {
             DATA_COMPONENTS.registerComponentType("u235_assay", b -> b.persistent(Codec.intRange(1, net.zagdrath.arcforge.nuclear.Enrichment.MAX_PCM))
                     .networkSynchronized(ByteBufCodecs.VAR_INT));
 
+    // The lithium-6 share of a stack of Enriched Lithium Fluoride or Lithium-6 Fluoride, in tenths of a percent (75 =
+    // 7.5%, natural lithium's; see Lithium6).
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> LI6_ASSAY =
+            DATA_COMPONENTS.registerComponentType("li6_assay", b -> b.persistent(Codec.intRange(1, 1_000)).networkSynchronized(ByteBufCodecs.VAR_INT));
+
+    // A Tritium Canister's Helium-3: what its tritium has decayed to (mB, kept apart in the canister), and when its
+    // contents were last brought up to date (game time).
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<net.neoforged.neoforge.fluids.SimpleFluidContent>> HELIUM_3_CONTENTS =
+            DATA_COMPONENTS.registerComponentType("helium_3_contents", b -> b.persistent(net.neoforged.neoforge.fluids.SimpleFluidContent.CODEC)
+                    .networkSynchronized(net.neoforged.neoforge.fluids.SimpleFluidContent.STREAM_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> DECAY_CLOCK =
+            DATA_COMPONENTS.registerComponentType("decay_clock", b -> b.persistent(Codec.LONG).networkSynchronized(ByteBufCodecs.VAR_LONG));
+
     // Present on a Pressurized Cylinder lined with PVC: it can hold a corrosive gas (#arcforge:corrosive_gases, UF6).
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> PVC_LINED =
             DATA_COMPONENTS.registerComponentType("pvc_lined", b -> b.persistent(Unit.CODEC).networkSynchronized(Unit.STREAM_CODEC));

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " S ",
+    "SCS",
+    " P "
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "C": "arcforge:cryostat_casing",
+    "P": "arcforge:steel_pipe"
+  },
+  "result": {
+    "id": "arcforge:vessel_port",
+    "count": 1
+  }
+}

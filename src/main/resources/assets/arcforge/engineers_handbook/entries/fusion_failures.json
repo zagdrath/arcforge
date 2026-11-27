@@ -1,0 +1,23 @@
+{
+  "title": "Fusion Failures",
+  "icon": "arcforge:first_wall",
+  "items": [
+    "arcforge:first_wall",
+    "arcforge:divertor_cassette",
+    "arcforge:quench_protection_unit"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A fusion reactor can't melt down: lose control and the plasma goes out. But it goes out hard.\n# Disruptions\nCrossing a limit dumps the plasma's energy into the wall in an instant: heavy wear on the First Wall and Divertor (more for a hotter, bigger plasma), possibly a few blocks melted out of the vessel, which then has to be rebuilt. A vertical disruption jerks the vessel and can open a vacuum leak. A tokamak carrying a big current can make runaway electrons that burn through the wall at the midplane, breaking the vacuum and letting the plasma's tritium out."
+    },
+    {
+      "type": "text",
+      "text": "# Quench\nCoils warming while energised (out of Liquid Helium) quench; see Superconducting Magnets.\n# Coolant loss\nWithout Water or Lead-Lithium flowing, the First Wall passes 1,300°C or the blanket 900°C: they wear fast, and well past it the plasma collapses and tiles melt.\n# Vacuum leaks\nA leak lets air in: the plasma can't start, and air in a hot vessel wears the wall. Idle seals bed back in slowly; the Remote Handling Arm reseals one.\n# Tritium releases\nVented exhaust and a burnt-through wall release tritium, contaminating the air and ground round the reactor like fallout. Inside a containment it stays inside."
+    },
+    {
+      "type": "text",
+      "text": "# Alarms\nThe Plasma page lights alarms for density, beta, vertical position, the pulse's end, vacuum, coolant, magnets, wear, disruption, quench and tritium. The serious ones sound a klaxon until you silence them."
+    }
+  ]
+}

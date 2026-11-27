@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TTT",
+    "TPT",
+    "SSS"
+  ],
+  "key": {
+    "T": "#c:plates/tungsten",
+    "P": "arcforge:steel_pipe",
+    "S": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:divertor_cassette",
+    "count": 2
+  }
+}

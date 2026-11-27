@@ -1,0 +1,18 @@
+{
+  "title": "Fusion Power",
+  "icon": "arcforge:fusion_reactor_controller",
+  "items": [
+    "arcforge:fusion_reactor_controller",
+    "arcforge:stellarator_coil"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "One tier above the Fission Reactor: a tokamak that fuses deuterium and tritium in a magnetically confined plasma at over a hundred million degrees. Done right it makes far more heat than it takes to run, with no chain reaction to run away and no meltdown. Done wrong it disrupts, quenches or lets tritium out.\n# What it makes\nAbout 3.5 million FE/t from the smallest reactor (major radius 3, 9×9×9, about the largest Fission Reactor's output) to 23 million from the largest (radius 7, 17×17×13), as Hot Lead-Lithium and Hot Coolant for Steam Generators and Nuclear Steam Turbines: two full-size turbines for the smallest, ten for the largest.\n# Tokamak or stellarator\nA tokamak drives a current in its plasma with a Central Solenoid, so it runs in pulses (minutes long) and can disrupt. A stellarator twists its field with coils alone: no current, no disruptions and no pulse limit, but it confines about two thirds as well."
+    },
+    {
+      "type": "text",
+      "text": "# The road there\n- Fuels: Deuterium from Heavy Water; Tritium bred from lithium-6; Helium-3 from tritium's decay.\n- Cryogenics: Liquid Nitrogen and Liquid Helium from the Cryogenic Plant; Helium from helium-rich natural gas.\n- Superconducting magnets from Arcite-tungsten tape.\n- The reactor: a ring of First Wall, Divertor, Breeding Blanket and coils in a cryostat, with heating, fuelling and pumping modules on its ports.\n- The Tritium Plant to recycle the exhaust, and a Remote Handling Arm to service it.\nEach has its own page in this chapter."
+    }
+  ]
+}

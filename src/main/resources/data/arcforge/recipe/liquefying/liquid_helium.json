@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:liquefying",
+  "input": {
+    "fluid": "arcforge:helium",
+    "amount": 2
+  },
+  "result": {
+    "id": "arcforge:liquid_helium",
+    "amount": 1
+  },
+  "energy": 4000
+}

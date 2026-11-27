@@ -79,6 +79,9 @@ public class TurbineArraySound extends AbstractTickableSoundInstance {
         if (turbine instanceof NuclearSteamTurbineBlockEntity nuclear) {
             return Mth.clamp(nuclear.getSyncedRpm() / (float) NuclearSteamTurbineBlockEntity.maxRpm(), 0.0F, 1.0F);
         }
+        if (turbine instanceof net.zagdrath.arcforge.blockentity.multiblock.HeliumGasTurbineBlockEntity helium) {
+            return Mth.clamp(helium.getSyncedRpm() / (float) net.zagdrath.arcforge.blockentity.multiblock.HeliumGasTurbineBlockEntity.maxRpm(), 0.0F, 1.0F);
+        }
         return turbine instanceof SteamTurbineArrayBlockEntity array
                 ? Mth.clamp(array.getSyncedRpm() / (float) SteamTurbineArrayBlockEntity.maxRpm(), 0.0F, 1.0F) : 0.0F;
     }

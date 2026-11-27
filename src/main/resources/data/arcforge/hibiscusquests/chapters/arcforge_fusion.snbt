@@ -1,0 +1,893 @@
+{
+    id: "arcforge_fusion",
+    group: "arcforge_fusion",
+    order: 20,
+    title: "Fusion",
+    subtitle: "Tokamaks, stellarators and the tritium cycle",
+    icon: "arcforge:fusion_reactor_controller",
+    default_shape: "circle",
+    quests: [
+        {
+            id: "deuterium",
+            title: "Deuterium",
+            icon: "arcforge:electrolyzer",
+            description: [
+                "Electrolyse Heavy Water: 100 mB gives 200 mB of Deuterium and 100 mB of Oxygen. Deuterium is half of a fusion reactor's fuel, and the Neutral Beam Injectors' beam."
+            ],
+            x: 0d,
+            y: 1.25d,
+            dependencies: [
+                "arcforge_nuclear_power/heavy_water",
+                "arcforge_chemistry/electrolyzer",
+                "arcforge_nuclear_power/fission_reactor"
+            ],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:deuterium"
+                        }
+                    },
+                    title: "Electrolyse Heavy Water into Deuterium",
+                    icon: "arcforge:electrolyzer"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:heavy_water_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "lithium_6",
+            title: "Lithium-6",
+            icon: "arcforge:lithium_6_fluoride",
+            description: [
+                "Natural lithium is 7.5% lithium-6, the isotope that breeds tritium. The Lithium Isotope Separator takes two Lithium Fluoride and gives one 20 points richer; feed it its own Enriched Lithium Fluoride until it gives Lithium-6 Fluoride (60% and up).",
+                "",
+                "**Covers:** {item:arcforge:lithium_isotope_separator}, {item:arcforge:enriched_lithium_fluoride}, {item:arcforge:lithium_6_fluoride}"
+            ],
+            x: 0d,
+            y: 2.5d,
+            dependencies: ["arcforge_salt_and_lithium/lithium_hydroxide", "arcforge_nuclear_power/fission_reactor"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "lithium_enriching"
+                        }
+                    },
+                    title: "Enrich lithium",
+                    icon: "arcforge:lithium_isotope_separator"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:lithium_6_fluoride"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lithium_fluoride",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "target_rods",
+            title: "Breeding Tritium",
+            icon: "arcforge:lithium_target_rod",
+            description: [
+                "A Zircaloy Tube between two Lithium-6 Fluoride makes a Lithium Target Rod. Load it into a Fission Reactor's Fuel Channel: its neutrons turn the lithium into tritium (the rod is a mild poison to the core).",
+                "",
+                "**Covers:** {item:arcforge:lithium_target_rod}"
+            ],
+            x: 1.5d,
+            y: 2.5d,
+            dependencies: ["lithium_6"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:lithium_target_rod"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:zircaloy_tube",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "tritium",
+            title: "Tritium",
+            icon: "arcforge:tritium_canister",
+            description: [
+                "The Tritium Extraction Unit bakes a bred rod at 600°C: up to 1,000 mB of Tritium and 250 mB of Helium, and the tube back. Tritium seeps out of ordinary tanks and cartridges; the double-walled Tritium Canister keeps it, and keeps the Helium-3 it decays to apart.",
+                "",
+                "**Covers:** {item:arcforge:tritium_extraction_unit}, {item:arcforge:tritium_canister}"
+            ],
+            x: 3d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["target_rods"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "tritium_extraction"
+                        }
+                    },
+                    title: "Extract tritium",
+                    icon: "arcforge:tritium_extraction_unit"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:tritium_canister"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:nickel_plate",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        },
+        {
+            id: "lead_lithium",
+            title: "Lead-Lithium",
+            icon: "arcforge:lead_lithium_ingot",
+            description: [
+                "Four Lead Ingots, a Lithium-6 Fluoride and Hydrogen in the Chemical Reactor make Lead-Lithium: the Breeding Blanket's breeder and coolant. The Arc Melter melts it for the reactor's tanks.",
+                "",
+                "**Covers:** {item:arcforge:lead_lithium_ingot}"
+            ],
+            x: 1.5d,
+            y: 3.75d,
+            dependencies: ["lithium_6"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:lead_lithium_ingot"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lead_ingot",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "cryogenic_plant",
+            title: "Cold Box",
+            icon: "arcforge:cryogenic_plant_controller",
+            description: [
+                "A box of Cryogenic Plant Casing, 3 to 7 across, empty inside: the Cryogenic Plant liquefies Nitrogen and Helium, faster the bigger it is. Ordinary tanks boil 5% of a cryogenic liquid away every minute; the Cryogenic Tank keeps it.",
+                "",
+                "**Covers:** {item:arcforge:cryogenic_plant_casing}, {item:arcforge:cryogenic_plant_controller}, {item:arcforge:cryogenic_tank}"
+            ],
+            x: 0d,
+            y: 0d,
+            dependencies: ["arcforge_bio_industry/air_separator", "arcforge_nuclear_power/fission_reactor"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:cryogenic_plant"
+                        }
+                    },
+                    title: "Form the Cryogenic Plant",
+                    icon: "arcforge:cryogenic_plant_controller"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:liquid_nitrogen",
+                            recipe_category: "cryogenics"
+                        }
+                    },
+                    title: "Liquefy Nitrogen",
+                    icon: "arcforge:cryogenic_plant_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:invar_plate",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "helium",
+            title: "Helium",
+            icon: "arcforge:cryogenic_column_controller",
+            description: [
+                "A quarter of gas caps are helium-rich. The Cryogenic Distillation Column (a 3×3 tower 6 to 16 tall) splits their gas into Natural Gas and Helium, a stage per block of its height; with no feed it splits air into Nitrogen, Oxygen and Argon.",
+                "",
+                "**Covers:** {item:arcforge:cryogenic_column_casing}, {item:arcforge:cryogenic_column_controller}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            dependencies: ["cryogenic_plant", "arcforge_oil_and_gas/gas_well"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:cryogenic_column"
+                        }
+                    },
+                    title: "Form the Cryogenic Distillation Column",
+                    icon: "arcforge:cryogenic_column_controller"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:helium",
+                            recipe_category: "cryogenics"
+                        }
+                    },
+                    title: "Distil Helium",
+                    icon: "arcforge:cryogenic_column_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:nickel_plate",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        },
+        {
+            id: "liquid_helium",
+            title: "4 Kelvin",
+            icon: "arcforge:cryogenic_plant_controller",
+            description: [
+                "Liquefy Helium in the Cryogenic Plant. Liquid Helium takes superconducting magnets to their full field, freezes the fuel pellets and runs the Cryopumps."
+            ],
+            x: 3d,
+            y: 0d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["helium"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:liquid_helium",
+                            recipe_category: "cryogenics"
+                        }
+                    },
+                    title: "Liquefy Helium",
+                    icon: "arcforge:cryogenic_plant_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:cryogenic_tank"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        },
+        {
+            id: "superconductor",
+            title: "Superconductor",
+            icon: "arcforge:superconducting_coil",
+            description: [
+                "Press Arcite-Tungsten Composite with the Rod Die into wire, sinter the wire into Superconducting Tape, and wind eight tapes round a Steel Rod: a Superconducting Coil. It carries current with no loss, but only when cold.",
+                "",
+                "**Covers:** {item:arcforge:arcite_tungsten_wire}, {item:arcforge:superconducting_tape}, {item:arcforge:superconducting_coil}"
+            ],
+            x: 0d,
+            y: 3.75d,
+            dependencies: ["arcforge_processing/composite", "arcforge_nuclear_power/fission_reactor"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:arcite_tungsten_wire"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:superconducting_tape"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:superconducting_coil"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcite_tungsten_composite",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "magnets",
+            title: "Field Coils",
+            icon: "arcforge:toroidal_field_coil",
+            description: [
+                "Toroidal Field Coils confine the plasma, the Central Solenoid drives its current, Poloidal Field Coils hold it in place. A Quench Protection Unit against the cryostat takes a quenching magnet's energy so the coil survives.",
+                "",
+                "**Covers:** {item:arcforge:toroidal_field_coil}, {item:arcforge:poloidal_field_coil}, {item:arcforge:central_solenoid}, {item:arcforge:quench_protection_unit}"
+            ],
+            x: 1.5d,
+            y: 5d,
+            dependencies: ["superconductor"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:toroidal_field_coil"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:poloidal_field_coil"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:central_solenoid"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:quench_protection_unit"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:superconducting_tape",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        },
+        {
+            id: "vessel_parts",
+            title: "In-Vessel Parts",
+            icon: "arcforge:first_wall",
+            description: [
+                "Tungsten-faced First Wall and Divertor Cassettes face the plasma; the Lead-Lithium Breeding Blanket behind them takes its neutrons as heat and breeds tritium. Cryostat Casing closes it all in, with Vessel Ports for modules.",
+                "",
+                "**Covers:** {item:arcforge:first_wall}, {item:arcforge:divertor_cassette}, {item:arcforge:breeding_blanket}, {item:arcforge:cryostat_casing}, {item:arcforge:vessel_port}, {item:arcforge:fusion_reactor_controller}"
+            ],
+            x: 3d,
+            y: 3.75d,
+            dependencies: ["lead_lithium"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:first_wall"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:divertor_cassette"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:breeding_blanket"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:cryostat_casing"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:vessel_port"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tungsten_plate",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        },
+        {
+            id: "modules",
+            title: "Port Modules",
+            icon: "arcforge:gyrotron",
+            description: [
+                "Against the Vessel Ports: Gyrotrons and Neutral Beam Injectors heat the plasma, Pellet Injectors and Gas Puff Valves fuel it, Cryopumps pump the vessel down and take the exhaust, and a Diagnostics Port shows the plasma in full.",
+                "",
+                "**Covers:** {item:arcforge:neutral_beam_injector}, {item:arcforge:gyrotron}, {item:arcforge:pellet_injector}, {item:arcforge:gas_puff_valve}, {item:arcforge:cryopump}, {item:arcforge:diagnostics_port}"
+            ],
+            x: 4.5d,
+            y: 3.75d,
+            dependencies: ["vessel_parts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:gyrotron", "arcforge:neutral_beam_injector"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Make a heater",
+                    icon: "arcforge:gyrotron"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:pellet_injector", "arcforge:gas_puff_valve"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Make a fueller",
+                    icon: "arcforge:pellet_injector"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:cryopump"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_pipe",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        },
+        {
+            id: "tokamak",
+            title: "Tokamak",
+            icon: "arcforge:fusion_reactor_controller",
+            description: [
+                "Build the ring: Central Solenoid up the axis, the plasma chamber in First Wall over a Divertor floor, the Breeding Blanket, the Toroidal Field Coils over and under with two rings of Poloidal Field Coils in them, and the cryostat round it all, 2R + 3 blocks across for a major radius R of 3 to 7. The controller goes in the cryostat's wall at the midplane."
+            ],
+            x: 6d,
+            y: 3.75d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["magnets", "vessel_parts", "modules", "liquid_helium"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:fusion_reactor"
+                        }
+                    },
+                    title: "Form the Fusion Reactor",
+                    icon: "arcforge:fusion_reactor_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:superconducting_coil",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ]
+        },
+        {
+            id: "first_plasma",
+            title: "First Plasma",
+            icon: "arcforge:fusion_reactor_controller",
+            description: [
+                "Pump the vessel down, cool and energise the magnets, charge the Central Solenoid, set the heating and density, and press Run. Watch the Greenwald density, beta and q95: cross a limit and it disrupts."
+            ],
+            x: 7.5d,
+            y: 2.5d,
+            dependencies: ["tokamak", "deuterium", "tritium"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "fusion_plasma"
+                        }
+                    },
+                    title: "Make a fusion plasma",
+                    icon: "arcforge:fusion_reactor_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:first_wall",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ]
+        },
+        {
+            id: "breakeven",
+            title: "Breakeven",
+            icon: "arcforge:fusion_reactor_controller",
+            description: [
+                "Q above 1: the plasma makes more fusion power than the heating puts in. Hot Lead-Lithium and Hot Coolant go to Steam Generators and turbines."
+            ],
+            x: 9d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["first_plasma"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "fusion_breakeven"
+                        }
+                    },
+                    title: "Reach Q = 1",
+                    icon: "arcforge:fusion_reactor_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:divertor_cassette",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 25
+                }
+            ]
+        },
+        {
+            id: "ignition",
+            title: "Ignition",
+            icon: "arcforge:fusion_reactor_controller",
+            description: [
+                "The alpha particles alone hold the plasma's temperature: the fire keeps itself lit. A big reactor gets there; it makes tens of millions of FE/t."
+            ],
+            x: 10.5d,
+            y: 2.5d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["breakeven"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "fusion_ignition"
+                        }
+                    },
+                    title: "Ignite the plasma",
+                    icon: "arcforge:fusion_reactor_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 40
+                }
+            ]
+        },
+        {
+            id: "tritium_plant",
+            title: "Tritium Plant",
+            icon: "arcforge:tritium_plant_controller",
+            description: [
+                "The Cryopumps' Fusion Exhaust is unburnt fuel, helium ash and the blanket's bred tritium. The Tritium Plant (a box of Tritium Plant Casing) splits it back into Deuterium, Tritium, Helium-3 and Helium: close the fuel cycle.",
+                "",
+                "**Covers:** {item:arcforge:tritium_plant_casing}, {item:arcforge:tritium_plant_controller}"
+            ],
+            x: 9d,
+            y: 3.75d,
+            dependencies: ["first_plasma"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:tritium_plant"
+                        }
+                    },
+                    title: "Form the Tritium Plant",
+                    icon: "arcforge:tritium_plant_controller"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "tritium"
+                        }
+                    },
+                    title: "Separate exhaust",
+                    icon: "arcforge:tritium_plant_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lead_plate",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ]
+        },
+        {
+            id: "remote_handling",
+            title: "Remote Handling",
+            icon: "arcforge:remote_handling_arm",
+            description: [
+                "The First Wall and Divertor wear, and neutrons make them radioactive. A Remote Handling Arm on a Vessel Port swaps them while the reactor is shut down; what it takes out are Activated Components for the Geological Repository.",
+                "",
+                "**Covers:** {item:arcforge:remote_handling_arm}, {item:arcforge:activated_component}"
+            ],
+            x: 9d,
+            y: 1.25d,
+            dependencies: ["first_plasma"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "remote_handling"
+                        }
+                    },
+                    title: "Replace a worn part",
+                    icon: "arcforge:remote_handling_arm"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lead_plate",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ]
+        },
+        {
+            id: "dhe3",
+            title: "Aneutronic",
+            icon: "arcforge:tritium_canister",
+            description: [
+                "Switch the fuel to D-He3, with Helium-3 from decayed tritium in the Pellet Injectors: almost no neutrons, almost no activation. Only a large, hot plasma burns it."
+            ],
+            x: 10.5d,
+            y: 5d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["tritium_plant", "breakeven"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "fusion_dhe3"
+                        }
+                    },
+                    title: "Burn D-He3",
+                    icon: "arcforge:fusion_reactor_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 30
+                }
+            ]
+        },
+        {
+            id: "direct_conversion",
+            title: "Direct Conversion",
+            icon: "arcforge:direct_energy_converter",
+            description: [
+                "A Direct Energy Converter on a Vessel Port catches the charged particles streaming out of the plasma and turns them straight into FE, half again what their heat would make through turbines. D-He3's power leaves almost all that way.",
+                "",
+                "**Covers:** {item:arcforge:direct_energy_converter}"
+            ],
+            x: 10.5d,
+            y: 6.25d,
+            dependencies: ["modules", "breakeven"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:direct_energy_converter"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:superconducting_coil",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ]
+        },
+        {
+            id: "helium_turbine",
+            title: "Helium Loop",
+            icon: "arcforge:helium_turbine_casing",
+            description: [
+                "Fill the reactor's coolant tank with Helium instead of Water: it comes out as Hot Helium. A Helium Gas Turbine (a hollow 5x5 tube of Helium Turbine Casings, 15 to 31 long) runs on it straight, no boiler between, and sends the Helium back. A full-size one makes about 8M FE/t.",
+                "",
+                "**Covers:** {item:arcforge:helium_turbine_casing}"
+            ],
+            x: 10.5d,
+            y: 3.75d,
+            dependencies: ["breakeven"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:helium_gas_turbine"
+                        }
+                    },
+                    title: "Form the Helium Gas Turbine",
+                    icon: "arcforge:helium_turbine_casing"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ]
+        },
+        {
+            id: "stellarator",
+            title: "Stellarator",
+            icon: "arcforge:stellarator_coil",
+            description: [
+                "Build the ring with Stellarator Coils where the Central Solenoid and Toroidal Field Coils go: twisted coils that need no plasma current. No pulses and no disruptions, at about two thirds of a tokamak's power.",
+                "",
+                "**Covers:** {item:arcforge:stellarator_coil}"
+            ],
+            x: 7.5d,
+            y: 3.75d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["tokamak"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:stellarator_coil"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:fusion_reactor"
+                        }
+                    },
+                    title: "Form the Fusion Reactor",
+                    icon: "arcforge:fusion_reactor_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:superconducting_coil",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 25
+                }
+            ]
+        }
+    ]
+}

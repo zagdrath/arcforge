@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:cryogenic_distilling",
+  "input": {
+    "fluid": "arcforge:helium_rich_natural_gas",
+    "amount": 100
+  },
+  "outputs": [
+    {
+      "id": "arcforge:natural_gas",
+      "amount": 90
+    },
+    {
+      "id": "arcforge:helium",
+      "amount": 10
+    }
+  ],
+  "time": 20
+}

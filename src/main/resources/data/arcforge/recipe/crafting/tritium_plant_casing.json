@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SAS",
+    "APA",
+    "SAS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "A": "#c:plates/lead",
+    "P": "arcforge:steel_pipe"
+  },
+  "result": {
+    "id": "arcforge:tritium_plant_casing",
+    "count": 4
+  }
+}

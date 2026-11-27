@@ -49,11 +49,13 @@ public class GeologicalRepositoryScreen extends AbstractContainerScreen<Geologic
             graphics.text(font, Component.translatable("gui.arcforge.geological_repository.invalid"), TEXT_X, TEXT_Y, ArcforgeGui.WARNING, false);
             graphics.text(font, Component.translatable("gui.arcforge.geological_repository.invalid_hint"), TEXT_X, TEXT_Y + LINE, ArcforgeGui.LABEL, false);
         } else {
-            graphics.text(font, Component.translatable("gui.arcforge.geological_repository.logs", menu.logs()), TEXT_X, TEXT_Y, ArcforgeGui.TEXT, false);
+            graphics.text(font, menu.components() > 0 ? Component.translatable("gui.arcforge.geological_repository.logs_and_components", menu.logs(),
+                    menu.components()) : Component.translatable("gui.arcforge.geological_repository.logs", menu.logs()), TEXT_X, TEXT_Y, ArcforgeGui.TEXT, false);
             graphics.text(font, Component.translatable("gui.arcforge.geological_repository.casks", menu.casks(), menu.rods()), TEXT_X, TEXT_Y + LINE,
                     ArcforgeGui.TEXT, false);
         }
         graphics.text(font, Component.translatable("gui.arcforge.geological_repository.activity", String.format(Locale.ROOT, "%,.1f", menu.activity())),
                 TEXT_X, TEXT_Y + LINE * 2, ArcforgeGui.ACCENT, false);
+
     }
 }

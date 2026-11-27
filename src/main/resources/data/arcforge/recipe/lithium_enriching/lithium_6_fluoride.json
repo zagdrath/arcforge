@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:lithium_enriching",
+  "input": {
+    "ingredient": "#arcforge:lithium_enrichment_feed",
+    "count": 2
+  },
+  "intermediate": "arcforge:enriched_lithium_fluoride",
+  "result": "arcforge:lithium_6_fluoride",
+  "time": 200
+}

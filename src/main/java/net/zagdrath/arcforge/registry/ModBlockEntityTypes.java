@@ -183,6 +183,32 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity>> CENTRIFUGE_CASCADE =
             BLOCK_ENTITY_TYPES.register("centrifuge_cascade", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity::new, ModBlocks.CENTRIFUGE_CASCADE_CONTROLLER.get()));
+    // The Fusion Reactor, on its controller; its port modules (one type: the kind comes from the block).
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.fusion.FusionReactorBlockEntity>> FUSION_REACTOR =
+            BLOCK_ENTITY_TYPES.register("fusion_reactor", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.fusion.FusionReactorBlockEntity::new, ModBlocks.FUSION_REACTOR_CONTROLLER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.fusion.FusionModuleBlockEntity>> FUSION_MODULE =
+            BLOCK_ENTITY_TYPES.register("fusion_module", () -> new BlockEntityType<>(net.zagdrath.arcforge.blockentity.fusion.FusionModuleBlockEntity::new,
+                    ModBlocks.NEUTRAL_BEAM_INJECTOR.get(), ModBlocks.GYROTRON.get(), ModBlocks.PELLET_INJECTOR.get(), ModBlocks.GAS_PUFF_VALVE.get(),
+                    ModBlocks.CRYOPUMP.get(), ModBlocks.DIAGNOSTICS_PORT.get(), ModBlocks.DIRECT_ENERGY_CONVERTER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.fusion.LithiumIsotopeSeparatorBlockEntity>> LITHIUM_ISOTOPE_SEPARATOR =
+            BLOCK_ENTITY_TYPES.register("lithium_isotope_separator", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.fusion.LithiumIsotopeSeparatorBlockEntity::new, ModBlocks.LITHIUM_ISOTOPE_SEPARATOR.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.fusion.TritiumExtractionUnitBlockEntity>> TRITIUM_EXTRACTION_UNIT =
+            BLOCK_ENTITY_TYPES.register("tritium_extraction_unit", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.fusion.TritiumExtractionUnitBlockEntity::new, ModBlocks.TRITIUM_EXTRACTION_UNIT.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.fusion.RemoteHandlingArmBlockEntity>> REMOTE_HANDLING_ARM =
+            BLOCK_ENTITY_TYPES.register("remote_handling_arm", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.fusion.RemoteHandlingArmBlockEntity::new, ModBlocks.REMOTE_HANDLING_ARM.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity>> CRYOGENIC_PLANT =
+            BLOCK_ENTITY_TYPES.register("cryogenic_plant", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity::cryogenicPlant, ModBlocks.CRYOGENIC_PLANT_CONTROLLER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity>> CRYOGENIC_COLUMN =
+            BLOCK_ENTITY_TYPES.register("cryogenic_column", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity::cryogenicColumn, ModBlocks.CRYOGENIC_COLUMN_CONTROLLER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity>> TRITIUM_PLANT =
+            BLOCK_ENTITY_TYPES.register("tritium_plant", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity::tritiumPlant, ModBlocks.TRITIUM_PLANT_CONTROLLER.get()));
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.FissionReactorBlockEntity>> FISSION_REACTOR =
             BLOCK_ENTITY_TYPES.register("fission_reactor", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.FissionReactorBlockEntity::new, ModBlocks.REACTOR_CONTROLLER.get()));
@@ -192,6 +218,9 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity>> NUCLEAR_STEAM_TURBINE =
             BLOCK_ENTITY_TYPES.register("nuclear_steam_turbine", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity::new, ModBlocks.NUCLEAR_TURBINE_CASING.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.HeliumGasTurbineBlockEntity>> HELIUM_GAS_TURBINE =
+            BLOCK_ENTITY_TYPES.register("helium_gas_turbine", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.multiblock.HeliumGasTurbineBlockEntity::new, ModBlocks.HELIUM_TURBINE_CASING.get()));
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.HeavyWaterTowerBlockEntity>> HEAVY_WATER_TOWER =
             BLOCK_ENTITY_TYPES.register("heavy_water_tower", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.HeavyWaterTowerBlockEntity::new, ModBlocks.HEAVY_WATER_TOWER_CONTROLLER.get()));
@@ -391,7 +420,8 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(ConduitBlockEntity::new, conduitBlocks(true)));
 
     public static final Supplier<BlockEntityType<FluidTankBlockEntity>> FLUID_TANK = BLOCK_ENTITY_TYPES.register("fluid_tank",
-            () -> new BlockEntityType<>(FluidTankBlockEntity::new, tierBlocks(ModBlocks::fluidTank, ModBlocks.CREATIVE_FLUID_TANK)));
+            () -> new BlockEntityType<>(FluidTankBlockEntity::new, withBlock(tierBlocks(ModBlocks::fluidTank, ModBlocks.CREATIVE_FLUID_TANK),
+                    ModBlocks.CRYOGENIC_TANK)));
 
     // The Fluid and Gas Reservoirs (one type: the kind comes from the block).
     public static final Supplier<BlockEntityType<ReservoirBlockEntity>> RESERVOIR = BLOCK_ENTITY_TYPES.register("reservoir",
@@ -453,6 +483,13 @@ public final class ModBlockEntityTypes {
         Block[] tiers = tierBlocks(byTier);
         Block[] all = Arrays.copyOf(tiers, tiers.length + 1);
         all[tiers.length] = creative.get();
+        return all;
+    }
+
+    // The blocks, and one more.
+    private static Block[] withBlock(Block[] blocks, DeferredBlock<? extends Block> extra) {
+        Block[] all = Arrays.copyOf(blocks, blocks.length + 1);
+        all[blocks.length] = extra.get();
         return all;
     }
 

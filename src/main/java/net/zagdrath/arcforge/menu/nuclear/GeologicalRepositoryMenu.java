@@ -55,6 +55,10 @@ public class GeologicalRepositoryMenu extends AbstractContainerMenu {
         return data.get(GeologicalRepositoryBlockEntity.DATA_RODS);
     }
 
+    public int components() {
+        return data.get(GeologicalRepositoryBlockEntity.DATA_COMPONENTS);
+    }
+
     // mSv/h locked away.
     public double activity() {
         return data.get(GeologicalRepositoryBlockEntity.DATA_ACTIVITY) / 10.0;

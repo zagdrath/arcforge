@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SCS",
+    "RHR",
+    "SCS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "C": "arcforge:cryostat_casing",
+    "R": "#c:dusts/redstone",
+    "H": "arcforge:reactor_controller"
+  },
+  "result": {
+    "id": "arcforge:fusion_reactor_controller",
+    "count": 1
+  }
+}

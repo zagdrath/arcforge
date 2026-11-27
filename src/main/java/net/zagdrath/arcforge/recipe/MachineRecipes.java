@@ -128,6 +128,39 @@ public final class MachineRecipes {
         return recipes(level).byType(ModRecipes.ISOTOPE_EXCHANGING.get()).stream().anyMatch(holder -> holder.value().takes(fluid));
     }
 
+    // --- The fusion tier's machines ---
+
+    public static Optional<RecipeHolder<LithiumEnrichingRecipe>> lithiumEnriching(@Nullable Level level, ItemStack input) {
+        return recipes(level).byType(ModRecipes.LITHIUM_ENRICHING.get()).stream()
+                .filter(holder -> holder.value().matches(new net.minecraft.world.item.crafting.SingleRecipeInput(input), level)).findFirst();
+    }
+
+    public static boolean isLithiumFeed(@Nullable Level level, ItemStack stack) {
+        return recipes(level).byType(ModRecipes.LITHIUM_ENRICHING.get()).stream().anyMatch(holder -> holder.value().input().ingredient().test(stack));
+    }
+
+    public static Optional<RecipeHolder<TritiumExtractingRecipe>> tritiumExtracting(@Nullable Level level, ItemStack input) {
+        return recipes(level).byType(ModRecipes.TRITIUM_EXTRACTING.get()).stream().filter(holder -> holder.value().ingredient().test(input)).findFirst();
+    }
+
+    // The recipe for what a column's feed tank holds (empty: the air recipe).
+    public static Optional<RecipeHolder<CryogenicDistillingRecipe>> cryogenicDistilling(@Nullable Level level, FluidResource fluid) {
+        return recipes(level).byType(ModRecipes.CRYOGENIC_DISTILLING.get()).stream()
+                .filter(holder -> fluid.isEmpty() ? holder.value().isAir() : holder.value().takes(fluid)).findFirst();
+    }
+
+    public static boolean isCryogenicFeed(@Nullable Level level, FluidResource fluid) {
+        return recipes(level).byType(ModRecipes.CRYOGENIC_DISTILLING.get()).stream().anyMatch(holder -> holder.value().takes(fluid));
+    }
+
+    public static Optional<RecipeHolder<LiquefyingRecipe>> liquefying(@Nullable Level level, FluidResource fluid) {
+        return recipes(level).byType(ModRecipes.LIQUEFYING.get()).stream().filter(holder -> holder.value().takes(fluid)).findFirst();
+    }
+
+    public static boolean isLiquefiable(@Nullable Level level, FluidResource fluid) {
+        return liquefying(level, fluid).isPresent();
+    }
+
     // --- The nuclear waste and reprocessing machines ---
 
     public static Optional<RecipeHolder<CompactingRecipe>> compacting(@Nullable Level level, ItemStack input) {

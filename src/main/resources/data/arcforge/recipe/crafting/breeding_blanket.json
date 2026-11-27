@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "LCL",
+    "SPS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "P": "arcforge:steel_pipe",
+    "L": "arcforge:lead_lithium_ingot",
+    "C": "arcforge:cryostat_casing"
+  },
+  "result": {
+    "id": "arcforge:breeding_blanket",
+    "count": 4
+  }
+}

@@ -13,5 +13,11 @@ import net.minecraft.world.phys.Vec3;
 public interface RadiationSource {
     double radiationRate();
 
+    // Neutrons (mSv/h at a block): shielded by the blocks' neutron transmission (see RadiationShielding) rather than
+    // their gamma one, and counted apart by the Geiger Counter. A fusion plasma's; none for most sources.
+    default double neutronRate() {
+        return 0.0;
+    }
+
     Vec3 radiationCentre();
 }

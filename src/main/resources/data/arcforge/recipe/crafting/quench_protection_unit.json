@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SQS",
+    "HBH",
+    "SQS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "Q": "#c:plates/copper",
+    "H": "arcforge:tungsten_heating_coil",
+    "B": "#c:storage_blocks/redstone"
+  },
+  "result": {
+    "id": "arcforge:quench_protection_unit",
+    "count": 1
+  }
+}

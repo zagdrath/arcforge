@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TTT",
+    "SCS",
+    "SSS"
+  ],
+  "key": {
+    "T": "#c:plates/tungsten",
+    "S": "#c:plates/steel",
+    "C": "arcforge:cryostat_casing"
+  },
+  "result": {
+    "id": "arcforge:first_wall",
+    "count": 8
+  }
+}

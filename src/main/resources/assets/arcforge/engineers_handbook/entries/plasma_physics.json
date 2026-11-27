@@ -1,0 +1,17 @@
+{
+  "title": "Plasma Physics",
+  "icon": "arcforge:diagnostics_port",
+  "items": [
+    "arcforge:diagnostics_port"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The plasma is simulated once a second: fusion from the measured reaction rates, energy lost by transport (the ITER H-mode scaling, ISS04 for a stellarator), bremsstrahlung and impurity radiation.\n# Limits\nCross one and a tokamak disrupts:\n- Density: the Greenwald limit, which rises with the plasma's current.\n- Pressure: the Troyon beta limit (normalised beta 3.5).\n- Safety factor: q95 must stay at 2 or more; too much current for the field drops it.\n- Vertical position: the Poloidal Field Coils hold the elongated plasma; missing or damaged coils, or too much current, let it drift into the wall.\n- Radiative collapse: a plasma too cold to carry its current."
+    },
+    {
+      "type": "text",
+      "text": "# Impurities\nA clean plasma is 0.2% impurity. Poor vacuum and a worn wall add to it, and impurities radiate the plasma's heat away. Keep the pumps running and the wall fresh.\n# The fuel cycle\nOnly a few percent of the fuel burns on each pass; the rest, the helium ash and the blanket's bred tritium leave through the divertor to the Cryopumps as Fusion Exhaust. Exhaust the pumps can't hold is vented: a tritium release."
+    }
+  ]
+}

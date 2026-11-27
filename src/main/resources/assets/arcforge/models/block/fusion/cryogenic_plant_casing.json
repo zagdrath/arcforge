@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "arcforge:block/fusion/cryogenic_plant_casing_top",
+    "bottom": "arcforge:block/fusion/cryogenic_plant_casing_top",
+    "side": "arcforge:block/fusion/cryogenic_plant_casing"
+  }
+}

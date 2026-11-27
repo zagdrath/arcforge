@@ -430,3 +430,32 @@ Two new core types in the same vessel: the lead-bismuth cooled fast reactor, wit
 - **Online Cleanup** `salt_processing`: Obtain Salt Processing Unit. After: fuel_salt. Rewards: 8× Steel Pipe, 8 lvl
 - ★ **Molten Salt Reactor** `molten_salt_reactor`: Run a molten salt reactor at power. After: freeze_plug. Rewards: 4× Arcforged Alloy, 20 lvl
 - ◆ **Walk-Away Safe** `walk_away`: Have a Freeze Plug drain an overheating core. After: molten_salt_reactor. Rewards: 4× Arcforged Alloy, 20 lvl
+
+## 21. Fusion (`arcforge_fusion`)
+
+Fusion · Tokamaks, stellarators and the tritium cycle · gate: arcforge_nuclear_power/fission_reactor
+
+The tier above fission: deuterium and bred tritium, lithium-6, cryogenics and superconducting magnets, the tokamak Fusion Reactor and the Stellarator, the Tritium Plant and remote maintenance.
+
+- **Deuterium** `deuterium`: Electrolyse Heavy Water into Deuterium. After: arcforge_nuclear_power/heavy_water, arcforge_chemistry/electrolyzer, arcforge_nuclear_power/fission_reactor. Rewards: 2× Heavy Water Bucket, 8 lvl
+- **Lithium-6** `lithium_6`: Enrich lithium; Obtain Lithium-6 Fluoride. After: arcforge_salt_and_lithium/lithium_hydroxide, arcforge_nuclear_power/fission_reactor. Rewards: 16× Lithium Fluoride, 10 lvl
+- **Breeding Tritium** `target_rods`: Obtain Lithium Target Rod. After: lithium_6. Rewards: 4× Zircaloy Tube, 10 lvl
+- ★ **Tritium** `tritium`: Extract tritium; Obtain Tritium Canister. After: target_rods. Rewards: 8× Nickel Plate, 12 lvl
+- **Lead-Lithium** `lead_lithium`: Obtain Lead-Lithium Ingot. After: lithium_6. Rewards: 16× Lead Ingot, 8 lvl
+- **Cold Box** `cryogenic_plant`: Form the Cryogenic Plant; Liquefy Nitrogen. After: arcforge_bio_industry/air_separator, arcforge_nuclear_power/fission_reactor. Rewards: 8× Invar Plate, 10 lvl
+- **Helium** `helium`: Form the Cryogenic Distillation Column; Distil Helium. After: cryogenic_plant, arcforge_oil_and_gas/gas_well. Rewards: 8× Nickel Plate, 12 lvl
+- ★ **4 Kelvin** `liquid_helium`: Liquefy Helium. After: helium. Rewards: 1× Cryogenic Tank, 12 lvl
+- **Superconductor** `superconductor`: Obtain Arcite-Tungsten Wire; Obtain Superconducting Tape; Obtain Superconducting Coil. After: arcforge_processing/composite, arcforge_nuclear_power/fission_reactor. Rewards: 4× Arcite-Tungsten Composite, 10 lvl
+- **Field Coils** `magnets`: Obtain Toroidal Field Coil; Obtain Poloidal Field Coil; Obtain Central Solenoid; Obtain Quench Protection Unit. After: superconductor. Rewards: 8× Superconducting Tape, 12 lvl
+- **In-Vessel Parts** `vessel_parts`: Obtain First Wall; Obtain Divertor Cassette; Obtain Breeding Blanket; Obtain Cryostat Casing; Obtain Vessel Port. After: lead_lithium. Rewards: 16× Tungsten Plate, 12 lvl
+- **Port Modules** `modules`: Make a heater; Make a fueller; Obtain Cryopump. After: vessel_parts. Rewards: 16× Steel Pipe, 12 lvl
+- ★ **Tokamak** `tokamak`: Form the Fusion Reactor. After: magnets, vessel_parts, modules, liquid_helium. Rewards: 4× Superconducting Coil, 20 lvl
+- **First Plasma** `first_plasma`: Make a fusion plasma. After: tokamak, deuterium, tritium. Rewards: 8× First Wall, 20 lvl
+- ★ **Breakeven** `breakeven`: Reach Q = 1. After: first_plasma. Rewards: 4× Divertor Cassette, 25 lvl
+- ◆ **Ignition** `ignition`: Ignite the plasma. After: breakeven. Rewards: 16× Arcforged Alloy, 40 lvl
+- **Tritium Plant** `tritium_plant`: Form the Tritium Plant; Separate exhaust. After: first_plasma. Rewards: 16× Lead Plate, 20 lvl
+- **Remote Handling** `remote_handling`: Replace a worn part. After: first_plasma. Rewards: 8× Lead Plate, 15 lvl
+- ◆ **Aneutronic** `dhe3`: Burn D-He3. After: tritium_plant, breakeven. Rewards: 8× Arcforged Alloy, 30 lvl
+- **Direct Conversion** `direct_conversion`: Obtain Direct Energy Converter. After: modules, breakeven. Rewards: 4× Superconducting Coil, 20 lvl
+- **Helium Loop** `helium_turbine`: Form the Helium Gas Turbine. After: breakeven. Rewards: 8× Arcforged Alloy, 20 lvl
+- ★ **Stellarator** `stellarator`: Obtain Stellarator Coil; Form the Fusion Reactor. After: tokamak. Rewards: 8× Superconducting Coil, 25 lvl

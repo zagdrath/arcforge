@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SCS",
+    "AVA",
+    "SBS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "C": "arcforge:superconducting_coil",
+    "A": "arcforge:arcforged_alloy",
+    "V": "arcforge:vessel_port",
+    "B": "minecraft:redstone_block"
+  },
+  "result": {
+    "id": "arcforge:direct_energy_converter",
+    "count": 1
+  }
+}

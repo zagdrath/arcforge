@@ -1,0 +1,19 @@
+{
+  "model": {
+    "type": "minecraft:composite",
+    "models": [
+      {
+        "type": "minecraft:model",
+        "model": "arcforge:item/cryogenic_tank"
+      },
+      {
+        "type": "minecraft:special",
+        "base": "arcforge:item/cryogenic_tank",
+        "model": {
+          "type": "arcforge:fluid_tank_contents",
+          "capacity": 256000
+        }
+      }
+    ]
+  }
+}

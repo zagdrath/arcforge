@@ -16,12 +16,13 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.block.multiblock.HeliumTurbineHitbox;
 import net.zagdrath.arcforge.block.multiblock.NuclearTurbineHitbox;
 
-// Keeps the player out of the Nuclear Steam Turbine's parts deep in its core, which no collision shape can reach (see
-// NuclearTurbineHitbox.overlapsDeep): after each tick, a player who has moved into one is put back where they last
-// stood clear, and stops. Players move on their own client, so this runs there. Spectators pass through as they do
-// everything else.
+// Keeps the player out of the Nuclear Steam Turbine's and Helium Gas Turbine's parts deep in their cores, which no
+// collision shape can reach (see NuclearTurbineHitbox.overlapsDeep and HeliumTurbineHitbox's): after each tick, a player
+// who has moved into one is put back where they last stood clear, and stops. Players move on their own client, so this
+// runs there. Spectators pass through as they do everything else.
 @EventBusSubscriber(modid = Arcforge.MODID, value = Dist.CLIENT)
 public final class TurbineDeepCollision {
     // How far (blocks) a last clear spot may be and still be gone back to; further, the player was moved some other way.
@@ -40,7 +41,7 @@ public final class TurbineDeepCollision {
             return;
         }
         Level level = player.level();
-        if (!NuclearTurbineHitbox.overlapsDeep(level, player.getBoundingBox())) {
+        if (!NuclearTurbineHitbox.overlapsDeep(level, player.getBoundingBox()) && !HeliumTurbineHitbox.overlapsDeep(level, player.getBoundingBox())) {
             clear = player.position();
             clearLevel = level;
             return;

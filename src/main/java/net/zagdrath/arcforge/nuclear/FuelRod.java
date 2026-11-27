@@ -28,9 +28,10 @@ import net.zagdrath.arcforge.registry.ModDataComponents;
 public record FuelRod(FuelType type, int enrichment, float burnup, float plutonium, float fissionProducts, float dischargeHeat, long discharged,
         boolean damaged, float startPlutonium) {
     // Uranium oxide (U-235 in U-238); mixed oxide (plutonium in depleted uranium); a thorium blanket rod (fertile
-    // thorium that breeds U-233); thorium-U-233 fuel (U-233 bred in a blanket, back in thorium).
+    // thorium that breeds U-233); thorium-U-233 fuel (U-233 bred in a blanket, back in thorium); a Lithium Target Rod
+    // (lithium-6 that breeds tritium, its burnup the share bred; no fuel at all).
     public enum FuelType implements StringRepresentable {
-        UOX("uox"), MOX("mox"), THORIUM("thorium"), U233("u233");
+        UOX("uox"), MOX("mox"), THORIUM("thorium"), U233("u233"), LITHIUM("lithium");
 
         public static final Codec<FuelType> CODEC = StringRepresentable.fromEnum(FuelType::values);
         private final String name;
@@ -77,19 +78,26 @@ public record FuelRod(FuelType type, int enrichment, float burnup, float plutoni
 
     // Spent at this burnup (for showing what a rod comes out as).
     public FuelRod burnt(float to) {
-        float fp = Math.min(1.0F, to);
-        float pu = type == FuelType.THORIUM ? 0.02F * to : startPlutonium * (1.0F - 0.4F * to) + 0.004F * to;
+        float fp = type == FuelType.LITHIUM ? 0.0F : Math.min(1.0F, to);
+        float pu = type == FuelType.LITHIUM ? 0.0F : type == FuelType.THORIUM ? 0.02F * to : startPlutonium * (1.0F - 0.4F * to) + 0.004F * to;
         return new FuelRod(type, enrichment, to, pu, fp, 0.0F, 0L, damaged, startPlutonium);
     }
 
     // The fissile uranium left (pcm): what reprocessing recovers.
     public int remainingUranium() {
+        if (type == FuelType.LITHIUM) {
+            return 0;
+        }
         double used = type == FuelType.THORIUM ? 0.0 : 0.45 * burnup;
         return (int) Math.round(enrichment * (1.0 - used));
     }
 
     public boolean isThoriumBlanket() {
         return type == FuelType.THORIUM;
+    }
+
+    public boolean isLithiumTarget() {
+        return type == FuelType.LITHIUM;
     }
 
     // A stack's rod; one without the component is fresh of its item's type (natural uranium, or the type's usual
@@ -105,6 +113,7 @@ public record FuelRod(FuelType type, int enrichment, float burnup, float plutoni
             case MOX -> fresh(FuelType.MOX, Enrichment.DEFAULT_TAILS_PCM, 0.07F);
             case THORIUM -> fresh(FuelType.THORIUM, 1, 0.0F);
             case U233 -> fresh(FuelType.U233, 3_000, 0.0F);
+            case LITHIUM -> fresh(FuelType.LITHIUM, 1, 0.0F);
         };
     }
 
@@ -122,7 +131,8 @@ public record FuelRod(FuelType type, int enrichment, float burnup, float plutoni
 
     // Into the reactor model, and back out of it (when the rod comes out, with its share of the decay heat).
     public ReactorSim.Rod toSim() {
-        ReactorSim.Rod rod = new ReactorSim.Rod(type == FuelType.THORIUM ? 0.0 : enrichmentFraction());
+        ReactorSim.Rod rod = new ReactorSim.Rod(type == FuelType.THORIUM || type == FuelType.LITHIUM ? 0.0 : enrichmentFraction());
+        rod.lithium = type == FuelType.LITHIUM;
         rod.burnup = burnup;
         rod.plutonium = plutonium;
         rod.plutonium0 = startPlutonium;
@@ -167,6 +177,10 @@ public record FuelRod(FuelType type, int enrichment, float burnup, float plutoni
     // Its dose rate (mSv/h at a block): fresh fuel a little by its enrichment; irradiated fuel by its fission products,
     // far more.
     public double doseRate() {
+        if (type == FuelType.LITHIUM) {
+            // A target rod: its activated cladding and the tritium in it, far less than fuel.
+            return ArcforgeConfig.REACTOR_SPENT_ROD_DOSE.getAsDouble() * 0.03 * Math.sqrt(Math.max(0.0, burnup));
+        }
         double fresh = ArcforgeConfig.REACTOR_FRESH_ROD_DOSE.getAsDouble() * Enrichment.activityFactor(enrichment);
         double spent = ArcforgeConfig.REACTOR_SPENT_ROD_DOSE.getAsDouble() * Math.sqrt(Math.max(0.0, fissionProducts));
         return damaged ? spent * 2.0 + fresh : fresh + spent;

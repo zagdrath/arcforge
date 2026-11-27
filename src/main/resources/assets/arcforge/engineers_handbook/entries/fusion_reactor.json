@@ -1,0 +1,34 @@
+{
+  "title": "Fusion Reactor",
+  "icon": "arcforge:fusion_reactor_controller",
+  "items": [
+    "arcforge:fusion_reactor_controller",
+    "arcforge:cryostat_casing",
+    "arcforge:vessel_port",
+    "arcforge:first_wall",
+    "arcforge:divertor_cassette",
+    "arcforge:breeding_blanket",
+    "arcforge:central_solenoid",
+    "arcforge:toroidal_field_coil",
+    "arcforge:poloidal_field_coil",
+    "arcforge:reactor_glass"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A compact ring built round a vertical axis, major radius R from 3 to 7 blocks. Distances are measured from the axis column; heights from the midplane. Its plasma half-height h is (R - 1) / 2, rounded down.\n# From the axis out\n- Central Solenoid: the axis column, between the coil layers.\n- First Wall: the inner wall 1 out, and the roof. The floor is Divertor Cassettes.\n- The plasma chamber: air, 2 to R - 1 out, h above and below the midplane.\n- Breeding Blanket: the outer wall R out (its face armoured, as real blanket modules are), and a layer over and under.\n- Toroidal Field Coils: the top and bottom layers, with the Poloidal Field Coils set into them as rings 1 out and R out."
+    },
+    {
+      "type": "text",
+      "text": "- The cryostat: a round wall of Cryostat Casing R + 1 out, the full height. The coils' outer legs run up inside it.\nSo a reactor is 2R + 3 blocks across: 9 at R 3, 17 at R 7, and 9 to 13 blocks tall.\n# The wall\nThe controller goes in the cryostat's wall at the midplane, straight out from the axis (the middle of a side), facing out. Vessel Ports (for modules and arms) and Reactor Glass (viewports: the plasma glows through them) may stand anywhere in the wall. Any wall block can be a port."
+    },
+    {
+      "type": "multiblock",
+      "structure": "fusion_reactor"
+    },
+    {
+      "type": "text",
+      "text": "# Sizes\nAt R 3 (9×9×9): 44 First Wall, 20 Divertor, 152 Blanket, 26 Toroidal Field Coil, 48 Poloidal Field Coil, 7 Central Solenoid and 288 Cryostat Casing, 592 in all. R 5 (13×13×11) is about twice that, R 7 (17×17×13) about three and a half times.\n# Ports\n- Input: Water or Helium (wall cooling), Lead-Lithium, Liquid Helium and Liquid Nitrogen.\n- Output: Hot Coolant from the wall, or Hot Helium on the helium loop. Hot Leg: Hot Lead-Lithium from the blanket.\n- Energy: FE for the magnets and the Central Solenoid. The modules take their own."
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "PVP",
+    "SGS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "P": "arcforge:steel_pipe",
+    "V": "arcforge:vessel_port",
+    "G": "arcforge:rubber_gasket"
+  },
+  "result": {
+    "id": "arcforge:gas_puff_valve",
+    "count": 1
+  }
+}

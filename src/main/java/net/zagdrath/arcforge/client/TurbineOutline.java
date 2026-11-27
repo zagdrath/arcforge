@@ -26,9 +26,9 @@ import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 
-// Looking at any block of a formed Steam Turbine Array or Nuclear Steam Turbine outlines the whole array as one box, in the vanilla outline's
-// colour and width, instead of the one block: its blocks are picked as full blocks, while they collide as the model
-// (see TurbineHitbox), so the array is one target.
+// Looking at any block of a formed Steam Turbine Array, Nuclear Steam Turbine or Helium Gas Turbine outlines the whole
+// array as one box, in the vanilla outline's colour and width, instead of the one block: its blocks are picked as full
+// blocks, while they collide as the model (see TurbineHitbox), so the array is one target.
 @EventBusSubscriber(modid = Arcforge.MODID, value = Dist.CLIENT)
 public final class TurbineOutline {
     private TurbineOutline() {}
@@ -64,6 +64,7 @@ public final class TurbineOutline {
                 ? part.getMaster()
                 : PressureGlassBlock.findMaster(level, pos);
         return master instanceof SteamTurbineArrayBlockEntity || master instanceof net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity
+                || master instanceof net.zagdrath.arcforge.blockentity.multiblock.HeliumGasTurbineBlockEntity
                 ? master.getShell() : null;
     }
 }

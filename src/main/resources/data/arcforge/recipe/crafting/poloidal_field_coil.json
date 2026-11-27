@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ICI",
+    "C C",
+    "III"
+  ],
+  "key": {
+    "I": "#c:plates/invar",
+    "C": "arcforge:superconducting_coil"
+  },
+  "result": {
+    "id": "arcforge:poloidal_field_coil",
+    "count": 1
+  }
+}

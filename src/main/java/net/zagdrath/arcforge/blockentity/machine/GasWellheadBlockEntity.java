@@ -47,7 +47,7 @@ public class GasWellheadBlockEntity extends BlockEntity implements ConduitConnec
 
     public GasWellheadBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.GAS_WELLHEAD.get(), pos, state);
-        this.tank = new FilteredFluidTank(ArcforgeConfig.GAS_WELLHEAD_TANK_CAPACITY.getAsInt(), resource -> resource.is(ModFluids.NATURAL_GAS.get()),
+        this.tank = new FilteredFluidTank(ArcforgeConfig.GAS_WELLHEAD_TANK_CAPACITY.getAsInt(), resource -> resource.is(ModFluids.NATURAL_GAS.get()) || resource.is(ModFluids.HELIUM_RICH_NATURAL_GAS.get()),
                 this::setChanged);
         this.output = new AutomationResourceHandler<>(tank, index -> false, index -> true);
     }
@@ -89,11 +89,11 @@ public class GasWellheadBlockEntity extends BlockEntity implements ConduitConnec
             whole = (int) Math.max(taken, Math.min(whole, Math.round(trickle)));
         }
         try (Transaction tx = Transaction.openRoot()) {
-            tank.insert(0, FluidResource.of(ModFluids.NATURAL_GAS.get()), whole, tx);
+            tank.insert(0, FluidResource.of(deposit.gas()), whole, tx);
             tx.commit();
         }
         if (level.getGameTime() % 20 == 0) {
-            ArcforgeAdvancements.produced(this, ItemStack.EMPTY, ModFluids.NATURAL_GAS.get(), "gas_well");
+            ArcforgeAdvancements.produced(this, ItemStack.EMPTY, deposit.gas(), "gas_well");
         }
         setChanged();
     }

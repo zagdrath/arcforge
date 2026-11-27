@@ -786,6 +786,37 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Helium Gas Turbine: a closed-cycle (Brayton) turbine-generator for a helium-cooled Fusion Reactor, 5x5 across and 15",
+                "to 31 long. It takes Hot Helium and gives the cooled Helium back. Values are per section as for the Steam Turbine Array",
+                "(width x height / 9 x length: a 5x5x15 is 41.7 sections, a 5x5x31 is 86.1).").push("heliumGasTurbine");
+    }
+
+    public static final ModConfigSpec.IntValue HELIUM_TURBINE_FLOW_PER_SECTION = BUILDER
+            .comment("Rated Hot Helium flow in mB/t, per section (116: a 5x5x31 takes up to 9,989 mB/t). Its output cap and FE buffer follow it.")
+            .defineInRange("maxFlowPerSection", 116, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue HELIUM_TURBINE_FE_PER_MB = BUILDER
+            .comment("FE per mB of Hot Helium at speed (times power.generationMultiplier): 8 FE for each HU it carries (fusion.hotHeliumHeat,",
+                    "100), a little more than steam's, as a recuperated helium cycle runs hotter. A 5x5x31 makes about 8M FE/t.")
+            .defineInRange("fePerMb", 800.0, 1.0, 100_000.0);
+
+    public static final ModConfigSpec.IntValue HELIUM_TURBINE_TANK_PER_SECTION = BUILDER
+            .comment("Hot Helium and Helium tank sizes in mB, per section.")
+            .defineInRange("tankCapacityPerSection", 4_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue HELIUM_TURBINE_ENERGY_BUFFER_TICKS = BUILDER
+            .comment("Internal FE buffer size, in ticks of its output cap.")
+            .defineInRange("energyBufferTicks", 200, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue HELIUM_TURBINE_MAX_RPM = BUILDER
+            .comment("Its synchronous speed: the shaft runs at this whatever the load.")
+            .defineInRange("maxRpm", 3_000, 100, 100_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Gas Turbine Array: a 3x3 turbine 5 to 9 blocks long that burns Fuel Burner fuels (those not marked",
                 "\"gas_turbine\": false) straight to FE, and passes part of the heat out of its exhaust.").push("gasTurbineArray");
     }
@@ -3934,6 +3965,11 @@ public class ArcforgeConfig {
                     "cavern), tapped by drilling into it and fitting a Gas Wellhead.")
             .defineInRange("gasCapChance", 0.35, 0.0, 1.0);
 
+    public static final ModConfigSpec.DoubleValue OIL_HELIUM_RICH_CHANCE = BUILDER
+            .comment("Chance that a gas cap is helium-rich: its wellheads give Helium-Rich Natural Gas, which the Cryogenic",
+                    "Distillation Column splits into Natural Gas and Helium. Shown by the Seismic Survey Tool and on Survey Records.")
+            .defineInRange("heliumRichChance", 0.25, 0.0, 1.0);
+
     public static final ModConfigSpec.IntValue OIL_GAS_PER_BLOCK = BUILDER
             .comment("Natural Gas a gas cap holds per block of its dome, in mB (times amountMultiplier).")
             .defineInRange("gasPerBlock", 2_000, 1, 1_000_000);
@@ -4632,6 +4668,287 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue CONTAMINATED_PER_DRUM = BUILDER
             .comment("Contaminated items (any item with fallout on it) the Waste Compactor packs into one Low-Level Waste Drum.")
             .defineInRange("contaminatedPerDrum", 16, 1, 64);
+
+    static {
+        BUILDER.pop();
+        BUILDER.pop();
+    }
+
+    // --- Fusion ---
+
+    static {
+        BUILDER.comment("The fusion tier: the tokamak Fusion Reactor (and the Stellarator), its fuels, cryogenics, magnets, tritium cycle and",
+                "failures. Its plasma physics (confinement scaling, fusion reactivities, limits) is fixed; these set its size of",
+                "output, its rates and its limits.").push("fusion");
+        BUILDER.comment("Liquid Nitrogen and Liquid Helium, the Cryogenic Plant and the Cryogenic Distillation Column.").push("cryogenics");
+    }
+
+    public static final ModConfigSpec.DoubleValue CRYOGENIC_BOIL_OFF = BUILDER
+            .comment("Share of the Liquid Nitrogen or Liquid Helium in an ordinary tank that boils away each minute (a Cryogenic Tank",
+                    "keeps it).")
+            .defineInRange("boilOffPerMinute", 0.05, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue CRYOGENIC_BOIL_OFF_MINIMUM = BUILDER
+            .comment("Fewest mB a second an ordinary tank holding a cryogenic liquid loses.")
+            .defineInRange("boilOffMinimum", 1, 0, 1000);
+
+    public static final ModConfigSpec.IntValue CRYO_PLANT_RATE = BUILDER
+            .comment("mB a tick of gas the Cryogenic Plant liquefies per block inside its cold box (3x3x3 to 7x7x7). The FE it takes is",
+                    "each arcforge:liquefying recipe's.")
+            .defineInRange("cryoPlantRatePerBlock", 4, 1, 10_000);
+
+    public static final ModConfigSpec.IntValue CRYO_PLANT_TANK = BUILDER
+            .comment("mB each of the Cryogenic Plant's tanks holds.")
+            .defineInRange("cryoPlantTank", 64_000, 1000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue CRYO_COLUMN_ENERGY = BUILDER
+            .comment("FE a tick the Cryogenic Distillation Column uses per block of its height while it runs.")
+            .defineInRange("columnEnergyPerBlock", 80, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue CRYO_COLUMN_TANK = BUILDER
+            .comment("mB each of the Cryogenic Distillation Column's tanks holds.")
+            .defineInRange("columnTank", 64_000, 1000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue CRYO_COLUMN_OPERATIONS = BUILDER
+            .comment("Operations of its recipe each stage (block of the column's inside height) runs every recipe time. The column is",
+                    "always 3 across, so it makes up in its stages what it lost in width: at 2, a 3x3x16 (14 stages) runs 28 a cycle.")
+            .defineInRange("columnOperationsPerStage", 2, 1, 1_000);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Lithium-6: the Lithium Isotope Separator, Lead-Lithium and Lithium Target Rods.").push("lithium");
+    }
+
+    public static final ModConfigSpec.IntValue LITHIUM_SEPARATOR_ENERGY = BUILDER
+            .comment("FE a tick the Lithium Isotope Separator uses while it works.")
+            .defineInRange("separatorEnergy", 160, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue LITHIUM_SEPARATOR_TIME = BUILDER
+            .comment("Ticks one pass of the Lithium Isotope Separator takes.")
+            .defineInRange("separatorTime", 200, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue LITHIUM_SEPARATOR_FEED = BUILDER
+            .comment("Lithium fluoride items one pass takes for one item out (the rest leaves as depleted tails).")
+            .defineInRange("separatorFeed", 2, 1, 64);
+
+    public static final ModConfigSpec.DoubleValue LITHIUM_ENRICHMENT_STEP = BUILDER
+            .comment("Percentage points of Li-6 one pass adds (natural lithium is 7.5% Li-6).")
+            .defineInRange("enrichmentStep", 20.0, 0.1, 100.0);
+
+    public static final ModConfigSpec.DoubleValue LITHIUM_MAX_ENRICHMENT = BUILDER
+            .comment("The most Li-6 the separator reaches, in %.")
+            .defineInRange("maxEnrichment", 95.0, 7.5, 100.0);
+
+    public static final ModConfigSpec.DoubleValue LITHIUM_ENRICHED_MINIMUM = BUILDER
+            .comment("The Li-6 share (%) Lead-Lithium and Lithium Target Rods need.")
+            .defineInRange("enrichedMinimum", 60.0, 7.5, 100.0);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Tritium: how it's made, how it decays, and how it leaks.").push("tritium");
+    }
+
+    public static final ModConfigSpec.DoubleValue TRITIUM_HALF_LIFE = BUILDER
+            .comment("Tritium's half-life in Minecraft days (the real one is 12.3 years). Stored tritium decays to Helium-3.")
+            .defineInRange("halfLifeDays", 120.0, 0.01, 1_000_000.0);
+
+    public static final ModConfigSpec.DoubleValue TRITIUM_LEAK = BUILDER
+            .comment("Share of the tritium in a single-walled tank or pipe that permeates into the air each minute. Tritium Canisters",
+                    "and the Tritium Plant are double-walled and keep it.")
+            .defineInRange("leakPerMinute", 0.002, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue TARGET_ROD_BREEDING = BUILDER
+            .comment("Share of a Lithium Target Rod bred a tick at full reactor power (it takes the rod's neutrons as a mild poison).")
+            .defineInRange("targetRodBreeding", 0.00004, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue TARGET_ROD_ABSORPTION = BUILDER
+            .comment("How strongly a Lithium Target Rod absorbs neutrons, against a Control Rod's 1.")
+            .defineInRange("targetRodAbsorption", 0.6, 0.0, 10.0);
+
+    public static final ModConfigSpec.IntValue EXTRACTION_HEAT = BUILDER
+            .comment("HU a tick the Tritium Extraction Unit uses while it bakes a rod.")
+            .defineInRange("extractionHeat", 400, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue EXTRACTION_TEMPERATURE = BUILDER
+            .comment("°C the Tritium Extraction Unit must reach to bake the tritium out.")
+            .defineInRange("extractionTemperature", 600, 20, 5000);
+
+    public static final ModConfigSpec.IntValue EXTRACTION_TIME = BUILDER
+            .comment("Ticks the Tritium Extraction Unit takes per rod.")
+            .defineInRange("extractionTime", 400, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue TRITIUM_PLANT_RATE = BUILDER
+            .comment("mB a tick of Fusion Exhaust the Tritium Plant processes per block inside it.")
+            .defineInRange("plantRatePerBlock", 8, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue TRITIUM_PLANT_ENERGY = BUILDER
+            .comment("FE the Tritium Plant spends per mB of Fusion Exhaust.")
+            .defineInRange("plantEnergy", 20, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue TRITIUM_PLANT_TANK = BUILDER
+            .comment("mB each of the Tritium Plant's tanks holds.")
+            .defineInRange("plantTank", 64_000, 1000, 10_000_000);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("The Fusion Reactor (tokamak) and the Stellarator. Its plasma is a 0-D power balance stepped once a second: IPB98(y,2)",
+                "confinement (ISS04 for the stellarator), Bosch-Hale reactivities, Greenwald/Troyon/vertical limits.").push("reactor");
+    }
+
+    public static final ModConfigSpec.IntValue FUSION_HU_PER_MW = BUILDER
+            .comment("HU/t one MW of fusion heat gives (blanket, divertor and first wall together). At 1,500 and the default 50 MW of",
+                    "heating, through Steam Generators (High-Pressure Steam) and Nuclear Steam Turbines (about 6.7 FE per HU): about",
+                    "3.5M FE/t from the smallest tokamak (two turbines) and 23.5M from the largest (ten).")
+            .defineInRange("huPerMegawatt", 1_500, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FUSION_HEATING_FE_PER_MW = BUILDER
+            .comment("FE/t one MW of plasma heating (neutral beams and gyrotrons) costs.")
+            .defineInRange("heatingFePerMegawatt", 6_000, 1, 10_000_000);
+
+    public static final ModConfigSpec.IntValue FUSION_CS_FE_PER_WEBER = BUILDER
+            .comment("FE the Central Solenoid stores per weber of flux swing; it charges before each pulse.")
+            .defineInRange("solenoidFePerWeber", 2_000_000, 0, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue FUSION_MAGNET_FE = BUILDER
+            .comment("FE to energise the field coils, per (major radius)², each time they're energised (about 18M at radius 3, 98M at 7).")
+            .defineInRange("magnetEnergisePerRadius", 2_000_000, 0, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue FUSION_MAGNET_LHE = BUILDER
+            .comment("mB a second of Liquid Helium the superconducting coils boil, per block of major radius.")
+            .defineInRange("magnetHeliumPerRadius", 3, 0, 10_000);
+
+    public static final ModConfigSpec.IntValue FUSION_MAGNET_LN2 = BUILDER
+            .comment("mB a second of Liquid Nitrogen they use instead, cooled only to 77 K (a weaker field).")
+            .defineInRange("magnetNitrogenPerRadius", 9, 0, 10_000);
+
+    public static final ModConfigSpec.DoubleValue FUSION_LN2_FIELD = BUILDER
+            .comment("Share of the full field the coils reach cooled with Liquid Nitrogen only.")
+            .defineInRange("nitrogenFieldShare", 0.4, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue FUSION_FIELD_SMALL = BUILDER
+            .comment("Toroidal field (T) of the smallest tokamak (major radius 3); larger ones step down to fieldLarge.")
+            .defineInRange("fieldSmall", 8.0, 0.5, 20.0);
+
+    public static final ModConfigSpec.DoubleValue FUSION_FIELD_LARGE = BUILDER
+            .comment("Toroidal field (T) of the largest tokamak (major radius 7). At 6 each size up makes more fusion power than the",
+                    "last (about 270 MW at major radius 3 to 2,050 MW at 7); much lower and the largest sizes make no more than the one below.")
+            .defineInRange("fieldLarge", 6.0, 0.5, 20.0);
+
+    public static final ModConfigSpec.DoubleValue FUSION_STELLARATOR_FIELD = BUILDER
+            .comment("A stellarator's field against a tokamak's of the same size.")
+            .defineInRange("stellaratorField", 0.9, 0.1, 2.0);
+
+    public static final ModConfigSpec.DoubleValue FUSION_H_FACTOR = BUILDER
+            .comment("Confinement multiplier on IPB98(y,2) (H98).")
+            .defineInRange("hFactor", 1.0, 0.1, 3.0);
+
+    public static final ModConfigSpec.DoubleValue FUSION_STELLARATOR_H = BUILDER
+            .comment("Confinement multiplier on ISS04 for the stellarator.")
+            .defineInRange("stellaratorH", 0.95, 0.1, 3.0);
+
+    public static final ModConfigSpec.DoubleValue FUSION_BETA_LIMIT = BUILDER
+            .comment("Troyon normalised beta limit: past it a tokamak disrupts.")
+            .defineInRange("betaNLimit", 3.5, 0.5, 10.0);
+
+    public static final ModConfigSpec.DoubleValue FUSION_GREENWALD_LIMIT = BUILDER
+            .comment("Greenwald density fraction past which a tokamak disrupts.")
+            .defineInRange("greenwaldLimit", 1.0, 0.1, 3.0);
+
+    public static final ModConfigSpec.DoubleValue FUSION_DHE3_BOOST = BUILDER
+            .comment("D-He3 reactivity multiplier: a gameplay allowance (real D-He3 needs confinement no tokamak reaches).")
+            .defineInRange("dhe3Boost", 40.0, 1.0, 1000.0);
+
+    public static final ModConfigSpec.DoubleValue FUSION_TBR = BUILDER
+            .comment("Tritium bred per tritium burnt by a whole, unworn Lead-Lithium blanket (each module port takes a little coverage).")
+            .defineInRange("tritiumBreedingRatio", 1.15, 0.0, 3.0);
+
+    public static final ModConfigSpec.DoubleValue FUSION_LEAD_LITHIUM_HEAT = BUILDER
+            .comment("HU each mB of Hot Lead-Lithium carries from the blanket to the Steam Generator (it boils High-Pressure Steam, for",
+                    "the Nuclear Steam Turbine, as a water-cooled lithium-lead blanket would).")
+            .defineInRange("hotLeadLithiumHeat", 300.0, 1.0, 100_000.0);
+
+    public static final ModConfigSpec.DoubleValue FUSION_HOT_HELIUM_HEAT = BUILDER
+            .comment("HU each mB of Hot Helium carries from a helium-cooled reactor to the Helium Gas Turbine (Helium in the coolant",
+                    "tank cools the wall, and whatever of the blanket's heat its Lead-Lithium can't take).")
+            .defineInRange("hotHeliumHeat", 100.0, 1.0, 100_000.0);
+
+    public static final ModConfigSpec.DoubleValue FUSION_BLANKET_GAIN = BUILDER
+            .comment("The blanket's energy multiplication: lithium-6's own reaction adds to the neutrons' energy.")
+            .defineInRange("blanketGain", 1.15, 1.0, 2.0);
+
+    public static final ModConfigSpec.DoubleValue FUSION_BASE_IMPURITY = BUILDER
+            .comment("Impurity fraction of a clean plasma (eroded walls and poor vacuum add to it).")
+            .defineInRange("baseImpurity", 0.002, 0.0, 0.1);
+
+    public static final ModConfigSpec.IntValue FUSION_PUMPDOWN = BUILDER
+            .comment("Seconds one Cryopump takes to pump a 4-radius vessel down to vacuum (bigger vessels and fewer pumps take longer).")
+            .defineInRange("pumpDownSeconds", 30, 1, 72_000);
+
+    public static final ModConfigSpec.DoubleValue FUSION_CRYOPUMP_SPEED = BUILDER
+            .comment("Share of the plasma's escaping particles each running Cryopump takes away as exhaust (the rest recycles).")
+            .defineInRange("cryopumpSpeed", 0.25, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue FUSION_NBI_POWER = BUILDER
+            .comment("Most heating (MW) one Neutral Beam Injector delivers.")
+            .defineInRange("nbiPower", 40, 1, 1000);
+
+    public static final ModConfigSpec.IntValue FUSION_GYROTRON_POWER = BUILDER
+            .comment("Most heating (MW) one Gyrotron delivers.")
+            .defineInRange("gyrotronPower", 20, 1, 1000);
+
+    public static final ModConfigSpec.IntValue FUSION_DEC_POWER = BUILDER
+            .comment("Most of the plasma's charged-particle outflow (MW, its transport loss) one Direct Energy Converter takes and turns",
+                    "straight into FE instead of heat. D-T sends most of its power out as neutrons, so the converters matter most on",
+                    "D-He3, whose power leaves almost all as charged particles.")
+            .defineInRange("directConverterPower", 250, 1, 10_000);
+
+    public static final ModConfigSpec.IntValue FUSION_DEC_FE_PER_MW = BUILDER
+            .comment("FE/t a Direct Energy Converter makes from each MW it takes: half again the thermal route's (a MW of heat is",
+                    "huPerMegawatt HU/t, about 6.7 FE per HU through turbines), as direct conversion runs at about 60% against a",
+                    "steam cycle's 40%.")
+            .defineInRange("directConverterFePerMegawatt", 15_000, 1, 10_000_000);
+
+    public static final ModConfigSpec.IntValue FUSION_PELLET_RATE = BUILDER
+            .comment("Most fuel (mB a second) one Pellet Injector delivers.")
+            .defineInRange("pelletRate", 80, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue FUSION_PUFF_RATE = BUILDER
+            .comment("Most gas (mB a second) one Gas Puff Valve lets in; half of it reaches the plasma.")
+            .defineInRange("gasPuffRate", 40, 1, 100_000);
+
+    public static final ModConfigSpec.DoubleValue FUSION_WALL_WEAR = BUILDER
+            .comment("First Wall and Divertor wear a second, per MW of heat through them per block of wall and divertor. The compact",
+                    "ring has about a quarter of the larger layout's wall, so this is a quarter of its rate: parts last as long.")
+            .defineInRange("wallWear", 0.0000005, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue FUSION_BLANKET_WEAR = BUILDER
+            .comment("Breeding Blanket wear a second per MW of neutrons per block of blanket (a little under half the larger",
+                    "layout's rate, for its fewer blankets).")
+            .defineInRange("blanketWear", 0.00000023, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue FUSION_DISRUPTION_WEAR = BUILDER
+            .comment("First Wall and Divertor wear a disruption does (more for a hotter, bigger plasma).")
+            .defineInRange("disruptionWear", 0.08, 0.0, 1.0);
+
+    public static final ModConfigSpec.BooleanValue FUSION_DISRUPTION_DAMAGE = BUILDER
+            .comment("Whether disruptions and runaway electrons can melt First Wall and Divertor blocks out of the vessel.")
+            .define("disruptionBlockDamage", true);
+
+    public static final ModConfigSpec.BooleanValue FUSION_QUENCH_DAMAGE = BUILDER
+            .comment("Whether a magnet quench without a Quench Protection Unit damages a coil.")
+            .define("quenchDamage", true);
+
+    public static final ModConfigSpec.BooleanValue FUSION_TRITIUM_CONTAMINATION = BUILDER
+            .comment("Whether a tritium release contaminates the air and surfaces round it.")
+            .define("tritiumContamination", true);
+
+    public static final ModConfigSpec.BooleanValue FUSION_NEUTRON_MOBS = BUILDER
+            .comment("Whether fusion neutrons dose mobs (players always take the dose).")
+            .define("neutronEffectsOnMobs", true);
+
+    public static final ModConfigSpec.DoubleValue FUSION_NEUTRON_DOSE = BUILDER
+            .comment("mSv/h at one block per MW of neutrons leaving the cryostat (shielded by concrete, water and Containment Concrete).")
+            .defineInRange("neutronDose", 0.02, 0.0, 1000.0);
 
     static {
         BUILDER.pop();

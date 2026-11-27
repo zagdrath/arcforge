@@ -1,0 +1,28 @@
+{
+  "title": "Superconducting Magnets",
+  "icon": "arcforge:superconducting_coil",
+  "items": [
+    "arcforge:arcite_tungsten_wire",
+    "arcforge:superconducting_tape",
+    "arcforge:superconducting_coil",
+    "arcforge:toroidal_field_coil",
+    "arcforge:poloidal_field_coil",
+    "arcforge:central_solenoid",
+    "arcforge:stellarator_coil",
+    "arcforge:quench_protection_unit"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Arcite-tungsten superconducts only when cold, and then carries any current with no loss.\n# Making them\n- Press Arcite-Tungsten Composite with the Rod Die: two Arcite-Tungsten Wire.\n- Sinter the wire into Superconducting Tape.\n- Four tapes round a Steel Rod: a Superconducting Coil.\n- Three coils in steel and invar make a Toroidal Field or Poloidal Field Coil, six round a Steel Rod a Central Solenoid block; Stellarator Coils are a Toroidal Field Coil wound with four more coils, two at a time. The smallest tokamak takes about 260 coils (1,060 arcite), the largest about 1,130 (4,500)."
+    },
+    {
+      "type": "text",
+      "text": "# What each does\n- Toroidal Field Coils make the field that confines the plasma: 8 T on the smallest reactor, 6 T on the largest.\n- The Central Solenoid drives the plasma's current; its flux sets how long a pulse lasts.\n- Poloidal Field Coils shape the plasma and hold it in place against the vertical instability.\n# Keeping them cold\nWith Liquid Helium they reach the full field and boil 3 mB a second per block of major radius. With Liquid Nitrogen alone (9 mB a second per block of radius) they reach only 40% of it. Energising them costs 2,000,000 FE times the radius squared, once; holding the field is free."
+    },
+    {
+      "type": "text",
+      "text": "# Quench\nA coil that warms past its critical temperature while energised goes normal: the field collapses, the plasma disrupts, and the magnet's stored energy dumps into the coil, damaging it, unless a Quench Protection Unit stands against the cryostat's wall to take it. Damaged coils weaken the vertical control; a Remote Handling Arm repairs them."
+    }
+  ]
+}

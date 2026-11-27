@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "arcforge:block/fusion/cryopump"
+    },
+    "facing=east": {
+      "model": "arcforge:block/fusion/cryopump",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "arcforge:block/fusion/cryopump",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "arcforge:block/fusion/cryopump",
+      "y": 270
+    }
+  }
+}

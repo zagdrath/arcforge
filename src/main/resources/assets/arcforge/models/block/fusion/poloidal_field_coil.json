@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "arcforge:block/fusion/poloidal_field_coil_top",
+    "bottom": "arcforge:block/fusion/poloidal_field_coil_top",
+    "side": "arcforge:block/fusion/poloidal_field_coil"
+  }
+}

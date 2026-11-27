@@ -84,6 +84,11 @@
       "hu_per_mb": 55,
       "mb_per_tick": 1.0,
       "burn_temperature": 1250
+    },
+    "arcforge:helium_rich_natural_gas": {
+      "hu_per_mb": 55,
+      "mb_per_tick": 1.0,
+      "burn_temperature": 1250
     }
   }
 }

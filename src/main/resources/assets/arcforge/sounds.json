@@ -295,5 +295,23 @@
         "stream": false
       }
     ]
+  },
+  "fusion_reactor_run": {
+    "subtitle": "subtitles.arcforge.fusion_reactor_run",
+    "sounds": [
+      {
+        "name": "arcforge:fusion_reactor_run",
+        "stream": false
+      }
+    ]
+  },
+  "cryogenic_plant_run": {
+    "subtitle": "subtitles.arcforge.cryogenic_plant_run",
+    "sounds": [
+      {
+        "name": "arcforge:cryogenic_plant_run",
+        "stream": false
+      }
+    ]
   }
 }

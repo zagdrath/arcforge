@@ -176,10 +176,12 @@ public class ArcforgeClient {
         EngineersHandbookItem.opener = EngineersHandbookScreen::open;
         SteamTurbineArrayBlockEntity.clientSoundHook = TurbineArraySound::keepPlaying;
         net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity.clientSoundHook = TurbineArraySound::keepPlaying;
+        net.zagdrath.arcforge.blockentity.multiblock.HeliumGasTurbineBlockEntity.clientSoundHook = TurbineArraySound::keepPlaying;
         GasTurbineArrayBlockEntity.clientHook = GasTurbineArraySound::clientTick;
         net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity.clientHook = net.zagdrath.arcforge.client.sound.DieselGeneratorSound::clientTick;
         net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity.clientHook = net.zagdrath.arcforge.client.sound.CentrifugeCascadeSound::clientTick;
         net.zagdrath.arcforge.blockentity.multiblock.FissionReactorBlockEntity.clientHook = net.zagdrath.arcforge.client.sound.FissionReactorSound::clientTick;
+        net.zagdrath.arcforge.blockentity.fusion.FusionReactorBlockEntity.clientHook = net.zagdrath.arcforge.client.sound.FusionReactorSound::clientTick;
         MachineSounds.clientHook = MachineLoopSound::keepPlaying;
         JetpackStatePayload.clientHandler = JetpackClient::onState;
         net.zagdrath.arcforge.network.ArcQuarryFinishedPayload.clientHandler = ArcQuarryToast::show;
@@ -201,6 +203,8 @@ public class ArcforgeClient {
         // The Fission Reactor's desk takes clicks on its controls before other mods' screen listeners can.
         NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGHEST, true, net.neoforged.neoforge.client.event.ScreenEvent.MouseButtonPressed.Pre.class,
                 net.zagdrath.arcforge.client.screen.multiblock.FissionReactorScreen::deskClick);
+        NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.HIGHEST, true, net.neoforged.neoforge.client.event.ScreenEvent.MouseButtonPressed.Pre.class,
+                net.zagdrath.arcforge.client.screen.fusion.FusionReactorScreen::deskClick);
         // Canister and cartridge fill bars take the fluid's colour from its model.
         PortableStorageItem.fluidTint = stack -> {
             var model = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(stack.getFluid().defaultFluidState());
@@ -214,6 +218,13 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.LEAD_BOX.get(), net.zagdrath.arcforge.client.screen.tool.LeadBoxScreen::new);
         event.register(ModMenuTypes.CENTRIFUGE_CASCADE.get(), net.zagdrath.arcforge.client.screen.multiblock.CentrifugeCascadeScreen::new);
         event.register(ModMenuTypes.FISSION_REACTOR.get(), net.zagdrath.arcforge.client.screen.multiblock.FissionReactorScreen::new);
+        event.register(ModMenuTypes.FUSION_REACTOR.get(), net.zagdrath.arcforge.client.screen.fusion.FusionReactorScreen::new);
+        event.register(ModMenuTypes.LITHIUM_ISOTOPE_SEPARATOR.get(), net.zagdrath.arcforge.client.screen.fusion.LithiumIsotopeSeparatorScreen::new);
+        event.register(ModMenuTypes.TRITIUM_EXTRACTION_UNIT.get(), net.zagdrath.arcforge.client.screen.fusion.TritiumExtractionUnitScreen::new);
+        event.register(ModMenuTypes.REMOTE_HANDLING_ARM.get(), net.zagdrath.arcforge.client.screen.fusion.RemoteHandlingArmScreen::new);
+        event.register(ModMenuTypes.CRYOGENIC_PLANT.get(), net.zagdrath.arcforge.client.screen.fusion.FusionPlantScreen::new);
+        event.register(ModMenuTypes.CRYOGENIC_COLUMN.get(), net.zagdrath.arcforge.client.screen.fusion.FusionPlantScreen::new);
+        event.register(ModMenuTypes.TRITIUM_PLANT.get(), net.zagdrath.arcforge.client.screen.fusion.FusionPlantScreen::new);
         event.register(ModMenuTypes.STEAM_GENERATOR.get(), net.zagdrath.arcforge.client.screen.multiblock.SteamGeneratorScreen::new);
         event.register(ModMenuTypes.HEAVY_WATER_TOWER.get(), net.zagdrath.arcforge.client.screen.multiblock.HeavyWaterTowerScreen::new);
         event.register(ModMenuTypes.PUREX_PLANT.get(), net.zagdrath.arcforge.client.screen.multiblock.PurexScreen::new);
@@ -283,6 +294,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.ARC_QUARRY_CONFIG.get(), ArcQuarryConfigScreen::new);
         event.register(ModMenuTypes.STEAM_TURBINE_ARRAY.get(), SteamTurbineArrayScreen::new);
         event.register(ModMenuTypes.NUCLEAR_STEAM_TURBINE.get(), net.zagdrath.arcforge.client.screen.multiblock.NuclearSteamTurbineScreen::new);
+        event.register(ModMenuTypes.HELIUM_GAS_TURBINE.get(), net.zagdrath.arcforge.client.screen.multiblock.HeliumGasTurbineScreen::new);
         event.register(ModMenuTypes.GAS_TURBINE_ARRAY.get(), GasTurbineArrayScreen::new);
         event.register(ModMenuTypes.SUPERHEATER_ARRAY.get(), SuperheaterArrayScreen::new);
         event.register(ModMenuTypes.CONDENSER_ARRAY.get(), CondenserArrayScreen::new);
@@ -382,6 +394,10 @@ public class ArcforgeClient {
         event.register(liquidModel("hot_fuel_salt"), ModFluids.HOT_FUEL_SALT, ModFluids.FLOWING_HOT_FUEL_SALT);
         event.register(liquidModel("corium"), ModFluids.CORIUM, ModFluids.FLOWING_CORIUM);
         event.register(liquidModel("mercury"), ModFluids.MERCURY, ModFluids.FLOWING_MERCURY);
+        event.register(liquidModel("liquid_nitrogen"), ModFluids.LIQUID_NITROGEN, ModFluids.FLOWING_LIQUID_NITROGEN);
+        event.register(liquidModel("liquid_helium"), ModFluids.LIQUID_HELIUM, ModFluids.FLOWING_LIQUID_HELIUM);
+        event.register(liquidModel("lead_lithium"), ModFluids.LEAD_LITHIUM, ModFluids.FLOWING_LEAD_LITHIUM);
+        event.register(liquidModel("hot_lead_lithium"), ModFluids.HOT_LEAD_LITHIUM, ModFluids.FLOWING_HOT_LEAD_LITHIUM);
         // The slurries share one greyscale texture, tinted per metal.
         for (OreSlurry slurry : OreSlurry.values()) {
             ModFluids.Slurry fluids = ModFluids.slurry(slurry);
@@ -417,6 +433,14 @@ public class ArcforgeClient {
         event.register(gasModel(HYDROGEN_SULFIDE_TINT), ModFluids.HYDROGEN_SULFIDE, ModFluids.FLOWING_HYDROGEN_SULFIDE);
         event.register(gasModel(GasTints.NITROGEN_DIOXIDE), ModFluids.NITROGEN_DIOXIDE, ModFluids.FLOWING_NITROGEN_DIOXIDE);
         event.register(gasModel(GasTints.SULFUR_DIOXIDE), ModFluids.SULFUR_DIOXIDE, ModFluids.FLOWING_SULFUR_DIOXIDE);
+        event.register(gasModel(GasTints.DEUTERIUM), ModFluids.DEUTERIUM, ModFluids.FLOWING_DEUTERIUM);
+        event.register(gasModel(GasTints.TRITIUM), ModFluids.TRITIUM, ModFluids.FLOWING_TRITIUM);
+        event.register(gasModel(GasTints.HELIUM), ModFluids.HELIUM, ModFluids.FLOWING_HELIUM);
+        event.register(gasModel(GasTints.HOT_HELIUM), ModFluids.HOT_HELIUM, ModFluids.FLOWING_HOT_HELIUM);
+        event.register(gasModel(GasTints.HELIUM_3), ModFluids.HELIUM_3, ModFluids.FLOWING_HELIUM_3);
+        event.register(gasModel(GasTints.ARGON), ModFluids.ARGON, ModFluids.FLOWING_ARGON);
+        event.register(gasModel(GasTints.HELIUM_RICH_NATURAL_GAS), ModFluids.HELIUM_RICH_NATURAL_GAS, ModFluids.FLOWING_HELIUM_RICH_NATURAL_GAS);
+        event.register(gasModel(GasTints.FUSION_EXHAUST), ModFluids.FUSION_EXHAUST, ModFluids.FLOWING_FUSION_EXHAUST);
     }
 
     private static FluidModel.Unbaked liquidModel(String name) {
@@ -536,6 +560,18 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(0xF06020, 0.5F), ModFluids.CORIUM_TYPE.get());
         event.registerFluidType(liquidFog(0x7FB84A, 5.0F), ModFluids.NUTRIENT_SOLUTION_TYPE.get());
         event.registerFluidType(liquidFog(0xD8A838, 4.0F), ModFluids.BIODIESEL_TYPE.get());
+        event.registerFluidType(liquidFog(GasTints.DEUTERIUM & 0xFFFFFF, 6.0F), ModFluids.DEUTERIUM_TYPE.get());
+        event.registerFluidType(liquidFog(GasTints.TRITIUM & 0xFFFFFF, 6.0F), ModFluids.TRITIUM_TYPE.get());
+        event.registerFluidType(liquidFog(GasTints.HELIUM & 0xFFFFFF, 6.0F), ModFluids.HELIUM_TYPE.get());
+        event.registerFluidType(liquidFog(GasTints.HOT_HELIUM & 0xFFFFFF, 6.0F), ModFluids.HOT_HELIUM_TYPE.get());
+        event.registerFluidType(liquidFog(GasTints.HELIUM_3 & 0xFFFFFF, 6.0F), ModFluids.HELIUM_3_TYPE.get());
+        event.registerFluidType(liquidFog(GasTints.ARGON & 0xFFFFFF, 6.0F), ModFluids.ARGON_TYPE.get());
+        event.registerFluidType(liquidFog(GasTints.HELIUM_RICH_NATURAL_GAS & 0xFFFFFF, 6.0F), ModFluids.HELIUM_RICH_NATURAL_GAS_TYPE.get());
+        event.registerFluidType(liquidFog(GasTints.FUSION_EXHAUST & 0xFFFFFF, 6.0F), ModFluids.FUSION_EXHAUST_TYPE.get());
+        event.registerFluidType(liquidFog(0xCFE4F2, 10.0F), ModFluids.LIQUID_NITROGEN_TYPE.get());
+        event.registerFluidType(liquidFog(0xDCEAF6, 12.0F), ModFluids.LIQUID_HELIUM_TYPE.get());
+        event.registerFluidType(liquidFog(0x6A7078, 1.0F), ModFluids.LEAD_LITHIUM_TYPE.get());
+        event.registerFluidType(liquidFog(0xA8603C, 1.0F), ModFluids.HOT_LEAD_LITHIUM_TYPE.get());
         for (OreSlurry slurry : OreSlurry.values()) {
             event.registerFluidType(liquidFog(slurry.tint() & 0xFFFFFF, 3.0F), ModFluids.slurry(slurry).type().get());
         }
@@ -637,6 +673,12 @@ public class ArcforgeClient {
     @SubscribeEvent
     static void registerStandaloneModels(ModelEvent.RegisterStandalone event) {
         event.register(ThrottleLeverRenderer.ARM, SimpleUnbakedStandaloneModel.quadCollection(ThrottleLeverRenderer.ARM_MODEL));
+        event.register(net.zagdrath.arcforge.client.renderer.blockentity.RemoteHandlingArmRenderer.STAGE_1,
+                SimpleUnbakedStandaloneModel.quadCollection(net.zagdrath.arcforge.client.renderer.blockentity.RemoteHandlingArmRenderer.STAGE_1_MODEL));
+        event.register(net.zagdrath.arcforge.client.renderer.blockentity.RemoteHandlingArmRenderer.STAGE_2,
+                SimpleUnbakedStandaloneModel.quadCollection(net.zagdrath.arcforge.client.renderer.blockentity.RemoteHandlingArmRenderer.STAGE_2_MODEL));
+        event.register(net.zagdrath.arcforge.client.renderer.blockentity.RemoteHandlingArmRenderer.GRIPPER,
+                SimpleUnbakedStandaloneModel.quadCollection(net.zagdrath.arcforge.client.renderer.blockentity.RemoteHandlingArmRenderer.GRIPPER_MODEL));
         event.register(ArcQuarryRenderer.EMITTER, SimpleUnbakedStandaloneModel.quadCollection(ArcQuarryRenderer.EMITTER_MODEL));
         event.register(SolarThermalArrayRenderer.MIRROR, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.MIRROR_MODEL));
         event.register(SolarThermalArrayRenderer.RECEIVER, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.RECEIVER_MODEL));
@@ -690,6 +732,8 @@ public class ArcforgeClient {
         event.registerBlockEntityRenderer(ModBlockEntityTypes.STEAM_TURBINE_ARRAY.get(), SteamTurbineArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.NUCLEAR_STEAM_TURBINE.get(),
                 net.zagdrath.arcforge.client.renderer.blockentity.NuclearSteamTurbineRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.HELIUM_GAS_TURBINE.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.HeliumGasTurbineRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.GAS_TURBINE_ARRAY.get(), GasTurbineArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.METER.get(), net.zagdrath.arcforge.client.renderer.blockentity.MeterRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.DISTILLATION_ARRAY.get(), DistillationArrayRenderer::new);
@@ -721,6 +765,16 @@ public class ArcforgeClient {
         // The nuclear vessels draw their large models (their walls' blocks hide when formed).
         event.registerBlockEntityRenderer(ModBlockEntityTypes.FISSION_REACTOR.get(),
                 net.zagdrath.arcforge.client.renderer.blockentity.FissionReactorRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.FUSION_REACTOR.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.FusionReactorRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.CRYOGENIC_PLANT.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.FusionPlantRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.CRYOGENIC_COLUMN.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.FusionPlantRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.TRITIUM_PLANT.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.FusionPlantRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.REMOTE_HANDLING_ARM.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.RemoteHandlingArmRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.STEAM_GENERATOR.get(),
                 net.zagdrath.arcforge.client.renderer.blockentity.SteamGeneratorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.HEAVY_WATER_TOWER.get(),

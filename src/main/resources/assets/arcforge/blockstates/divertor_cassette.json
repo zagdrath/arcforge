@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/fusion/divertor_cassette"
+    },
+    "formed=true": {
+      "model": "arcforge:block/fusion/tokamak_hidden"
+    }
+  }
+}

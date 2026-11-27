@@ -22,6 +22,8 @@ import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.zagdrath.arcforge.block.farming.greenhouse.GreenhouseControllerBlock;
+import net.zagdrath.arcforge.block.fusion.FusionModuleBlock;
+import net.zagdrath.arcforge.block.fusion.FusionReactorControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.block.multiblock.BiogasDigesterControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
@@ -30,6 +32,7 @@ import net.zagdrath.arcforge.block.multiblock.GasTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SolarThermalArrayControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.VesselControllerBlock;
+import net.zagdrath.arcforge.fusion.TokamakLayout;
 import net.zagdrath.arcforge.registry.ModBlocks;
 
 // An example build of every Arcforge multiblock, for the JEI build viewer and the Engineer's Handbook: which block
@@ -78,6 +81,7 @@ public final class MultiblockBlueprints {
                 steamBoilerArray(),
                 steamTurbineArray(),
                 nuclearSteamTurbine(),
+                heliumGasTurbine(),
                 gasTurbineArray(),
                 distillationArray(),
                 refinery(),
@@ -104,7 +108,15 @@ public final class MultiblockBlueprints {
                 vessel("heavy_water_tower", new BlockPos(3, 5, 3), ModBlocks.HEAVY_WATER_TOWER_CASING.get(),
                         ModBlocks.HEAVY_WATER_TOWER_CONTROLLER.get(), pos -> ModBlocks.EXCHANGE_TRAY.get().defaultBlockState()),
                 purexPlant(),
-                containment());
+                containment(),
+                fusionReactor("fusion_reactor", false),
+                fusionReactor("stellarator", true),
+                vessel("cryogenic_plant", new BlockPos(4, 4, 4), ModBlocks.CRYOGENIC_PLANT_CASING.get(), ModBlocks.CRYOGENIC_PLANT_CONTROLLER.get(),
+                        pos -> null),
+                vessel("cryogenic_column", new BlockPos(3, 10, 3), ModBlocks.CRYOGENIC_COLUMN_CASING.get(), ModBlocks.CRYOGENIC_COLUMN_CONTROLLER.get(),
+                        pos -> null),
+                vessel("tritium_plant", new BlockPos(5, 3, 5), ModBlocks.TRITIUM_PLANT_CASING.get(), ModBlocks.TRITIUM_PLANT_CONTROLLER.get(),
+                        pos -> null));
     }
 
     // A solid 3x3x3 cube of one casing.
@@ -491,6 +503,22 @@ public final class MultiblockBlueprints {
         return new Blueprint("nuclear_steam_turbine", placements, size);
     }
 
+    // The shortest Helium Gas Turbine: 5x5, 15 long along X (up to 31 works), every block of its outside a casing.
+    private static Blueprint heliumGasTurbine() {
+        BlockPos size = new BlockPos(net.zagdrath.arcforge.steam.HeliumTurbineLayout.MIN_LENGTH, 5, 5);
+        List<Placement> placements = new ArrayList<>();
+        for (int y = 0; y < size.getY(); y++) {
+            for (int z = 0; z < size.getZ(); z++) {
+                for (int x = 0; x < size.getX(); x++) {
+                    if (x == 0 || x == size.getX() - 1 || y == 0 || y == size.getY() - 1 || z == 0 || z == size.getZ() - 1) {
+                        placements.add(new Placement(new BlockPos(x, y, z), ModBlocks.HELIUM_TURBINE_CASING.get().defaultBlockState()));
+                    }
+                }
+            }
+        }
+        return new Blueprint("helium_gas_turbine", placements, size);
+    }
+
     // 3x3, 5 long along X (5 to 9 work), with windows along the front and top, the intake at the west end and
     // the exhaust at the east.
     private static Blueprint gasTurbineArray() {
@@ -592,5 +620,62 @@ public final class MultiblockBlueprints {
             }
         }
         return new Blueprint("containment", sorted(placements), size);
+    }
+
+    // The smallest Fusion Reactor (major radius 3; up to 7 work, see TokamakLayout), with a block of room round it for
+    // its modules: the controller in the middle of the front's wall at the midplane, facing south, a Reactor Glass
+    // window either side of it; Vessel Ports east, west and north at the midplane and a block below, each with a module
+    // against it (Gyrotron and Pellet Injector east, Neutral Beam Injector and Diagnostics Port west, Cryopump and Gas
+    // Puff Valve north) and a Quench Protection Unit against the north wall. stellarator: Stellarator Coils in the
+    // solenoid's and toroidal coils' places.
+    private static Blueprint fusionReactor(String id, boolean stellarator) {
+        TokamakLayout layout = new TokamakLayout(TokamakLayout.MIN_RADIUS);
+        int ro = layout.outer(), top = layout.top();
+        BlockPos size = new BlockPos(layout.width() + 2, layout.height(), layout.width() + 2);
+        BlockPos axis = new BlockPos(ro + 1, top, ro + 1);
+        Map<BlockPos, BlockState> special = new LinkedHashMap<>();
+        special.put(axis.offset(0, 0, ro), ModBlocks.FUSION_REACTOR_CONTROLLER.get().defaultBlockState().setValue(FusionReactorControllerBlock.FACING,
+                Direction.SOUTH));
+        special.put(axis.offset(-2, 0, ro), ModBlocks.REACTOR_GLASS.get().defaultBlockState());
+        special.put(axis.offset(2, 0, ro), ModBlocks.REACTOR_GLASS.get().defaultBlockState());
+        Block[][] modules = {
+            { ModBlocks.GYROTRON.get(), ModBlocks.PELLET_INJECTOR.get() },
+            { ModBlocks.NEUTRAL_BEAM_INJECTOR.get(), ModBlocks.DIAGNOSTICS_PORT.get() },
+            { ModBlocks.CRYOPUMP.get(), ModBlocks.GAS_PUFF_VALVE.get() } };
+        Direction[] sides = { Direction.EAST, Direction.WEST, Direction.NORTH };
+        for (int i = 0; i < sides.length; i++) {
+            Direction out = sides[i];
+            for (int row = 0; row < 2; row++) {
+                BlockPos port = axis.relative(out, ro).below(row);
+                special.put(port, ModBlocks.VESSEL_PORT.get().defaultBlockState());
+                special.put(port.relative(out), modules[i][row].defaultBlockState().setValue(FusionModuleBlock.FACING, out.getOpposite()));
+            }
+        }
+        special.put(axis.relative(Direction.NORTH, ro + 1).above(), ModBlocks.QUENCH_PROTECTION_UNIT.get().defaultBlockState());
+        List<Placement> placements = new ArrayList<>();
+        for (int y = 0; y < size.getY(); y++) {
+            for (int z = 0; z < size.getZ(); z++) {
+                for (int x = 0; x < size.getX(); x++) {
+                    BlockPos pos = new BlockPos(x, y, z);
+                    BlockState state = special.get(pos);
+                    if (state == null) {
+                        state = switch (layout.at(x - axis.getX(), y - axis.getY(), z - axis.getZ())) {
+                            case CRYOSTAT_WALL, CRYOSTAT_LID -> ModBlocks.CRYOSTAT_CASING.get().defaultBlockState();
+                            case CENTRAL_SOLENOID -> (stellarator ? ModBlocks.STELLARATOR_COIL : ModBlocks.CENTRAL_SOLENOID).get().defaultBlockState();
+                            case TOROIDAL_COIL -> (stellarator ? ModBlocks.STELLARATOR_COIL : ModBlocks.TOROIDAL_FIELD_COIL).get().defaultBlockState();
+                            case POLOIDAL_COIL -> ModBlocks.POLOIDAL_FIELD_COIL.get().defaultBlockState();
+                            case BLANKET -> ModBlocks.BREEDING_BLANKET.get().defaultBlockState();
+                            case FIRST_WALL -> ModBlocks.FIRST_WALL.get().defaultBlockState();
+                            case DIVERTOR -> ModBlocks.DIVERTOR_CASSETTE.get().defaultBlockState();
+                            case AIR, OUTSIDE -> null;
+                        };
+                    }
+                    if (state != null) {
+                        placements.add(new Placement(pos, state));
+                    }
+                }
+            }
+        }
+        return new Blueprint(id, sorted(placements), size);
     }
 }

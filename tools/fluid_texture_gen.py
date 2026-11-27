@@ -45,6 +45,9 @@ KINDS = {
     'molten': dict(cells=(4, 8), fine=0.45, turns=4, gamma=1.1, ridged=True, still=4, flow=3),
     # A suspension of ground ore (the slurries, tinted per metal): swells with a fine grain through them.
     'slurry': dict(cells=(5, 16), fine=0.6, turns=4, gamma=1.0, ridged=False, still=3, flow=2),
+    # Cryogenic liquids (Liquid Nitrogen, Liquid Helium): pale and clear, a fast fine shimmer as they boil off, little
+    # sheen.
+    'cryo': dict(cells=(6, 14), fine=0.65, turns=12, gamma=0.8, ridged=False, still=2, flow=1),
     # Liquid Experience: bright and lively, glowing crests.
     'glow': dict(cells=(5, 10), fine=0.5, turns=8, gamma=1.4, ridged=False, still=2, flow=1),
 }
@@ -60,6 +63,8 @@ LIQUIDS = {
     'heavy_oil': 'thick', 'crude_oil': 'thick', 'sour_crude_oil': 'thick', 'bitumen': 'thick', 'creosote': 'thick',
     'high_level_waste': 'thick',
     'lead_bismuth': 'molten', 'hot_lead_bismuth': 'molten', 'fuel_salt': 'molten', 'hot_fuel_salt': 'molten',
+    'lead_lithium': 'molten', 'hot_lead_lithium': 'molten',
+    'liquid_nitrogen': 'cryo', 'liquid_helium': 'cryo',
     'slurry': 'slurry',
     'liquid_experience': 'glow',
 }
@@ -101,6 +106,12 @@ PALETTES = {
     'high_level_waste': ([0x2A1A0E, 0x3A2614, 0x4C321A, 0x74522E, 0x8C683E], 255),
     'lead_bismuth': ([0x3A3C46, 0x4E505C, 0x646674, 0x9A9CA8, 0xC0C2CC], 255),
     'hot_lead_bismuth': ([0x5A2E26, 0x7A3E2C, 0x9A5434, 0xD49056, 0xECB87A], 255),
+    # The fusion tier's: Lead-Lithium in the Lead-Lithium Ingot's lilac silver (docs/TEXTURE_STYLE.md, "Fusion tier"),
+    # its hot form and the cryogenic liquids their old tones.
+    'lead_lithium': ([0x2E2A40, 0x4C4664, 0x6E6690, 0x958CB6, 0xC0B8DA], 255),
+    'hot_lead_lithium': ([0x5A4A44, 0x7A5E50, 0x9A7058, 0xB88A68, 0xD4A880], 255),
+    'liquid_nitrogen': ([0xA8C4D8, 0xBCD4E6, 0xCCE0EE, 0xDCEAF4, 0xECF4FA], 210),
+    'liquid_helium': ([0xBCD2E0, 0xCCDEEA, 0xDAE8F2, 0xE6F0F8, 0xF4F8FC], 178),
     'fuel_salt': ([0x3E6A3A, 0x4E7E48, 0x62925A, 0x96C08A, 0xB8D8A8], 210),
     'hot_fuel_salt': ([0x7A5A1A, 0x987020, 0xB48A2A, 0xE0C050, 0xF2DC7A], 210),
     'slurry': ([0x8A8A8A, 0x9A9A9A, 0xABABAB, 0xBDBDBD, 0xD9D9D9, 0xF0F0F0], 235),

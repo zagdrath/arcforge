@@ -1,0 +1,15 @@
+{
+  "type": "arcforge:electrolyzing",
+  "input": {
+    "fluid": "arcforge:heavy_water",
+    "amount": 100
+  },
+  "primary": {
+    "id": "arcforge:deuterium",
+    "amount": 200
+  },
+  "secondary": {
+    "id": "arcforge:oxygen",
+    "amount": 100
+  }
+}

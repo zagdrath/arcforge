@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "arcforge:block/remote_handling_arm/sheet_0",
+    "0": "arcforge:block/remote_handling_arm/sheet_0",
+    "1": "arcforge:block/remote_handling_arm/sheet_1",
+    "2": "arcforge:block/remote_handling_arm/sheet_2",
+    "3": "arcforge:block/remote_handling_arm/sheet_3",
+    "4": "arcforge:block/remote_handling_arm/sheet_4",
+    "5": "arcforge:block/remote_handling_arm/sheet_5",
+    "6": "arcforge:block/remote_handling_arm/sheet_6",
+    "7": "arcforge:block/remote_handling_arm/sheet_7",
+    "8": "arcforge:block/remote_handling_arm/sheet_8",
+    "9": "arcforge:block/remote_handling_arm/sheet_9",
+    "10": "arcforge:block/remote_handling_arm/sheet_10",
+    "11": "arcforge:block/remote_handling_arm/sheet_11",
+    "12": "arcforge:block/remote_handling_arm/sheet_12",
+    "13": "arcforge:block/remote_handling_arm/sheet_13"
+  },
+  "elements": [
+    {
+      "name": "stage 2",
+      "from": [6, 6, 5],
+      "to": [10, 10, 13],
+      "faces": {
+        "north": {"uv": [8, 4, 12, 8], "texture": "#11"},
+        "west": {"uv": [0, 8, 8, 12], "texture": "#11"},
+        "east": {"uv": [8, 8, 16, 12], "texture": "#11"},
+        "up": {"uv": [0, 0, 4, 8], "texture": "#7"},
+        "down": {"uv": [4, 0, 8, 8], "texture": "#7"}
+      }
+    }
+  ]
+}

@@ -46,7 +46,7 @@ import snownee.jade.api.config.IPluginConfig;
 // how far that bank is in. The Steam Generator: its tubes and the steam it made last tick. The Heavy Water Tower: its
 // trays and the Heavy Water it holds. The reactor also shows its containment (sealed or why not, and its air's
 // Hydrogen) and each alarm that's up; the PUREX Plant its setting and its waste. The server builds the lines; Client
-// draws them.
+// draws them. The fusion tier's Cryogenic Plant, Cryogenic Distillation Column and Tritium Plant: their size and tanks.
 public enum VesselProvider implements StreamServerDataProvider<BlockAccessor, List<Component>> {
     INSTANCE;
 
@@ -83,10 +83,31 @@ public enum VesselProvider implements StreamServerDataProvider<BlockAccessor, Li
             case net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity plant -> lines.add(Component.translatable("jade.arcforge.purex_plant.mode",
                     Component.translatable("gui.arcforge.purex_plant." + plant.getMode().getSerializedName()),
                     String.format(Locale.ROOT, "%,d", plant.getWaste().getAmount())).withStyle(ChatFormatting.GRAY));
+            case net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity plant -> fusionPlant(lines, plant);
             default -> {}
         }
         lines.add(vessel.getStatus().getDescription());
         return lines;
+    }
+
+    // The Cryogenic Plant, the Cryogenic Distillation Column and the Tritium Plant: their size (the plants' inside
+    // volume, the column's stages) and what each tank holds.
+    private static void fusionPlant(List<Component> lines, net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity plant) {
+        if (!plant.isFormed()) {
+            return;
+        }
+        lines.add(Component.translatable("jade.arcforge." + plant.getKind().id() + ".size", plant.size()).withStyle(ChatFormatting.GRAY));
+        plantTank(lines, plant.getInput());
+        for (int i = 0; i < plant.getKind().outputs(); i++) {
+            plantTank(lines, plant.getOutput(i));
+        }
+    }
+
+    private static void plantTank(List<Component> lines, net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank tank) {
+        if (tank.getAmount() > 0) {
+            lines.add(Component.translatable("jade.arcforge.fusion.tank", tank.getResource(0).getFluid().getFluidType().getDescription(),
+                    String.format(Locale.ROOT, "%,d", tank.getAmount())).withStyle(ChatFormatting.GRAY));
+        }
     }
 
     private static void reactor(List<Component> lines, FissionReactorBlockEntity reactor, BlockAccessor accessor) {

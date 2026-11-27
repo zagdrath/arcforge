@@ -1,0 +1,58 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "arcforge:block/remote_handling_arm/sheet_0",
+    "0": "arcforge:block/remote_handling_arm/sheet_0",
+    "1": "arcforge:block/remote_handling_arm/sheet_1",
+    "2": "arcforge:block/remote_handling_arm/sheet_2",
+    "3": "arcforge:block/remote_handling_arm/sheet_3",
+    "4": "arcforge:block/remote_handling_arm/sheet_4",
+    "5": "arcforge:block/remote_handling_arm/sheet_5",
+    "6": "arcforge:block/remote_handling_arm/sheet_6",
+    "7": "arcforge:block/remote_handling_arm/sheet_7",
+    "8": "arcforge:block/remote_handling_arm/sheet_8",
+    "9": "arcforge:block/remote_handling_arm/sheet_9",
+    "10": "arcforge:block/remote_handling_arm/sheet_10",
+    "11": "arcforge:block/remote_handling_arm/sheet_11",
+    "12": "arcforge:block/remote_handling_arm/sheet_12",
+    "13": "arcforge:block/remote_handling_arm/sheet_13"
+  },
+  "elements": [
+    {
+      "name": "wrist",
+      "from": [6.5, 6.5, 2.5],
+      "to": [9.5, 9.5, 5],
+      "faces": {
+        "north": {"uv": [0, 12, 3, 15], "texture": "#12"},
+        "west": {"uv": [3, 12, 5.5, 15], "texture": "#12"},
+        "east": {"uv": [6, 12, 8.5, 15], "texture": "#12"},
+        "up": {"uv": [9, 12, 12, 14.5], "texture": "#12"},
+        "down": {"uv": [12, 12, 15, 14.5], "texture": "#12"}
+      }
+    },
+    {
+      "name": "west jaw",
+      "from": [6, 6.5, 0.5],
+      "to": [7, 9.5, 2.5],
+      "faces": {
+        "north": {"uv": [15, 12, 16, 15], "texture": "#12"},
+        "west": {"uv": [0, 0, 2, 3], "texture": "#13"},
+        "east": {"uv": [2, 0, 4, 3], "texture": "#13"},
+        "up": {"uv": [14, 5, 15, 7], "texture": "#13"},
+        "down": {"uv": [15, 5, 16, 7], "texture": "#13"}
+      }
+    },
+    {
+      "name": "east jaw",
+      "from": [9, 6.5, 0.5],
+      "to": [10, 9.5, 2.5],
+      "faces": {
+        "north": {"uv": [4, 0, 5, 3], "texture": "#13"},
+        "west": {"uv": [5, 0, 7, 3], "texture": "#13"},
+        "east": {"uv": [7, 0, 9, 3], "texture": "#13"},
+        "up": {"uv": [0, 7, 1, 9], "texture": "#13"},
+        "down": {"uv": [1, 7, 2, 9], "texture": "#13"}
+      }
+    }
+  ]
+}

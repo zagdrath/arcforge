@@ -44,6 +44,18 @@ public final class GasTints {
     public static final int NITROGEN_DIOXIDE = 0xFFC8743C;
     // Sulfur Dioxide: colourless in fact, so a clear pale yellow, paler and warmer than Fluorine.
     public static final int SULFUR_DIOXIDE = 0xFFF2ECB8;
+    // The fusion gases, all colourless in fact: Deuterium a pale blue, Tritium a pale green, Helium-3 a pale gold,
+    // Helium near-white, Argon a faint lavender (paler and greyer than Nitrogen's lilac), Helium-Rich Natural Gas Natural
+    // Gas's pale blue gone grey, Fusion Exhaust a dull grey-violet.
+    public static final int DEUTERIUM = 0xFFC6DCF4;
+    public static final int TRITIUM = 0xFFCDEBCB;
+    public static final int HELIUM = 0xFFF2F2EE;
+    public static final int HELIUM_3 = 0xFFEEDFB0;
+    // Hot Helium: the helium coolant hot from a fusion reactor, a warm peach-white (Superheated Steam's warm cast, paler).
+    public static final int HOT_HELIUM = 0xFFF6DCC8;
+    public static final int ARGON = 0xFFDCD4EE;
+    public static final int HELIUM_RICH_NATURAL_GAS = 0xFFD4E4EA;
+    public static final int FUSION_EXHAUST = 0xFFB6AEC4;
 
     private GasTints() {}
 }

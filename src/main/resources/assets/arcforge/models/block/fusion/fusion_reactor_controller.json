@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "top": "arcforge:block/fusion/cryostat_casing_top",
+    "bottom": "arcforge:block/fusion/cryostat_casing_top",
+    "side": "arcforge:block/fusion/cryostat_casing",
+    "front": "arcforge:block/fusion/fusion_reactor_controller"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SCS",
+    "QVQ",
+    "SBS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "C": "arcforge:superconducting_coil",
+    "Q": "#c:plates/copper",
+    "V": "arcforge:vessel_port",
+    "B": "#c:storage_blocks/redstone"
+  },
+  "result": {
+    "id": "arcforge:gyrotron",
+    "count": 1
+  }
+}

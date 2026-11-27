@@ -8,6 +8,7 @@ cinnabar_dust.png
 copper_dust.png
 depleted_uranium_dioxide.png
 depleted_uranium_dust.png
+enriched_lithium_fluoride.png
 flour.png
 fluorite_dust.png
 gold_dust.png
@@ -15,6 +16,7 @@ invar_dust.png
 iolite_dust.png
 iron_dust.png
 lead_dust.png
+lithium_6_fluoride.png
 lithium_fluoride.png
 lithium_hydroxide.png
 monazite_dust.png

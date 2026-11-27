@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:liquefying",
+  "input": {
+    "fluid": "arcforge:nitrogen",
+    "amount": 2
+  },
+  "result": {
+    "id": "arcforge:liquid_nitrogen",
+    "amount": 1
+  },
+  "energy": 400
+}

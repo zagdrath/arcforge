@@ -1047,6 +1047,29 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 - **Hitbox**: voxelized from NuclearTurbineMesh at 1 px (NuclearTurbineShapes), as the Steam Turbine Array's; the deck,
   the walkway along the front and the staircase are walkable, with the handrail on the deck's edge.
 
+## Helium Gas Turbine model
+- **Loose casing** (`block/helium_gas_turbine/casing`, Arcforged): the Nuclear Turbine Casing with its Hardened pips moved
+  to the same steps of the Arcforged ramp and its enamel panel in the helium enamel (below).
+- **Sheet** (`block/helium_gas_turbine/turbine`, 128×384): the Nuclear Steam Turbine's sheet with its enamel (rows
+  234–236, columns 122–124 of rows 128–191, and rows 256 down) moved to a cold steel blue: hue about 211°, each pixel's
+  value kept and its saturation raised (×1.5 + 0.06, at most 0.25), so the field reads about `#A6B2C0` and the grain,
+  plate edges, ramps and scuffs carry over. Made by `tools/helium_turbine_sheet_gen.py` from the Nuclear Steam Turbine's
+  textures; rerun it if those change.
+- Formed, HeliumTurbineMesh draws one closed-cycle (Brayton) turbine-generator set from HeliumTurbineLayout, in the
+  Nuclear Steam Turbine's manner on a 5×5 section: a deck (top at 22 px) on stepped columns, the walkway and handrail
+  along the front, a six-step stair at the front end. Deliberately round where the Nuclear Steam Turbine is angular:
+  - **Enamel**: the intake plenum (a square box with a bolted lid and two stiffeners), the compressor (a 12-sided drum
+    narrowing from 10 to 7 px with a BANDED flange every 6 px), the power turbines (16-sided, flaring 9 → 12 px, an
+    enamel inlet ring, a split flange with bolts, a flange at the exhaust end and an exhaust neck on top), the
+    recuperator (one long vessel along the back on machine-steel saddles, domed ends, a girth flange at its middle), its
+    crossover ducts (a cubic arch from each exhaust neck, 12 lengths swept as one tube, crown at 72 px), the precooler
+    (a box along the front of the compressor), the generator, its single cooler, slip-ring housing and exciter.
+  - **Vent tile**: the precooler's finned front, framed by enamel edges, and the exciter's grille.
+  - **Machine steel**: the deck, columns, stair, walkway, front standard and pedestals, the insulated Hot Helium ducts
+    (BANDED risers through the deck into each inlet ring), the discharge pipe, the precooler's water headers and every
+    flange and collar. **FE red** only on the terminal box.
+- **Hitbox**: voxelized from HeliumTurbineMesh by NuclearTurbineShapes, the same way.
+
 ## Lithium and the Battery Array
 - **Spodumene** follows the ore method: Cody's green ore (as for fluorite, without the alternate purple clusters), his green
   raw item and green raw block, and his dust, all mapped by brightness onto a pale mint "hiddenite" ramp
@@ -1974,11 +1997,149 @@ which made many fluids the same pattern in different colours.
   - *milky* (Latex, Sodium Silicate, Lye): 4 / 8, 0.35, 4 turns, gamma 0.9, 3 / 2: soft and flat;
   - *oil* (light fuels and oils): 4 / 10, 0.4, 4 turns, gamma 1.6, 3 / 2: broad swells, sheen on the crests;
   - *thick* (Heavy Oil, crudes, Bitumen, Creosote, High-Level Waste): 3 / 6, 0.3, 3 turns, gamma 1.8, 6 / 4: big, lazy;
-  - *molten* (Lead-Bismuth, Fuel Salt and their hot forms): 4 / 8 ridged (lava's crusted veins), 4 turns, 1.1, 4 / 3;
+  - *molten* (Lead-Bismuth, Lead-Lithium, Fuel Salt and their hot forms): 4 / 8 ridged (lava's crusted veins), 4 turns,
+    1.1, 4 / 3;
   - *slurry* (the shared, tinted slurry texture): 5 / 16, 0.6: swells with a fine grain of ground ore through them;
+  - *cryo* (Liquid Nitrogen, Liquid Helium): 6 / 14, 0.65, 12 turns, gamma 0.8, 2 / 1: pale and clear, a fast fine
+    shimmer as they boil off, little sheen;
   - *glow* (Liquid Experience): 5 / 10, 0.5, 8 turns, 1.4, 2 / 1.
 - **Gases** share one greyscale texture the game tints per gas (`block/fluid/steam_*`): near-white vapour (`#D8D8D8` to
   `#FAFAFA` in 12 steps) whose opacity carries the shape, 25 to 70% opaque, a broad slow octave domain-warped by a second
   so the wisps curl rather than blob, plus a fine one. Still 16×16 frametime 3; flowing 32×32 frametime 2, drifting up.
+  Hot Helium (the fusion helium loop) is tinted `#F6DCC8`, a warm off-white next to Helium's `#F2F2EE`.
 - New fluids get an entry in `LIQUIDS` (and `PALETTES`) and a kind, and the script is re-run. Mercury (the mercury
   line) is drawn the same way by its own generator, and is the reference for the look.
+
+## Fusion tier
+- **Accents**: plasma violet (`#2A1A4A #4A2E80 #7A52C8 #A884EC #D8C4FA`), superconducting tape copper-gold
+  (`#3E2610 #6A4420 #9A6A30 #C69048 #E8BC70`), tungsten a warm pale grey (`#3A3936 … #BEB9AE`), Lead-Lithium a lilac
+  silver (`#2E2A40 … #C0B8DA`), tritium its radioluminescent green (`#1C4424 #2E7A3C #4CB860 #9AF0A8`), the cold line a
+  pale cyan (`#2E5A66 #4E8EA0 #7CC0D2 #B4E6F0`). `tools/fusion_texture_gen.py` paints everything here.
+- **Tokamak blocks** (`block/fusion/`, the machine steel ramp): the Cryostat Casing is the casing with a riveted flange
+  strap across it and a recessed plasma-violet name plate; its top a bolt circle round a recessed blind flange. The
+  Vessel Port is a bolted octagonal flange (lit top-left) round a recessed bore. The coils show their winding pack of tape
+  turns (a lit row, a shade row, an insulation line) in a recessed steel case: the Central Solenoid's turns run round
+  it between collars (its top the turns end-on as rings round the bore), the Toroidal Field Coil's run up it, the Poloidal
+  Field Coil's along it under two clamps, the Stellarator Coil's on the diagonal. The First Wall is castellated tungsten
+  armour: 4 px tiles each lit top-left, offset 2 px row to row. The Divertor Cassette is four tungsten monoblocks, each
+  bored for its cooling tube, over the cassette body and its clamped pipe; its top the targets end-on. The Breeding
+  Blanket shows Lead-Lithium channels in a recess. The controller is the nuclear controller face with the plasma's
+  violet D-shaped cross-section, power and density bars and the Run (green) and Fast Shutdown (red) buttons. Formed,
+  every tokamak block hides (`block/fusion/tokamak_hidden`; the cryostat's ported blocks keep their port plates).
+- **Plant casings**: the Cryogenic Plant's cold box is frost-white insulated cladding (`#5E6870 … #DCE4E8`, lit
+  top-left, split at 10/16) in a steel frame with the cold line under it; its top a vent. The Cryogenic Distillation
+  Column follows the distillation band grammar: frost cladding sheets in rows 0–8, the cold line on row 9, the tray sill
+  and the riveted strap; its controller is a screen pane in that band (tray temperatures falling down the column). The
+  Tritium Plant is lead (`#2E3440 … #A2AAB8`): a dark glovebox window with its glints over two glove ports, a tritium
+  green tell-tale. Controllers are the casing with a screen recess; formed casings and controllers hide
+  (`block/fusion/<plant>_hidden`, ported).
+- **Single blocks**: the Quench Protection Unit is a dump-resistor cabinet (a louvred vent recess over a hazard
+  high-voltage plate). The Lithium Isotope Separator's front is a vapour cell window, a violet laser line across it while
+  it works (`_front_on`), over the magnet's tape band; its sides the magnet's turns. The Tritium Extraction Unit's front
+  is the bake-out oven door: a target rod (its Li-6 band) standing in the oven, glowing hot while it bakes; its sides
+  the heat line in and the tritium line out.
+- **Port modules** (Mekanism-style element models, `block/fusion/module/<name>`, 64×64, every face its own painted
+  rectangle at 1 texel per px; plates bevelled and riveted from 9 px, round parts octagonal prisms of two crossed pairs
+  of boxes, the ramp across each facet, flat caps): each stands on the same riveted mount flange and collar against the
+  Vessel Port (north when facing north). The Neutral Beam Injector is a beamline box with the neutraliser on top and the
+  ion source at its back (a copper-gold bushing band). The Gyrotron is an upright tube in its frost-cold magnet with a
+  tape-coloured collar, a waveguide to the port. The Pellet Injector is a gun barrel into the port with the breech and a
+  frost-white pellet magazine. The Gas Puff Valve is a valve body with its piezo actuator (a cyan cap) and gas line. The
+  Cryopump is a gate-valve plate and pump body with its cold head and Liquid Helium line on top. The Diagnostics Port is
+  a sensor head with a cyan lens and its cable. The Direct Energy Converter is a plated vacuum tank with three
+  copper-gold collector grids standing on top, each a step taller toward the back, a white ceramic high-voltage
+  bushing (banded) with a violet cap at the back, and two dark feet.
+- **Items** (outline `#0C0D0F`): Enriched Lithium Fluoride and Lithium-6 Fluoride are Lithium Fluoride re-toned by
+  brightness with a faint teal and a faint violet cast, keeping the dusts' softened shadow side (their ramps' darkest
+  tone lifted 30% on the outline and 65% inside, as `tools/dust_shading_gen.py` lifts it); the Lead-Lithium Ingot is
+  the lead ingot in lilac silver; the Lithium Target Rod is the Fuel Rod with its band in Li-6 violet. The Arcite-Tungsten Wire is
+  Arcforge: Transmission's wire coil (its `tools/wire_texture_gen.py` spool: two black plastic flanges, the winding
+  between them lit left of the middle) wound with dark tungsten (`#22211F … #7E7A72`), its arcite core glinting cyan
+  (`#7FDCEE`) on every other turn of the lit band. The Superconducting Tape is a round reel: a steel flange rim, the
+  copper-gold tape stepping from lit at the top-left to shaded at the bottom-right with one layer line, a steel hub ring
+  round an open hole 6 px across. The Superconducting Coil is a toroidal winding: a copper-gold ring (its edges a step
+  darker) wound with twelve turns, each parted by a dark line, round an open middle. The Tritium Canister is the Hardened Canister
+  with its accents tritium green and a second wall inside the outline. The Activated Component is a block of four
+  castellated tungsten tiles, each bevelled (lit top-left, dark bottom-right, its face split lit/shade) and stepping
+  darker from the top-left tile to the bottom-right, with a soot streak (its lower edge burnt brown) and a yellow
+  radiation tag shaded like a plate.
+- **GUIs** (`tools/fusion_gui_gen.py`, the machine panel's frame and recesses):
+  - Fusion Reactor (`gui/container/fusion_reactor`, 300×270 on a 512 sheet): the control desk's screen inset across the
+    top (7..292 × 15..148) with Page, Run and Fast Shutdown along its bottom (Run the Fission Reactor's Reset button,
+    Fast Shutdown its SCRAM stretched to 66 px by its middle columns), four input tanks left of the player inventory, two
+    output tanks and an 18×52 FE gauge (the Diesel Generator's stripes) right of it.
+  - Remote Handling Arm (176×186): the FE gauge, a 3×3 grid of blue input slots, the arrow, a 3×3 grid of orange output
+    slots, the status line, the inventory 104 down.
+  - Cryogenic Plant, Cryogenic Distillation Column and Tritium Plant (176×166): the Heavy Water Tower's layout (every
+    inset spanning y 16..69): the FE gauge, the input tank, the house screen and one, three or four output tanks.
+  - Lithium Isotope Separator (the Induction Furnace's) and Tritium Extraction Unit (the Fiberizer's, its heat track
+    shortened to make room for a second tank).
+
+### Fusion Reactor model
+- **A large model** ("Large model texturing"), TokamakMesh drawn by FusionReactorRenderer, on its own sheet
+  `textures/block/fusion/tokamak_model.png`: the refinery tower's 128×256 large-model sheet copied whole, with the
+  tokamak's three tiles in its free bottom row (`tools/tokamak_sheet_gen.py`; rerun when the refinery sheet changes):
+  - (32, 240) **First Wall armour**: four castellated tungsten tiles 8×8 (two close greys of brushed grain, lit top/left
+    edge `#7E858E`, dark bottom/right `#34383D`, a 1 px gap `#1E2023`);
+  - (48, 240) **Divertor targets**: monoblock slats 4 px wide (lit left column, dark right), a dark joint every 8 px;
+  - (64, 240) **plasma**: neutral greys only (176–246, lightest along the middle rows, two faint streaks), tinted in
+    code so the tint multiplies cleanly.
+- Formed, every block hides and the model is the whole machine: the **cryostat**, a plated faceted cylinder over the
+  ring's footprint (a facet about a block wide, four-fold so the front falls on a facet's middle; riveted plates laid
+  over the shell unrolled, ≤ 64 px, seams only where plates meet), on a skirt and base flange, closed by a bolted top
+  flange and a shallow pressed head (bare grain) with the solenoid's access hub on its crown.
+- On the wall: **coil ribs** (raised plain plates 6 px wide, 16 or 18 round it over the TF coils; a stellarator's are ten
+  helical bands 9 px wide, each turning a fifth of the way round as it rises), two **girth bands** over the PF coil
+  layers (3 px, standing 2 px out, so the ribs pass under them), each **Vessel Port** a riveted 14×14 flange with a
+  10×10 collar, nozzles to the faces of ports set to a side and of modules, and the **control desk** at the controller
+  (the GEN steel cabinet, louvres, a lit screen in a recess). Ribs and bands stop short of viewports, frames, flanges and
+  the desk; every stop has an end face.
+- **Viewports** follow the Fission Reactor's windows: the Reactor Glass in the wall opens the facets facing it at its row,
+  touching glass makes one viewport with one raised 2 px frame, the glass tile's rim and glints (once, top left) over the
+  light grey tint pane. Behind each a plated **port duct** runs in toward the axis: into the plasma chamber at its rows,
+  else closed by a blanket module's riveted plate.
+- **Inside** (built only when a viewport looks into it): the chamber's outer wall (facing in), the centre column and the
+  roof in the First Wall tile, the floor in the Divertor tile, tiles at 1:1 on the block rows and carrying on round.
+- **The plasma** (drawn only while it burns, full-bright): a D-shaped torus (κ 1.7, δ 0.33; a stellarator's an ellipse
+  turning five half-turns round the ring) as a bright core in a halo at 40%, both tinted by temperature: deep pink-violet
+  `#C745DB` cool to a pale pink-white `#FFD1F5` hot (D-He3 lilac `#9E80FF` to `#E6E0FF`), stronger as it heats. Its light
+  falls on the walls of the ducts into the chamber (the tile's faint rows, drawn with the halo), so a lit viewport reads
+  pink from a slant too.
+
+### Fusion plant models and the Remote Handling Arm
+- **Cryogenic Plant, Cryogenic Distillation Column and Tritium Plant models** (large models, "Large model texturing",
+  on the refinery tower's sheet like the other vessels; FusionPlantMesh and its three meshes, drawn by
+  FusionPlantRenderer). Formed, their walls' blocks hide and the model stands on the vessels' plinth, sized to the box,
+  with the grating walkway along the front, the controller's panel and the port nozzles. Shared parts:
+  - round vessels (skirt, plated CASING shell with a BANDED flange band at each section seam, elliptical head);
+  - **vacuum-jacketed transfer lines**: a 1.5 px jacket with a wider bellows ring (2.1 px, 1.5 long, capped both ends)
+    every 9 px, a plain flanged elbow block at each bend;
+  - **sight glasses**: a steel boss with a dark window (M_CORE_DARK) whose lower 70% shows M_CORE_LIT, full-bright,
+    only while the controller is lit (the running list);
+  - **windows into a box** (the gloveboxes): a recess with a dark back and sides, a lamp along its top (M_LAMP, running
+    list), the glass tile's frame and glints at the mouth (glassPane) and the rivet-tone tint pane a hair behind it, as
+    the Fission Reactor's windows.
+  - Cryogenic Plant: the cold box is the light generator steel, unriveted (GEN_PLAIN: an insulated casing reads smooth),
+    angle posts up its edges, M_FLANGE girder bands every two blocks, a relief stack with a rain cap on its roof; its
+    height is capped at 4.5 blocks so the expander column stands proud on a big plant. The expander column (plated, in
+    16 px sections) carries the turbo-expander's drum lying on its crown; the compressor skid is a DECK footing, a BANDED
+    barrel on saddles with a flanged end, a hazard-striped coupling guard and an M_MOTOR motor; a big plant adds a gas
+    buffer vessel behind the skid. The Liquid Nitrogen dewar has a sight glass.
+  - Cryogenic Distillation Column: the plated column (radius 7–11 px) in 24 px tray sections, its head and the
+    narrower condenser drum and vent on top, a caged ladder (rails, rungs every 4 px, hoops every two blocks from 40 px
+    up), three draw-off nozzles with jacketed lines down to the plinth, the reboiler kettle on saddles at its foot with
+    its vapour and liquid lines and a sight glass on its end.
+  - Tritium Plant: the glovebox line in the light generator steel (riveted sides, plain front, a dark underside) on
+    four-legged stands, each with its lit window and two glove ports (a BANDED ring, its dark glove disc); the line
+    leaves the controller's panel clear (a narrower single box fills a short run). Behind: the palladium permeator
+    (a POLISHED drum on saddles, BANDED flanged ends), rows of hydride storage beds with their headers, two getter beds,
+    the slim isotope column with a sight glass, and a low shield wall of FOOTING along the back.
+- **Remote Handling Arm** (block models with packed 16×16 sheets, rule 6, `tools/RemoteHandlingArmModelGen.java`,
+  `textures/block/remote_handling_arm/sheet_N`): the mount is a frame against the cryostat wall round a 6 px opening,
+  the cradle behind it, and four drive housings that carry the 8×8 single-block port plates at the block's edges (Input
+  top and sides, Output underneath, Energy on the back). Flat faces are grain plates with a 1 px lit top/left and dark
+  bottom/right edge; the status lamp is flat dark cyan (`#2F6E68`, rim `#1C3A38`) off and `#5FD4C4` with a `#B8F2EA`
+  glint on (`remote_handling_arm_on`). The telescoping arm's standalone parts: stage 1 in hazard yellow plates
+  (`#D0A41E … #E6B828`, lit `#F0CC50`, dark `#9A7614`) with a steel collar, stage 2 in bright machined steel, the gripper
+  a steel wrist and two bright jaws. RemoteHandlingArmRenderer slides stage 1 out 14 px and stage 2 and the gripper
+  22 px through the opening into the port (eased), pitching the gripper 20° nose down at full reach.

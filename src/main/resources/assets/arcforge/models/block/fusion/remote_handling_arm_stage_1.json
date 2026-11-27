@@ -1,0 +1,46 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "arcforge:block/remote_handling_arm/sheet_0",
+    "0": "arcforge:block/remote_handling_arm/sheet_0",
+    "1": "arcforge:block/remote_handling_arm/sheet_1",
+    "2": "arcforge:block/remote_handling_arm/sheet_2",
+    "3": "arcforge:block/remote_handling_arm/sheet_3",
+    "4": "arcforge:block/remote_handling_arm/sheet_4",
+    "5": "arcforge:block/remote_handling_arm/sheet_5",
+    "6": "arcforge:block/remote_handling_arm/sheet_6",
+    "7": "arcforge:block/remote_handling_arm/sheet_7",
+    "8": "arcforge:block/remote_handling_arm/sheet_8",
+    "9": "arcforge:block/remote_handling_arm/sheet_9",
+    "10": "arcforge:block/remote_handling_arm/sheet_10",
+    "11": "arcforge:block/remote_handling_arm/sheet_11",
+    "12": "arcforge:block/remote_handling_arm/sheet_12",
+    "13": "arcforge:block/remote_handling_arm/sheet_13"
+  },
+  "elements": [
+    {
+      "name": "stage 1",
+      "from": [5, 5, 4.5],
+      "to": [11, 11, 14],
+      "faces": {
+        "north": {"uv": [6, 0, 12, 6], "texture": "#8"},
+        "west": {"uv": [0, 6, 9.5, 12], "texture": "#8"},
+        "east": {"uv": [0, 0, 9.5, 6], "texture": "#9"},
+        "up": {"uv": [0, 0, 6, 9.5], "texture": "#1"},
+        "down": {"uv": [6, 0, 12, 9.5], "texture": "#1"}
+      }
+    },
+    {
+      "name": "stage 1 collar",
+      "from": [4.5, 4.5, 4],
+      "to": [11.5, 11.5, 5],
+      "faces": {
+        "north": {"uv": [8, 0, 15, 7], "texture": "#7"},
+        "west": {"uv": [15, 0, 16, 7], "texture": "#7"},
+        "east": {"uv": [0, 8, 1, 15], "texture": "#7"},
+        "up": {"uv": [0, 13, 7, 14], "texture": "#13"},
+        "down": {"uv": [7, 13, 14, 14], "texture": "#13"}
+      }
+    }
+  ]
+}

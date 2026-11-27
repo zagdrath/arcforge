@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.multiblock;
 
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
@@ -21,11 +23,13 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.zagdrath.arcforge.fusion.TokamakStructure;
+import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.VesselStructure;
 
 // A vessel's window (Reactor Glass: leaded, so it shields like a wall; see the radiation_shielding data map). It never
 // does IO; clicking a formed pane opens the vessel. The Fission Reactor shows its Cherenkov glow through it while it
-// runs.
+// runs. Reactor Glass is also a tokamak's viewport, so a pane belongs to a Fusion Reactor when no vessel holds it.
 public class VesselGlassBlock extends TransparentBlock implements VesselPart {
     private final Supplier<VesselStructure> structure;
 
@@ -38,6 +42,12 @@ public class VesselGlassBlock extends TransparentBlock implements VesselPart {
     @Override
     public VesselStructure structure() {
         return structure.get();
+    }
+
+    @Override
+    public @Nullable MultiblockController findController(Level level, BlockPos pos) {
+        MultiblockController controller = structure().findController(level, pos);
+        return controller != null ? controller : TokamakStructure.findController(level, pos);
     }
 
     @Override
@@ -56,6 +66,7 @@ public class VesselGlassBlock extends TransparentBlock implements VesselPart {
         super.onPlace(state, level, pos, oldState, movedByPiston);
         if (!oldState.is(this)) {
             structure().notifyChanged(level, pos);
+            TokamakStructure.notifyChanged(level, pos);
         }
     }
 
@@ -63,10 +74,12 @@ public class VesselGlassBlock extends TransparentBlock implements VesselPart {
     protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
         super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
         structure().notifyChanged(level, pos);
+        TokamakStructure.notifyChanged(level, pos);
     }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        return state.getValue(FORMED) ? structure().useOnPart(level, pos, player) : InteractionResult.PASS;
+        // A tokamak leaves its viewports unformed; useOnPart opens the reactor whose formed shape holds the pane.
+        return state.getValue(FORMED) ? structure().useOnPart(level, pos, player) : TokamakStructure.useOnPart(level, pos, player);
     }
 }

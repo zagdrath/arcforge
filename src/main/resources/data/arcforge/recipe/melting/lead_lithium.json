@@ -1,0 +1,8 @@
+{
+  "type": "arcforge:melting",
+  "ingredient": "arcforge:lead_lithium_ingot",
+  "result": {
+    "id": "arcforge:lead_lithium",
+    "amount": 250
+  }
+}

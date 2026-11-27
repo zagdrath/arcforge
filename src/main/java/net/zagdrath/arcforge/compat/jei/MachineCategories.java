@@ -1045,8 +1045,8 @@ final class MachineCategories {
             super(TYPE, "steam_generating", ModBlocks.STEAM_GENERATOR_CONTROLLER.get(), gui, 150, 50);
         }
 
-        private static int steam(Fluid steam) {
-            double hot = net.zagdrath.arcforge.config.ArcforgeConfig.REACTOR_HOT_COOLANT_HEAT.getAsDouble();
+        private static int steam(Fluid hotFluid, Fluid steam) {
+            double hot = net.zagdrath.arcforge.blockentity.multiblock.SteamGeneratorBlockEntity.heatPerMb(hotFluid);
             double each = net.zagdrath.arcforge.config.ArcforgeConfig.STEAM_GENERATOR_STEAM_HEAT.getAsDouble()
                     * (steam == ModFluids.SUPERHEATED_STEAM.get() ? net.zagdrath.arcforge.blockentity.multiblock.SteamGeneratorBlockEntity.SUPERHEATED_FACTOR : 1.0);
             return (int) Math.floor(100 * hot / Math.max(1.0, each));
@@ -1055,9 +1055,9 @@ final class MachineCategories {
         @Override
         public void setRecipe(IRecipeLayoutBuilder builder, SteamGeneratingRecipe recipe, IFocusGroup focuses) {
             fluid(builder, true, 1, 5, recipe.hot(), 100);
-            fluid(builder, true, 21, 5, net.minecraft.world.level.material.Fluids.WATER, steam(recipe.steam()));
+            fluid(builder, true, 21, 5, net.minecraft.world.level.material.Fluids.WATER, steam(recipe.hot(), recipe.steam()));
             fluid(builder, false, 81, 5, recipe.cooled(), 100);
-            fluid(builder, false, 101, 5, recipe.steam(), steam(recipe.steam()));
+            fluid(builder, false, 101, 5, recipe.steam(), steam(recipe.hot(), recipe.steam()));
         }
 
         @Override
@@ -1068,7 +1068,7 @@ final class MachineCategories {
         @Override
         public void draw(SteamGeneratingRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
             text(graphics, Component.translatable("jei.arcforge.steam_generating.heat", String.format(Locale.ROOT, "%,.0f",
-                    net.zagdrath.arcforge.config.ArcforgeConfig.REACTOR_HOT_COOLANT_HEAT.getAsDouble())), 0, 28);
+                    net.zagdrath.arcforge.blockentity.multiblock.SteamGeneratorBlockEntity.heatPerMb(recipe.hot()))), 0, 28);
             text(graphics, Component.translatable("jei.arcforge.steam_generating.tubes", String.format(Locale.ROOT, "%,d",
                     net.zagdrath.arcforge.config.ArcforgeConfig.STEAM_GENERATOR_TUBE_RATE.getAsInt())), 0, 38);
         }
@@ -1963,6 +1963,8 @@ final class MachineCategories {
             builder.addInputSlot(1, 5).setStandardSlotBackground().add(new ItemStack(ModItems.GAS_WELLHEAD.get()));
             builder.addInputSlot(21, 5).setStandardSlotBackground().add(new ItemStack(ModItems.WELL_HEAD.get()));
             fluid(builder, false, 81, 5, ModFluids.NATURAL_GAS.get(), ArcforgeConfig.GAS_WELLHEAD_RATE.getAsInt() * 20);
+            // A helium-rich gas cap gives Helium-Rich Natural Gas instead.
+            fluid(builder, false, 101, 5, ModFluids.HELIUM_RICH_NATURAL_GAS.get(), ArcforgeConfig.GAS_WELLHEAD_RATE.getAsInt() * 20);
         }
 
         @Override

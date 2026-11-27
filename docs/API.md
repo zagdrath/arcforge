@@ -272,6 +272,41 @@ or `REJECTED` (it can't be changed right now). `succeeded()` is true for the fir
 | Arc Quarry | `running` | Boolean: start/resume or stop, like its Start/Stop button |
 | Superheater Array | `pressure` | Choice: `auto`, `high_pressure`, `superheated` |
 | Steam Boiler Array | `pressure` | Choice: `auto`, `steam`, `high_pressure`, `superheated` |
+| Fusion Reactor | `running` | Boolean: start (Run) or stop, like its Run button; a stopped reactor ramps its plasma down |
+| Fusion Reactor | `fast_shutdown` | Boolean: `true` while a stopped reactor's plasma is still being shut down; setting `true` fires a Fast Shutdown (a massive gas injection that quenches the plasma at once). `REJECTED` with no plasma to shut down |
+| Fusion Reactor | `repeat` | Boolean: start the next pulse when one ends |
+| Fusion Reactor | `fuel` | Choice: `dt` (deuterium-tritium) or `dhe3` (deuterium-helium-3) |
+| Fusion Reactor | `heating_setpoint` | Integer, 0 to 1,000: MW of auxiliary heating asked of its injectors and gyrotrons |
+| Fusion Reactor | `density_setpoint`, `current_setpoint` | Integer, 0 to 120: % of the density (Greenwald) and plasma current limits |
+| Fusion Reactor | `field_setpoint` | Integer, 0 to 100: % of the magnets' full field |
+
+**Readings.** Some machines also report values of their own as integer options that no write changes (`setOption`
+returns `REJECTED` for any other value). They are fixed-point, as below:
+
+| Machine | Reading id | Value |
+|---|---|---|
+| Fusion Reactor | `radius` | Major radius in blocks (3 to 7; 0 unformed) |
+| Fusion Reactor | `stellarator` | 1 for a Stellarator, 0 for a Tokamak |
+| Fusion Reactor | `temperature` | Plasma temperature, keV × 10 (0 without a plasma) |
+| Fusion Reactor | `density` | Electron density, 10²⁰ m⁻³ × 1,000 |
+| Fusion Reactor | `plasma_current` | MA × 100 |
+| Fusion Reactor | `field` | Toroidal field, T × 100 |
+| Fusion Reactor | `fusion_power`, `heating_power`, `neutron_power` | MW × 10 |
+| Fusion Reactor | `gain` | Q (fusion power over heating power) × 100 |
+| Fusion Reactor | `beta_n` | Normalised beta × 100 |
+| Fusion Reactor | `greenwald_fraction` | Density over the Greenwald limit × 1,000 |
+| Fusion Reactor | `q95` | Edge safety factor × 100 |
+| Fusion Reactor | `pulse_left` | Seconds of solenoid flux left; −1 for a steady plasma (a Stellarator, or none) |
+| Fusion Reactor | `alarms` | A bit mask of the alarms that are up, in order: density, beta, vertical, pulse, vacuum, coolant, magnet, wear, disruption, quench, tritium (bit 0 first) |
+| Cryogenic Plant, Tritium Plant | `size` | Blocks inside the box (its rate scales with it) |
+| Cryogenic Distillation Column | `size` | Stages: the blocks of its inside's height |
+| Remote Handling Arm | `parts_replaced` | Parts it has fitted |
+
+The Fusion Reactor's tanks are, in order, Water or Helium (input), Hot Coolant or Hot Helium (output), Lead-Lithium (input), Hot Lead-Lithium
+(output), Liquid Helium and Liquid Nitrogen (inputs). The Cryogenic Plant has its gas in and its liquid out, the
+Cryogenic Distillation Column its feed in and three products out, and the Tritium Plant its Fusion Exhaust in and
+Deuterium, Tritium, Helium-3 and Helium out, in that order. The Helium Gas Turbine (`arcforge:helium_gas_turbine`) is a
+generator with Hot Helium in and Helium out.
 
 ### `MachineStatistics` (`api.machine.status`)
 
@@ -389,7 +424,8 @@ hold a gas:
 - **Single-block machines:** the Air Separator, Carbon Reclaimer, Chemical Reactor, Combustion Plant, Electrolyzer,
   Fermenter, Firebox, Fischer-Tropsch Reactor, Fuel Burner, Gasifier, Haber Reactor and Hydroponic Cell.
 - **Multiblocks:** the Arcforge Furnace, Biogas Digester, Condenser Array, Distillation Array, Firebox Array, Gas
-  Turbine Array, Greenhouse, Nuclear Steam Turbine, Steam Boiler Array, Steam Turbine Array and Superheater Array.
+  Turbine Array, Greenhouse, Helium Gas Turbine, Nuclear Steam Turbine, Steam Boiler Array, Steam Turbine Array and
+  Superheater Array.
   Every block of a formed multiblock gives its controller's tanks, as `MACHINE_CONTROL` does.
 - **Storage:** Pressurized Cylinders of every tier.
 
@@ -623,8 +659,9 @@ public final class ArcforgeMachineLink implements MachineListener {
 
 ## Coverage
 
-These machines provide the capability: every single-block machine with a GUI, the Arc Quarry, and all seventeen
-multiblocks. That includes the Geothermal Plant, the Hydrothermal Carbonizer, the Arcforge Furnace and the Carbonizer.
+These machines provide the capability: every single-block machine with a GUI, the Arc Quarry, and every multiblock
+(the fusion tier's Fusion Reactor, Cryogenic Plant, Cryogenic Distillation Column and Tritium Plant among them). That
+includes the Geothermal Plant, the Hydrothermal Carbonizer, the Arcforge Furnace and the Carbonizer.
 Storage blocks (cells, tanks, crates, vaults), conduits, the Meter, the Chunk Loader, the Quantum Tunnel, the Chargepad
 and the simple farm blocks (Planter, Harvester, Compost Bin, Millstone, Resin Tap, sprinklers) aren't machines in this
 sense and don't provide it.

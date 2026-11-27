@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "arcforge:block/fusion/first_wall",
+    "bottom": "arcforge:block/fusion/first_wall",
+    "side": "arcforge:block/fusion/first_wall"
+  }
+}

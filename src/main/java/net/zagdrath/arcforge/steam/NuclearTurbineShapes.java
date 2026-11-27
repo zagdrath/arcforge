@@ -12,7 +12,8 @@ import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
-// The formed Nuclear Steam Turbine's collision shape, taken from its model (NuclearTurbineMesh) as TurbineShapes takes
+// The formed Nuclear Steam Turbine's (and Helium Gas Turbine's) collision shape, taken from its model (NuclearTurbineMesh,
+// or HeliumTurbineMesh) as TurbineShapes takes
 // the Steam Turbine Array's: every pixel the model's still parts and shaft pass through, and every pixel they close off
 // from the air outside, so its parts are solid (px; x across, y up, u along), cut up by blocks. The hollow core is
 // air, so the shell's blocks carry it all: each its own block's pieces, and the first layer of the core is shared out
@@ -40,14 +41,15 @@ public final class NuclearTurbineShapes {
     // own px; null elsewhere or where it holds none. NuclearTurbineHitbox.overlapsDeep keeps players out of it instead.
     private final int[][][] deep;
 
-    private NuclearTurbineShapes(NuclearTurbineLayout layout) {
-        this.length = layout.length();
-        this.width = NuclearTurbineLayout.WIDTH;
-        this.height = NuclearTurbineLayout.HEIGHT;
+    // A set of length blocks along its shaft and width x height across, from its model's still and turning quads.
+    private NuclearTurbineShapes(int length, int width, int height, float[]... quads) {
+        this.length = length;
+        this.width = width;
+        this.height = height;
         this.sizeX = width * PX;
         this.sizeY = height * PX;
         this.sizeU = length * PX;
-        this.solid = voxels(layout);
+        this.solid = voxels(quads);
         BitSet[] grids = split(solid);
         this.deep = new int[grids.length][][];
         for (int i = 0; i < grids.length; i++) {
@@ -100,7 +102,15 @@ public final class NuclearTurbineShapes {
     }
 
     public static NuclearTurbineShapes of(NuclearTurbineLayout layout) {
-        return new NuclearTurbineShapes(layout);
+        NuclearTurbineMesh mesh = new NuclearTurbineMesh(layout, false);
+        float[][] still = mesh.buildStatic(List.of());
+        return new NuclearTurbineShapes(layout.length(), NuclearTurbineLayout.WIDTH, NuclearTurbineLayout.HEIGHT, still[0], still[1], mesh.buildRotor());
+    }
+
+    public static NuclearTurbineShapes of(HeliumTurbineLayout layout) {
+        HeliumTurbineMesh mesh = new HeliumTurbineMesh(layout, false);
+        float[][] still = mesh.buildStatic(List.of());
+        return new NuclearTurbineShapes(layout.length(), HeliumTurbineLayout.WIDTH, HeliumTurbineLayout.HEIGHT, still[0], still[1], mesh.buildRotor());
     }
 
     // The boxes of the shell block at (u, y, x) in the turbine's frame (see TurbineLayout.blockU and blockX), in its own
@@ -141,11 +151,9 @@ public final class NuclearTurbineShapes {
     // The model's solid pixels over the whole structure: every pixel its surfaces pass through (the still parts and the
     // glass, without ports, and the rotor at rest), then every pixel the air outside can't reach, so its parts come out
     // solid rather than as skins.
-    private BitSet voxels(NuclearTurbineLayout layout) {
+    private BitSet voxels(float[][] lists) {
         BitSet surface = new BitSet(sizeX * sizeY * sizeU);
-        NuclearTurbineMesh mesh = new NuclearTurbineMesh(layout, false);
-        float[][] still = mesh.buildStatic(List.of());
-        for (float[] quads : new float[][] { still[0], still[1], mesh.buildRotor() }) {
+        for (float[] quads : lists) {
             for (int i = 0; i + QUAD <= quads.length; i += QUAD) {
                 surface(surface, quads, i);
             }

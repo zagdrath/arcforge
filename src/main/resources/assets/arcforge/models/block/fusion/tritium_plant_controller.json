@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "top": "arcforge:block/fusion/tritium_plant_casing_top",
+    "bottom": "arcforge:block/fusion/tritium_plant_casing_top",
+    "side": "arcforge:block/fusion/tritium_plant_casing",
+    "front": "arcforge:block/fusion/tritium_plant_controller"
+  }
+}

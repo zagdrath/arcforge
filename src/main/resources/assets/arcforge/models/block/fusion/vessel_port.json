@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "arcforge:block/fusion/cryostat_casing_top",
+    "bottom": "arcforge:block/fusion/cryostat_casing_top",
+    "side": "arcforge:block/fusion/vessel_port"
+  }
+}

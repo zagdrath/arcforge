@@ -1,0 +1,31 @@
+{
+  "title": "Port Modules",
+  "icon": "arcforge:gyrotron",
+  "items": [
+    "arcforge:neutral_beam_injector",
+    "arcforge:gyrotron",
+    "arcforge:pellet_injector",
+    "arcforge:gas_puff_valve",
+    "arcforge:cryopump",
+    "arcforge:diagnostics_port",
+    "arcforge:direct_energy_converter"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Modules stand outside the cryostat against a Vessel Port, facing it. Each is filled from any side but its front and has its own FE.\n# Heating\n- Gyrotron: microwaves heat the electrons, up to 20 MW, and break the gas down to start a plasma. Used first.\n- Neutral Beam Injector: a beam of fast deuterium, up to 40 MW, that also drives some current and fuels a little. Needs Deuterium.\nHeating costs 6,000 FE/t per MW."
+    },
+    {
+      "type": "text",
+      "text": "# Fuel\n- Pellet Injector: fires frozen pellets deep into the plasma, up to 80 mB a second; the main fuelling. Holds Deuterium, Tritium and Helium-3, and Liquid Helium to freeze them (1 mB per 20 mB of fuel).\n- Gas Puff Valve: puffs gas in at the edge, up to 40 mB a second; only half reaches the plasma, the rest goes straight to the pumps.\n# Pumping\n- Cryopump: Liquid Helium and FE. Pumps the vessel down to vacuum and takes the exhaust out of the divertor as Fusion Exhaust, which it gives out of its sides and back.\n# Diagnostics Port\nNeeds nothing: while one is fitted the controller shows the plasma in full."
+    },
+    {
+      "type": "text",
+      "text": "# Direct Energy Converter\nTakes the charged particles streaming out of the plasma (its transport loss, up to 250 MW each) before they reach the divertor, slows them on its grids and turns them straight into FE: 15,000 FE/t a MW, half again what that heat would make through turbines. What it takes no longer heats the wall. It gives FE out of every side but its front.\nD-T sends four fifths of its power out as neutrons, so a converter or two is plenty; D-He3's power leaves almost all as charged particles, and a big D-He3 reactor runs best on converters."
+    },
+    {
+      "type": "text",
+      "text": "Every Vessel Port takes 1% of the blanket's coverage, so fit the ports you need."
+    }
+  ]
+}

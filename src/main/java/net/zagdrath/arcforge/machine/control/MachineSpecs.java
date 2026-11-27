@@ -9,6 +9,7 @@ import net.zagdrath.arcforge.machine.control.spec.ArrayMultiblockSpecs;
 import net.zagdrath.arcforge.machine.control.spec.AutomationMachineSpecs;
 import net.zagdrath.arcforge.machine.control.spec.ChemicalMachineSpecs;
 import net.zagdrath.arcforge.machine.control.spec.ControllerMultiblockSpecs;
+import net.zagdrath.arcforge.machine.control.spec.FusionMachineSpecs;
 import net.zagdrath.arcforge.machine.control.spec.PowerMachineSpecs;
 import net.zagdrath.arcforge.machine.control.spec.ProcessingMachineSpecs;
 import net.zagdrath.arcforge.machine.control.spec.RefineryMachineSpecs;
@@ -25,5 +26,6 @@ final class MachineSpecs {
         ArrayMultiblockSpecs.register();
         ControllerMultiblockSpecs.register();
         RefineryMachineSpecs.register();
+        FusionMachineSpecs.register();
     }
 }

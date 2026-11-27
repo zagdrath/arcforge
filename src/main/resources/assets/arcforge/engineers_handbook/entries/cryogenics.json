@@ -1,0 +1,33 @@
+{
+  "title": "Cryogenics",
+  "icon": "arcforge:cryogenic_plant_controller",
+  "items": [
+    "arcforge:cryogenic_plant_controller",
+    "arcforge:cryogenic_plant_casing",
+    "arcforge:cryogenic_column_controller",
+    "arcforge:cryogenic_column_casing",
+    "arcforge:cryogenic_tank"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The superconducting magnets and the fuel pellets need cold: Liquid Nitrogen (77 K) and Liquid Helium (4 K).\n# Boil-off\nAn ordinary tank loses 5% of a cryogenic liquid a minute (at least 1 mB a second) and steams at the top. The Cryogenic Tank, an insulated upgrade of the Hardened Fluid Tank, holds 256,000 mB and loses nothing.\n# Cryogenic Plant\nA cold box of Cryogenic Plant Casing, 3 to 7 blocks each way, empty inside, the controller in a wall. It liquefies the gas in its input: 2 mB of Nitrogen into 1 mB of Liquid Nitrogen for 400 FE, 2 mB of Helium into 1 mB of Liquid Helium for 4,000 FE. It handles 4 mB of gas a tick for every block inside it."
+    },
+    {
+      "type": "multiblock",
+      "structure": "cryogenic_plant"
+    },
+    {
+      "type": "text",
+      "text": "# Cryogenic Distillation Column\nA tower of Cryogenic Column Casing, always 3 across and 6 to 16 tall, empty inside. Formed, it's a cold tower with a platform every four blocks. Every block of its inside's height is a stage; every second, each stage twice:\n- splits 100 mB of Helium-Rich Natural Gas into 90 mB of Natural Gas and 10 mB of Helium, or\n- with no feed, splits the air round it into 780 mB of Nitrogen, 210 mB of Oxygen and 10 mB of Argon.\nA 3×3×16 has 14 stages. It uses 80 FE/t per block of its height. Products leave by port: Output (first), By-product (second), Tails (third)."
+    },
+    {
+      "type": "multiblock",
+      "structure": "cryogenic_column"
+    },
+    {
+      "type": "text",
+      "text": "# Helium\nA quarter of gas caps are helium-rich (the Seismic Survey Tool tells you which): their wellheads give Helium-Rich Natural Gas. It burns like natural gas, but the helium in it is worth more."
+    }
+  ]
+}

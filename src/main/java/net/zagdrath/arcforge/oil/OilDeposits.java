@@ -67,11 +67,25 @@ public final class OilDeposits extends SavedData {
     // Mixed into the seed for the sulfur and gas cap rolls, apart from the rolls that place a deposit (so adding them
     // left every deposit where it was).
     private static final long TRAIT_SALT = 0x737570686F726761L;
+    // A gas cap's helium is drawn from its own salt, so adding it left every other trait where it was.
+    private static final long HELIUM_SALT = 0x68656C69756D2121L;
 
     // A deposit: its region, kind, how much it held (mB), its middle and radius (chunks), the height it lies at, whether
-    // it's sour and whether it has a gas cap.
+    // it's sour, whether it has a gas cap and whether that gas is helium-rich (its Natural Gas carries a small share of
+    // helium: Helium-Rich Natural Gas).
     public record Deposit(String dimension, int regionX, int regionZ, DepositKind kind, long amount, int centreChunkX, int centreChunkZ,
-            int radius, int y, boolean sour, boolean gasCap) {
+            int radius, int y, boolean sour, boolean gasCap, boolean heliumRich) {
+        public Deposit(String dimension, int regionX, int regionZ, DepositKind kind, long amount, int centreChunkX, int centreChunkZ,
+                int radius, int y, boolean sour, boolean gasCap) {
+            this(dimension, regionX, regionZ, kind, amount, centreChunkX, centreChunkZ, radius, y, sour, gasCap, false);
+        }
+
+        // The gas its wellheads give: Natural Gas, or Helium-Rich Natural Gas from a helium-rich gas cap.
+        public net.minecraft.world.level.material.Fluid gas() {
+            return heliumRich ? net.zagdrath.arcforge.registry.ModFluids.HELIUM_RICH_NATURAL_GAS.get()
+                    : net.zagdrath.arcforge.registry.ModFluids.NATURAL_GAS.get();
+        }
+
         public long key() {
             return (long) regionX << 32 | regionZ & 0xFFFFFFFFL;
         }
@@ -438,7 +452,8 @@ public final class OilDeposits extends SavedData {
         traits = mix(traits ^ regionZ * 0x165667B19E3779F9L);
         boolean sour = unit(traits = mix(traits)) < (sourRich ? ArcforgeConfig.OIL_SOUR_RICH_CHANCE : ArcforgeConfig.OIL_SOUR_CHANCE).getAsDouble();
         boolean gasCap = unit(mix(traits)) < ArcforgeConfig.OIL_GAS_CAP_CHANCE.getAsDouble();
-        return new Deposit(dimension, regionX, regionZ, kind, amount, centreX, centreZ, radius, y, sour, gasCap);
+        boolean helium = gasCap && unit(mix(traits ^ HELIUM_SALT)) < ArcforgeConfig.OIL_HELIUM_RICH_CHANCE.getAsDouble();
+        return new Deposit(dimension, regionX, regionZ, kind, amount, centreX, centreZ, radius, y, sour, gasCap, helium);
     }
 
     // For the GameTests: a deposit of this kind and amount lying at y, under the chunk holding pos alone (its region
@@ -448,10 +463,15 @@ public final class OilDeposits extends SavedData {
     }
 
     public static Deposit putTestDeposit(ServerLevel level, BlockPos pos, DepositKind kind, long amount, int y, boolean sour, boolean gasCap) {
+        return putTestDeposit(level, pos, kind, amount, y, sour, gasCap, false);
+    }
+
+    public static Deposit putTestDeposit(ServerLevel level, BlockPos pos, DepositKind kind, long amount, int y, boolean sour, boolean gasCap,
+            boolean heliumRich) {
         String dimension = level.dimension().identifier().toString();
         int chunkX = SectionPos.blockToSectionCoord(pos.getX()), chunkZ = SectionPos.blockToSectionCoord(pos.getZ());
         Deposit deposit = new Deposit(dimension, Integer.MIN_VALUE + chunkX, Integer.MIN_VALUE + chunkZ, kind, amount, chunkX, chunkZ, 0, y, sour,
-                gasCap);
+                gasCap, gasCap && heliumRich);
         TEST_DEPOSITS.computeIfAbsent(dimension, d -> new java.util.concurrent.ConcurrentHashMap<>()).put(ChunkPosKey.of(pos), deposit);
         get(level.getServer()).setExtracted(deposit, 0);
         get(level.getServer()).setGasExtracted(deposit, 0);

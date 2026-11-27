@@ -156,10 +156,24 @@ public class PortableStorageItem extends Item {
         return low;
     }
 
-    // Carried capsules leak like the Heat Cell of their tier, once a second.
+    // Carried capsules leak like the Heat Cell of their tier, once a second; carried canisters and cartridges let
+    // tritium permeate out (see Tritium.leak; a Tritium Canister keeps it).
     @Override
     public void inventoryTick(ItemStack stack, ServerLevel level, Entity owner, @Nullable EquipmentSlot slot) {
-        if (kind != Kind.THERMAL_CAPSULE || level.getGameTime() % LEAK_INTERVAL != 0) {
+        if (level.getGameTime() % LEAK_INTERVAL != 0) {
+            return;
+        }
+        if (kind == Kind.CANISTER || kind == Kind.GAS_CARTRIDGE) {
+            FluidStack fluid = fluid(stack);
+            int lost = fluid.isEmpty() ? 0 : net.zagdrath.arcforge.fusion.Tritium.leak(level, owner.position(),
+                    net.neoforged.neoforge.transfer.fluid.FluidResource.of(fluid), fluid.getAmount());
+            if (lost > 0) {
+                fluid.shrink(lost);
+                stack.set(ModDataComponents.FLUID_CONTENTS.get(), SimpleFluidContent.copyOf(fluid));
+            }
+            return;
+        }
+        if (kind != Kind.THERMAL_CAPSULE) {
             return;
         }
         int heat = amount(stack);

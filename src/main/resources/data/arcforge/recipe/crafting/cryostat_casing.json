@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SIS",
+    "IRI",
+    "SIS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "I": "#c:plates/invar",
+    "R": "arcforge:reactor_casing"
+  },
+  "result": {
+    "id": "arcforge:cryostat_casing",
+    "count": 4
+  }
+}

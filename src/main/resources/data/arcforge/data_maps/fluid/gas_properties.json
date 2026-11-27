@@ -68,6 +68,30 @@
     },
     "arcforge:sulfur_dioxide": {
       "color": "#F2ECB8"
+    },
+    "arcforge:deuterium": {
+      "color": "#C6DCF4"
+    },
+    "arcforge:tritium": {
+      "color": "#CDEBCB"
+    },
+    "arcforge:helium": {
+      "color": "#F2F2EE"
+    },
+    "arcforge:hot_helium": {
+      "color": "#F6DCC8"
+    },
+    "arcforge:helium_3": {
+      "color": "#EEDFB0"
+    },
+    "arcforge:argon": {
+      "color": "#DCD4EE"
+    },
+    "arcforge:helium_rich_natural_gas": {
+      "color": "#D4E4EA"
+    },
+    "arcforge:fusion_exhaust": {
+      "color": "#B6AEC4"
     }
   }
 }

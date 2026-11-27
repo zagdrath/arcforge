@@ -389,6 +389,14 @@ public final class ModCreativeTabs {
             .displayItems((parameters, output) -> ModItems.nuclear().forEach(item -> output.accept(item.get())))
             .build());
 
+    // The fusion tier: its fuels, cryogenics, the tritium cycle and the Fusion Reactor.
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> FUSION = CREATIVE_MODE_TABS.register("fusion", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.arcforge.fusion"))
+            .withTabsBefore(NUCLEAR.getKey())
+            .icon(() -> ModItems.FUSION_REACTOR_CONTROLLER.get().getDefaultInstance())
+            .displayItems((parameters, output) -> ModItems.fusion().forEach(item -> output.accept(item.get())))
+            .build());
+
     private ModCreativeTabs() {}
 
     public static void register(IEventBus modEventBus) {
