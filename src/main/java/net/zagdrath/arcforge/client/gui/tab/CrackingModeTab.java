@@ -76,7 +76,7 @@ public class CrackingModeTab extends SideTab {
     @Override
     protected boolean contentClicked(MouseButtonEvent event, int localX, int localY) {
         CrackingMode mode = buttonAt(localX, localY);
-        if (mode == null || event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
+        if (mode == null || !ArcforgeGui.isPress(event)) {
             return false;
         }
         if (mode != current.get()) {

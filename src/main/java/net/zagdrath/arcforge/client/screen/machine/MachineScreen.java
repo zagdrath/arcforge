@@ -214,10 +214,11 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
         drawContents(graphics, leftPos, topPos);
         for (GasVent vent : gasVents()) {
             if (!showVent(vent)) continue;
+            int vx = vent.x() + VENT_INSET;
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ArcforgeGui.sprite("container/electrolyzer/vent_" + (menu.ventEnabled(vent.output()) ? "on" : "off")),
-                    leftPos + vent.x(), topPos + vent.y(), 14, 12);
-            if (isHovering(vent.x(), vent.y(), 14, 12, mouseX, mouseY)) {
-                graphics.fill(leftPos + vent.x(), topPos + vent.y(), leftPos + vent.x() + 14, topPos + vent.y() + 12, 0x30FFFFFF);
+                    leftPos + vx, topPos + vent.y(), VENT_SIZE, VENT_SIZE);
+            if (isHovering(vx, vent.y(), VENT_SIZE, VENT_SIZE, mouseX, mouseY)) {
+                graphics.fill(leftPos + vx, topPos + vent.y(), leftPos + vx + VENT_SIZE, topPos + vent.y() + VENT_SIZE, 0x30FFFFFF);
             }
         }
         // Tabs overlap the panel edge, so they are drawn after the background.
@@ -238,9 +239,13 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
 
     protected boolean showInventoryLabel() { return true; }
 
+    // x, y: the corner of a 14-wide space under the gas gauge; the square button is drawn centred in it (VENT_INSET).
     protected record GasVent(int output, int x, int y) {
         public GasVent {}
     }
+
+    // The vent button: square, VENT_SIZE across, inset from its slot to line up under a 12-wide gauge.
+    protected static final int VENT_SIZE = 12, VENT_INSET = 1;
 
     // Each screen places these directly below its gas gauges, using the Electrolyzer's controls.
     protected List<GasVent> gasVents() { return List.of(); }
@@ -280,7 +285,7 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
         super.extractTooltip(graphics, mouseX, mouseY);
         List<Component> lines = new ArrayList<>();
         for (GasVent vent : gasVents()) {
-            if (showVent(vent) && isHovering(vent.x(), vent.y(), 14, 12, mouseX, mouseY)) {
+            if (showVent(vent) && isHovering(vent.x() + VENT_INSET, vent.y(), VENT_SIZE, VENT_SIZE, mouseX, mouseY)) {
                 Fluid fluid = menu.ventFluid(vent.output());
                 Component name = fluid == null || fluid == Fluids.EMPTY ? Component.translatable("gui.arcforge.vent.output", vent.output() + 1)
                         : fluid.getFluidType().getDescription();
@@ -433,9 +438,9 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == 0 && menu.getCarried().isEmpty()) {
+        if (ArcforgeGui.isPress(event) && menu.getCarried().isEmpty()) {
             for (GasVent vent : gasVents()) {
-                if (showVent(vent) && isHovering(vent.x(), vent.y(), 14, 12, event.x(), event.y())) {
+                if (showVent(vent) && isHovering(vent.x() + VENT_INSET, vent.y(), VENT_SIZE, VENT_SIZE, event.x(), event.y())) {
                     sendButton(net.zagdrath.arcforge.machine.GasVents.BUTTON_FIRST + vent.output());
                     ArcforgeGui.playClickSound();
                     return true;

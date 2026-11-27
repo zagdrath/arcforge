@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:arcforged_upgrade",
+  "template": "arcforge:arcforged_upgrade_smithing_template",
+  "base": "minecraft:netherite_sword",
+  "addition": "#c:ingots/arcforged_alloy",
+  "result": {
+    "id": "arcforge:arcforged_sword",
+    "count": 1
+  }
+}

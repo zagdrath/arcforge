@@ -1,0 +1,11 @@
+{
+  "type": "arcforge:arcforged_upgrade",
+  "template": "arcforge:arcforged_upgrade_smithing_template",
+  "base": "arcforge:steel_excavator",
+  "addition": "#c:ingots/arcforged_alloy",
+  "addition_count": 2,
+  "result": {
+    "id": "arcforge:arcforged_excavator",
+    "count": 1
+  }
+}

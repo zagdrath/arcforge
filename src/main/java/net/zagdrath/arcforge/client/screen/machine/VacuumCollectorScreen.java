@@ -100,7 +100,7 @@ public class VacuumCollectorScreen extends MachineScreen<VacuumCollectorMenu> {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+        if (ArcforgeGui.isPress(event)) {
             int buttonX = buttonAt(event.x(), event.y());
             if (buttonX == SHOW_X) {
                 RangeOutlineRenderer.toggleGuiOutline();

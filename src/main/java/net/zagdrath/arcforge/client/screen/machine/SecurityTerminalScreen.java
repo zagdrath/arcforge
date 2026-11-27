@@ -209,7 +209,7 @@ public class SecurityTerminalScreen extends AbstractContainerScreen<SecurityTerm
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && enabled()) {
+        if (ArcforgeGui.isPress(event) && enabled()) {
             for (int index = 0; index < MODES.size(); index++) {
                 if (ArcforgeGui.isInside(event.x(), event.y(), leftPos + MODE_X + index * MODE_PITCH, topPos + MODE_Y, BUTTON_SIZE, BUTTON_SIZE)) {
                     if (MODES.get(index) != profile().defaultMode()) {

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ITI",
+    "ISI",
+    "III"
+  ],
+  "key": {
+    "I": "#c:gems/iolite",
+    "T": "arcforge:arcforged_upgrade_smithing_template",
+    "S": "#c:storage_blocks/steel"
+  },
+  "result": {
+    "id": "arcforge:arcforged_upgrade_smithing_template",
+    "count": 2
+  }
+}

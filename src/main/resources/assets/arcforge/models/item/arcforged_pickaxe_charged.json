@@ -1,0 +1,13 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "arcforge:item/arcforged_pickaxe",
+    "layer1": {
+      "sprite": "arcforge:item/arcforged_pickaxe_glow",
+      "neoforge_data": {
+        "light_emission": 15,
+        "ambient_occlusion": false
+      }
+    }
+  }
+}

@@ -19,6 +19,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.recipe.AirSeparatingRecipe;
 import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
+import net.zagdrath.arcforge.recipe.ArcforgedUpgradeRecipe;
 import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
 import net.zagdrath.arcforge.recipe.ChemicalReactingRecipe;
 import net.zagdrath.arcforge.recipe.ConduitDyeingRecipe;
@@ -257,6 +258,10 @@ public final class ModRecipes {
     // Legacy serializer retained for existing data packs. Built-in armored jetpacks use crafting recipes.
     public static final Supplier<RecipeSerializer<JetpackPlatingRecipe>> JETPACK_PLATING_SERIALIZER = RECIPE_SERIALIZERS.register("jetpack_plating",
             () -> new RecipeSerializer<>(JetpackPlatingRecipe.MAP_CODEC, JetpackPlatingRecipe.STREAM_CODEC));
+
+    // Smithing netherite gear (and the Steel Hammer and Excavator) into Arcforged gear, keeping its share of wear.
+    public static final Supplier<RecipeSerializer<ArcforgedUpgradeRecipe>> ARCFORGED_UPGRADE_SERIALIZER = RECIPE_SERIALIZERS.register("arcforged_upgrade",
+            () -> new RecipeSerializer<>(ArcforgedUpgradeRecipe.MAP_CODEC, ArcforgedUpgradeRecipe.STREAM_CODEC));
 
     // Machine recipes never show in the recipe book, but every recipe must name a category.
     public static final Supplier<RecipeBookCategory> MACHINE_CATEGORY = RECIPE_BOOK_CATEGORIES.register("machine", RecipeBookCategory::new);

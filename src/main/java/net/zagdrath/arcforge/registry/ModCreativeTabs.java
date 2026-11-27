@@ -281,6 +281,11 @@ public final class ModCreativeTabs {
                         ModItems.STEEL_BOOTS, ModItems.FOUNDRY_HELMET, ModItems.FOUNDRY_CHESTPLATE, ModItems.FOUNDRY_LEGGINGS, ModItems.FOUNDRY_BOOTS)) {
                     output.accept(item.get());
                 }
+                // Arcforged gear, after steel: the template, then each piece.
+                output.accept(ModItems.ARCFORGED_UPGRADE_TEMPLATE.get());
+                for (var item : ModItems.arcforgedGear()) {
+                    output.accept(item.get());
+                }
                 ModItems.jetpacks().forEach(item -> output.accept(item.get()));
                 output.accept(ModItems.LONG_FALL_BOOTS.get());
                 output.accept(ModItems.ARMORED_LONG_FALL_BOOTS.get());

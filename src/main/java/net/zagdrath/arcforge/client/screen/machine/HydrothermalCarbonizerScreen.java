@@ -33,7 +33,7 @@ public class HydrothermalCarbonizerScreen extends MachineScreen<HydrothermalCarb
     private static final int HEAT_X = 43, HEAT_Y = 66, HEAT_W = 92;
     private static final int TICK_Y = 63, TICK_W = 3, TICK_H = 7;
     // The discard toggle under the returned-water tank, in the gap above the inventory (as the Electrolyzer's vents).
-    private static final int DISCARD_X = RETURNED_X - 1, DISCARD_Y = 71, DISCARD_W = 14, DISCARD_H = 12;
+    private static final int DISCARD_X = RETURNED_X, DISCARD_Y = 71, DISCARD_W = VENT_SIZE, DISCARD_H = VENT_SIZE;
     private static final int HOVER = 0x30FFFFFF;
 
     private final Identifier heatBuffer = sprite("heat_buffer");
@@ -84,7 +84,7 @@ public class HydrothermalCarbonizerScreen extends MachineScreen<HydrothermalCarb
 
     @Override
     public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT && minecraft.gameMode != null
+        if (ArcforgeGui.isPress(event) && minecraft.gameMode != null
                 && isHovering(DISCARD_X, DISCARD_Y, DISCARD_W, DISCARD_H, event.x(), event.y())) {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, HydrothermalCarbonizerMenu.BUTTON_DISCARD);
             ArcforgeGui.playClickSound();

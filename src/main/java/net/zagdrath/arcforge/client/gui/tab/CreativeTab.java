@@ -68,7 +68,7 @@ public class CreativeTab extends SideTab {
 
     @Override
     protected boolean contentClicked(MouseButtonEvent event, int localX, int localY) {
-        if (event.button() != InputConstants.MOUSE_BUTTON_LEFT || !onRow(localX, localY)) {
+        if (!ArcforgeGui.isPress(event) || !onRow(localX, localY)) {
             return false;
         }
         clear.run();

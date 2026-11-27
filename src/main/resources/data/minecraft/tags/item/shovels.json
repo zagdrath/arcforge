@@ -2,7 +2,9 @@
   "replace": false,
   "values": [
     "arcforge:steel_shovel",
+    "arcforge:arcforged_shovel",
     "arcforge:steel_excavator",
+    "arcforge:arcforged_excavator",
     "#arcforge:arc_drills"
   ]
 }

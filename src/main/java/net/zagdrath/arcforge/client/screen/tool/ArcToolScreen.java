@@ -123,7 +123,7 @@ public class ArcToolScreen extends AbstractContainerScreen<ArcToolMenu> {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == 0 && minecraft.gameMode != null) {
+        if (ArcforgeGui.isPress(event) && minecraft.gameMode != null) {
             for (Entry entry : entries()) {
                 if (isHovering(entry.x(), NAME_Y - 1, entry.width(), font.lineHeight + 1, event.x(), event.y())) {
                     minecraft.gameMode.handleInventoryButtonClick(menu.containerId, ArcToolMenu.TOGGLE + entry.index());

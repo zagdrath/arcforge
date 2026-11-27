@@ -17,7 +17,7 @@
                 "**Covers:** {item:arcforge:steel_sword}, {item:arcforge:steel_pickaxe}, {item:arcforge:steel_axe}, {item:arcforge:steel_shovel}, {item:arcforge:steel_hoe}"
             ],
             x: 0d,
-            y: 0d,
+            y: 1.25d,
             dependencies: ["arcforge_getting_started/steel_ingot"],
             tasks: [
                 {
@@ -64,7 +64,7 @@
                 "**Covers:** {item:arcforge:steel_helmet}, {item:arcforge:steel_chestplate}, {item:arcforge:steel_leggings}, {item:arcforge:steel_boots}"
             ],
             x: 1.5d,
-            y: 0d,
+            y: 1.25d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["steel_tools"],
@@ -108,7 +108,7 @@
                 "**Covers:** {item:arcforge:steel_hammer}, {item:arcforge:steel_excavator}"
             ],
             x: 1.5d,
-            y: 1.25d,
+            y: 2.5d,
             dependencies: ["steel_tools"],
             tasks: [
                 {
@@ -140,6 +140,170 @@
             ]
         },
         {
+            id: "arcforged_template",
+            title: "Arcforged Upgrade",
+            icon: "arcforge:arcforged_upgrade_smithing_template",
+            description: [
+                "Arcite-Tungsten Composite, Iolite Crystals and a Netherite Ingot make the Arcforged Upgrade Template. At a Smithing Table it upgrades netherite gear (and the Steel Hammer and Excavator) to Arcforged with Arcforged Alloy, keeping enchantments, trim and name. It's used up; seven Iolite Crystals and a Block of Steel copy it.",
+                "",
+                "**Covers:** {item:arcforge:arcforged_upgrade_smithing_template}"
+            ],
+            x: 3d,
+            y: 1.25d,
+            dependencies: ["steel_armour"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_upgrade_smithing_template"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:iolite_crystal",
+                    count: 7
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "arcforged_gear_tools",
+            title: "Beyond Netherite",
+            icon: "arcforge:arcforged_pickaxe",
+            description: [
+                "Arcforged tools: 3,072 uses, speed 11, a 9-damage sword. Each holds 512,000 FE: charged, its wear costs FE instead of durability and it repairs itself; empty, it wears like any other tool. Charge it like an Arc Drill.",
+                "",
+                "**Covers:** {item:arcforge:arcforged_sword}, {item:arcforge:arcforged_pickaxe}, {item:arcforge:arcforged_axe}, {item:arcforge:arcforged_shovel}, {item:arcforge:arcforged_hoe}"
+            ],
+            x: 4.5d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["arcforged_template"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:arcforged_sword",
+                                        "arcforge:arcforged_pickaxe",
+                                        "arcforge:arcforged_axe",
+                                        "arcforge:arcforged_shovel",
+                                        "arcforge:arcforged_hoe"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Arcforged Sword or Arcforged Pickaxe or Arcforged Axe or Arcforged Shovel or Arcforged Hoe",
+                    icon: "arcforge:arcforged_sword"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ]
+        },
+        {
+            id: "arcforged_gear_armour",
+            title: "Arcforged Armour",
+            icon: "arcforge:arcforged_chestplate",
+            description: [
+                "4 / 9 / 7 / 4 armour, 4 toughness and 0.15 knockback resistance a piece, fire resistant, trimmable, and paying its wear in FE while charged. The visor and seams glow while it has charge.",
+                "",
+                "**Covers:** {item:arcforge:arcforged_helmet}, {item:arcforge:arcforged_chestplate}, {item:arcforge:arcforged_leggings}, {item:arcforge:arcforged_boots}"
+            ],
+            x: 4.5d,
+            y: 2.5d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["arcforged_template"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_helmet"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_chestplate"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_leggings"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_boots"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ]
+        },
+        {
+            id: "arcforged_gear_area",
+            title: "Arcforged Hammer and Excavator",
+            icon: "arcforge:arcforged_hammer",
+            description: [
+                "Smith the Steel Hammer or Excavator with the template and two Arcforged Alloy: the same 3×3 at netherite level, 9,216 uses, each block 100 FE while charged.",
+                "",
+                "**Covers:** {item:arcforge:arcforged_hammer}, {item:arcforge:arcforged_excavator}"
+            ],
+            x: 4.5d,
+            y: 3.75d,
+            dependencies: ["arcforged_template", "hammer"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:arcforged_hammer", "arcforge:arcforged_excavator"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Arcforged Hammer or Arcforged Excavator",
+                    icon: "arcforge:arcforged_hammer"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        },
+        {
             id: "foundry_suit",
             title: "Foundry Suit",
             icon: "arcforge:foundry_chestplate",
@@ -149,7 +313,7 @@
                 "**Covers:** {item:arcforge:foundry_helmet}, {item:arcforge:foundry_chestplate}, {item:arcforge:foundry_leggings}, {item:arcforge:foundry_boots}"
             ],
             x: 3d,
-            y: 0d,
+            y: 2.5d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["steel_armour"],
@@ -193,7 +357,7 @@
                 "**Covers:** {item:arcforge:tempered_jetpack}"
             ],
             x: 3d,
-            y: 1.25d,
+            y: 0d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["steel_armour"],
@@ -224,7 +388,7 @@
                 "**Covers:** {item:arcforge:hardened_jetpack}, {item:arcforge:arcforged_jetpack}"
             ],
             x: 4.5d,
-            y: 1.25d,
+            y: 0d,
             dependencies: ["jetpack"],
             tasks: [
                 {
@@ -265,7 +429,7 @@
                 "**Covers:** {item:arcforge:tempered_arc_drill}, {item:arcforge:tempered_arc_saw}"
             ],
             x: 3d,
-            y: 2.5d,
+            y: 3.75d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["hammer"],
@@ -307,7 +471,7 @@
                 "**Covers:** {item:arcforge:area_module}, {item:arcforge:silk_touch_module}, {item:arcforge:fortune_i_module}, {item:arcforge:fortune_ii_module}, {item:arcforge:fortune_iii_module}, {item:arcforge:vein_module}, {item:arcforge:speed_module}"
             ],
             x: 4.5d,
-            y: 2.5d,
+            y: 5d,
             dependencies: ["arc_tools"],
             tasks: [
                 {
@@ -355,7 +519,7 @@
                 "**Covers:** {item:arcforge:hardened_arc_drill}, {item:arcforge:hardened_arc_saw}"
             ],
             x: 4.5d,
-            y: 3.75d,
+            y: 6.25d,
             dependencies: ["arc_tools"],
             tasks: [
                 {
@@ -395,7 +559,7 @@
                 "**Covers:** {item:arcforge:arcforged_arc_drill}, {item:arcforge:arcforged_arc_saw}"
             ],
             x: 6d,
-            y: 3.75d,
+            y: 6.25d,
             shape: "gear",
             size: 1.5d,
             dependencies: ["hardened_tools"],
@@ -433,7 +597,7 @@
             icon: "arcforge:arcforged_jetpack",
             description: ["Foundry Suit, Arcforged Jetpack, Arcforged Drill and Saw with a full rack of modules."],
             x: 7.5d,
-            y: 2.5d,
+            y: 3.75d,
             shape: "gear",
             size: 1.5d,
             dependencies: ["foundry_suit", "better_jetpacks", "arcforged_tools", "modules"],

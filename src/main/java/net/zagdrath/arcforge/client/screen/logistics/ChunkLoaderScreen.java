@@ -177,7 +177,7 @@ public class ChunkLoaderScreen extends AbstractContainerScreen<ChunkLoaderMenu> 
         if (tabs.mouseClicked(event)) {
             return true;
         }
-        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+        if (ArcforgeGui.isPress(event)) {
             int radius = menu.getRadius();
             if (radius > 0 && ArcforgeGui.isInside(event.x(), event.y(), leftPos + MINUS_X, topPos + BUTTONS_Y, BUTTON_SIZE, BUTTON_SIZE)) {
                 sendButton(ChunkLoaderMenu.BUTTON_RADIUS_MINUS);

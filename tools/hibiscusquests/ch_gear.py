@@ -21,6 +21,33 @@ ch.q("hammer", "Hammer and Excavator", "steel_hammer",
      [have("steel_hammer", "steel_excavator")], deps=["steel_tools"], rewards=[item("steel_block", 2), xp(4)],
      items=["steel_hammer", "steel_excavator"])
 
+ch.q("arcforged_template", "Arcforged Upgrade", "arcforged_upgrade_smithing_template",
+     "Arcite-Tungsten Composite, Iolite Crystals and a Netherite Ingot make the Arcforged Upgrade Template. At a Smithing "
+     "Table it upgrades netherite gear (and the Steel Hammer and Excavator) to Arcforged with Arcforged Alloy, keeping "
+     "enchantments, trim and name. It's used up; seven Iolite Crystals and a Block of Steel copy it.",
+     [have("arcforged_upgrade_smithing_template")], deps=["steel_armour"], rewards=[item("iolite_crystal", 7), xp(10)],
+     items=["arcforged_upgrade_smithing_template"])
+
+ch.q("arcforged_gear_tools", "Beyond Netherite", "arcforged_pickaxe",
+     "Arcforged tools: 3,072 uses, speed 11, a 9-damage sword. Each holds 512,000 FE: charged, its wear costs FE instead of "
+     "durability and it repairs itself; empty, it wears like any other tool. Charge it like an Arc Drill.",
+     [have("arcforged_sword", "arcforged_pickaxe", "arcforged_axe", "arcforged_shovel", "arcforged_hoe")], deps=["arcforged_template"],
+     rewards=[item("arcforged_alloy", 2), xp(15)], frame="goal",
+     items=["arcforged_sword", "arcforged_pickaxe", "arcforged_axe", "arcforged_shovel", "arcforged_hoe"])
+
+ch.q("arcforged_gear_armour", "Arcforged Armour", "arcforged_chestplate",
+     "4 / 9 / 7 / 4 armour, 4 toughness and 0.15 knockback resistance a piece, fire resistant, trimmable, and paying its wear "
+     "in FE while charged. The visor and seams glow while it has charge.",
+     [have("arcforged_helmet"), have("arcforged_chestplate"), have("arcforged_leggings"), have("arcforged_boots")],
+     deps=["arcforged_template"], rewards=[item("arcforged_alloy", 4), xp(20)], frame="challenge",
+     items=["arcforged_helmet", "arcforged_chestplate", "arcforged_leggings", "arcforged_boots"])
+
+ch.q("arcforged_gear_area", "Arcforged Hammer and Excavator", "arcforged_hammer",
+     "Smith the Steel Hammer or Excavator with the template and two Arcforged Alloy: the same 3×3 at netherite level, "
+     "9,216 uses, each block 100 FE while charged.",
+     [have("arcforged_hammer", "arcforged_excavator")], deps=["arcforged_template", "hammer"], rewards=[item("arcforged_alloy", 2), xp(12)],
+     items=["arcforged_hammer", "arcforged_excavator"])
+
 ch.q("foundry_suit", "Foundry Suit", "foundry_chestplate",
      "Rock Wool, Slag Wool and Steel Plates. Each piece cuts fire and magma damage 25%; the full set makes you fire immune "
      "with an 8-second lava shield, and Rock Wool repairs it. Built for walking on Geothermal lava.",

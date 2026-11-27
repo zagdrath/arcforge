@@ -125,6 +125,10 @@ What you wear and carry: steel tools and armour, the Foundry Suit, three tiers o
 - **Steel Tools** `steel_tools`: Obtain Steel Sword or Steel Pickaxe or Steel Axe or Steel Shovel or Steel Hoe. After: arcforge_getting_started/steel_ingot. Rewards: 8× Steel Ingot, 3 lvl
 - ★ **Steel Armour** `steel_armour`: Obtain Steel Helmet; Obtain Steel Chestplate; Obtain Steel Leggings; Obtain Steel Boots. After: steel_tools. Rewards: 16× Steel Ingot, 5 lvl
 - **Hammer and Excavator** `hammer`: Obtain Steel Hammer or Steel Excavator. After: steel_tools. Rewards: 2× Block of Steel, 4 lvl
+- **Arcforged Upgrade** `arcforged_template`: Obtain Arcforged Upgrade Template. After: steel_armour. Rewards: 7× Iolite Crystal, 10 lvl
+- ★ **Beyond Netherite** `arcforged_gear_tools`: Obtain Arcforged Sword or Arcforged Pickaxe or Arcforged Axe or Arcforged Shovel or Arcforged Hoe. After: arcforged_template. Rewards: 2× Arcforged Alloy, 15 lvl
+- ◆ **Arcforged Armour** `arcforged_gear_armour`: Obtain Arcforged Helmet; Obtain Arcforged Chestplate; Obtain Arcforged Leggings; Obtain Arcforged Boots. After: arcforged_template. Rewards: 4× Arcforged Alloy, 20 lvl
+- **Arcforged Hammer and Excavator** `arcforged_gear_area`: Obtain Arcforged Hammer or Arcforged Excavator. After: arcforged_template, hammer. Rewards: 2× Arcforged Alloy, 12 lvl
 - ★ **Foundry Suit** `foundry_suit`: Obtain Foundry Helmet; Obtain Foundry Chestplate; Obtain Foundry Leggings; Obtain Foundry Boots. After: steel_armour. Rewards: 8× Rock Wool, 8 lvl
 - ★ **Tempered Jetpack** `jetpack`: Obtain Tempered Jetpack. After: steel_armour. Rewards: 1× Tempered Gas Cartridge, 8 lvl
 - **Higher, Faster** `better_jetpacks`: Obtain Hardened Jetpack or Arcforged Jetpack. After: jetpack. Rewards: 4× Kerosene Bucket, 10 lvl

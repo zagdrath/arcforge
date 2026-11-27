@@ -34,7 +34,7 @@ public class ElectrolyzerScreen extends MachineScreen<ElectrolyzerMenu> {
     private final Identifier ventOn = sprite("vent_on");
     private final Identifier ventOff = sprite("vent_off");
     // A vent toggle under each gas tank, in the gap above the inventory.
-    private static final int VENT_Y = 71, VENT_W = 14, VENT_H = 12;
+    private static final int VENT_Y = 71, VENT_W = VENT_SIZE, VENT_H = VENT_SIZE;
     private static final int HOVER = 0x30FFFFFF;
     private int mouseX, mouseY;
 
@@ -65,8 +65,8 @@ public class ElectrolyzerScreen extends MachineScreen<ElectrolyzerMenu> {
         drawFluidTank(graphics, menu.getTertiaryFluid(), menu.getTertiary(), menu.getLiquidCapacity(), tankGauge, tankGauge,
                 x, y, LIQUID_X, TANK_Y, TANK_W, TANK_H);
         ArcCrusherScreen.drawProgress(graphics, progress, x + PROGRESS_X, y + PROGRESS_Y, menu.getProgress(), menu.getTotal());
-        vent(graphics, x, y, HYDROGEN_X - 1, menu.isVentingHydrogen());
-        vent(graphics, x, y, OXYGEN_X - 1, menu.isVentingOxygen());
+        vent(graphics, x, y, HYDROGEN_X, menu.isVentingHydrogen());
+        vent(graphics, x, y, OXYGEN_X, menu.isVentingOxygen());
         drawLed(graphics, x, y, LED_X, LED_Y);
     }
 
@@ -86,9 +86,9 @@ public class ElectrolyzerScreen extends MachineScreen<ElectrolyzerMenu> {
 
     @Override
     public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT && minecraft.gameMode != null) {
-            int button = isHovering(HYDROGEN_X - 1, VENT_Y, VENT_W, VENT_H, event.x(), event.y()) ? ElectrolyzerMenu.BUTTON_VENT_HYDROGEN
-                    : isHovering(OXYGEN_X - 1, VENT_Y, VENT_W, VENT_H, event.x(), event.y()) ? ElectrolyzerMenu.BUTTON_VENT_OXYGEN : -1;
+        if (ArcforgeGui.isPress(event) && minecraft.gameMode != null) {
+            int button = isHovering(HYDROGEN_X, VENT_Y, VENT_W, VENT_H, event.x(), event.y()) ? ElectrolyzerMenu.BUTTON_VENT_HYDROGEN
+                    : isHovering(OXYGEN_X, VENT_Y, VENT_W, VENT_H, event.x(), event.y()) ? ElectrolyzerMenu.BUTTON_VENT_OXYGEN : -1;
             if (button >= 0) {
                 minecraft.gameMode.handleInventoryButtonClick(menu.containerId, button);
                 ArcforgeGui.playClickSound();
@@ -143,7 +143,7 @@ public class ElectrolyzerScreen extends MachineScreen<ElectrolyzerMenu> {
     @Override
     protected void addTooltip(List<Component> lines, int mouseX, int mouseY) {
         for (boolean hydrogen : new boolean[] { true, false }) {
-            if (isHovering((hydrogen ? HYDROGEN_X : OXYGEN_X) - 1, VENT_Y, VENT_W, VENT_H, mouseX, mouseY)) {
+            if (isHovering((hydrogen ? HYDROGEN_X : OXYGEN_X), VENT_Y, VENT_W, VENT_H, mouseX, mouseY)) {
                 boolean on = hydrogen ? menu.isVentingHydrogen() : menu.isVentingOxygen();
                 lines.add(Component.translatable(hydrogen ? "gui.arcforge.electrolyzer.vent_hydrogen" : "gui.arcforge.electrolyzer.vent_oxygen"));
                 lines.add(Component.translatable(on ? "gui.arcforge.electrolyzer.vent_on" : "gui.arcforge.electrolyzer.vent_off")

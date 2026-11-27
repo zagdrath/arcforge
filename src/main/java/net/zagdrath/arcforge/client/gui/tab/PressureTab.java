@@ -94,7 +94,7 @@ public class PressureTab extends SideTab {
     @Override
     protected boolean contentClicked(MouseButtonEvent event, int localX, int localY) {
         BoilerPressure pressure = rowAt(localX, localY);
-        if (pressure == null || event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
+        if (pressure == null || !ArcforgeGui.isPress(event)) {
             return false;
         }
         if (pressure != current.get()) {

@@ -1,0 +1,32 @@
+{
+  "title": "Arcforged Tools & Armor",
+  "icon": "arcforge:arcforged_pickaxe",
+  "items": [
+    "arcforge:arcforged_upgrade_smithing_template",
+    "arcforge:arcforged_sword",
+    "arcforge:arcforged_pickaxe",
+    "arcforge:arcforged_axe",
+    "arcforge:arcforged_shovel",
+    "arcforge:arcforged_hoe",
+    "arcforge:arcforged_hammer",
+    "arcforge:arcforged_excavator",
+    "arcforge:arcforged_helmet",
+    "arcforge:arcforged_chestplate",
+    "arcforge:arcforged_leggings",
+    "arcforge:arcforged_boots"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "One tier above netherite, on the steel tools' and armor's shapes in dark Arcforged steel with an Arcite inlay.\n- Tools: 3,072 uses, speed 11, mine what netherite mines; a sword deals 9 (netherite 8). Hammer and Excavator break 3×3 as the steel ones do, 9,216 uses.\n- Armor: 4 / 9 / 7 / 4 armor, 4 toughness and 0.15 knockback resistance a piece.\n- Repaired with Arcforged Alloy. Fire resistant like netherite, and they survive explosions as dropped items.\n- Every enchantment and armor trim works on them."
+    },
+    {
+      "type": "text",
+      "text": "# Upgrading\nCraft the Arcforged Upgrade Template from Arcite-Tungsten Composite, Iolite Crystals and a Netherite Ingot; a template, seven Iolite Crystals and a Block of Steel make two.\nAt a Smithing Table: the template, a netherite tool or armor piece and an Arcforged Alloy give the Arcforged piece. The Hammer and Excavator upgrade from the Steel Hammer and Excavator with the template and two Arcforged Alloy.\nThe template is used up. Enchantments, trim and name carry over, and the same share of durability used."
+    },
+    {
+      "type": "text",
+      "text": "# FE self-repair\nEach piece holds 512,000 FE. Charge it in an Energy Cell's slots, on a Chargepad or from a Battery, like an Arc Drill.\n- While it has charge, wear costs 100 FE a point instead of durability, and a damaged piece repairs a point a second from its charge.\n- With no charge it wears and repairs (anvil, Mending) like any other gear, so it never stops working.\n- The cyan bar above the durability bar is the charge. The inlay, and worn armor's visor, chest and shoulder seams, glow while charged.\nAll of this is in the arcforgedGear config section, with a switch to turn the FE buffer off."
+    }
+  ]
+}

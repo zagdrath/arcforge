@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "arcforge:steel_hoe"
+    "arcforge:steel_hoe",
+    "arcforge:arcforged_hoe"
   ]
 }

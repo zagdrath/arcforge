@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "arcforge:steel_sword"
+    "arcforge:steel_sword",
+    "arcforge:arcforged_sword"
   ]
 }

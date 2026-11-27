@@ -142,6 +142,7 @@ public final class ArcforgeGameTests {
         TESTS.put("water_intake_pumps", MaxScaleGameTests::waterIntakePumps);
         TESTS.put("water_intake_needs_a_water_body", MaxScaleGameTests::waterIntakeNeedsAWaterBody);
         TESTS.put("water_intake_seawater_mode", MaxScaleGameTests::waterIntakeSeawaterMode);
+        TESTS.put("distillation_vents_refinery_gas", DistillationGameTests::ventsRefineryGas);
         TESTS.put("carbonizer_speed_upgrades", MaxScaleGameTests::carbonizerSpeedUpgrades);
         TESTS.put("distillation_upgrades", MaxScaleGameTests::distillationUpgrades);
         TESTS.put("heat_pipe_carries_heat", HeatTransportGameTests::heatPipeCarriesHeat);
@@ -231,6 +232,13 @@ public final class ArcforgeGameTests {
         TESTS.put("area_sneak_single", SteelEquipmentGameTests::sneakSingle);
         TESTS.put("area_durability_per_block", SteelEquipmentGameTests::durabilityPerBlock);
         TESTS.put("area_break_event_cancel", SteelEquipmentGameTests::breakEventCancel);
+        TESTS.put("arcforged_tool_levels", ArcforgedGearGameTests::toolLevels);
+        TESTS.put("arcforged_armor_values", ArcforgedGearGameTests::armorValues);
+        TESTS.put("arcforged_fe_wear", ArcforgedGearGameTests::feWear);
+        TESTS.put("arcforged_charges_in_energy_cell", ArcforgedGearGameTests::chargesInEnergyCell);
+        TESTS.put("arcforged_smithing_upgrade", ArcforgedGearGameTests::smithingUpgrade);
+        TESTS.put("arcforged_template_duplicates", ArcforgedGearGameTests::templateDuplicates);
+        TESTS.put("arcforged_survives_fire_and_explosions", ArcforgedGearGameTests::survivesFireAndExplosions);
         TESTS.put("jetpack_fills_from_cylinder", ArcToolGameTests::jetpackFillsFromCylinder);
         TESTS.put("jetpack_fills_from_cartridge", ArcToolGameTests::jetpackFillsFromCartridge);
         TESTS.put("jetpack_burns_per_data_map", ArcToolGameTests::jetpackBurnsPerDataMap);

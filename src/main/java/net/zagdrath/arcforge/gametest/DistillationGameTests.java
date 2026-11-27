@@ -215,6 +215,50 @@ final class DistillationGameTests {
                 .thenSucceed();
     }
 
+    // A full Refinery Gas tank stops a column, until its vent (the GUI's button, the menu's vent button id) is turned on:
+    // then the gas that doesn't fit is discarded and the column keeps making its liquids.
+    static void ventsRefineryGas(GameTestHelper helper) {
+        BlockPos vented = new BlockPos(0, 1, 0), blocked = new BlockPos(3, 1, 0);
+        buildColumn(helper, vented, 6, 1, Direction.NORTH);
+        buildColumn(helper, blocked, 6, 1, Direction.NORTH);
+        helper.startSequence()
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    for (BlockPos min : new BlockPos[] { vented, blocked }) {
+                        DistillationArrayBlockEntity column = controller(helper, min, 1);
+                        var gas = column.getProduct(Product.REFINERY_GAS);
+                        try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+                            gas.insert(0, net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.zagdrath.arcforge.registry.ModFluids.REFINERY_GAS.get()),
+                                    gas.getCapacity(), tx);
+                            tx.commit();
+                        }
+                        helper.assertTrue(gas.getSpace() == 0, "The Refinery Gas tank isn't full");
+                        helper.assertTrue(SteamGameTests.fill(column.getFluidHandler(null), CRUDE, 1_000) == 1_000, "The column didn't take Crude Oil");
+                        column.getHeat().add(column.getHeat().getCapacity());
+                    }
+                    // The click as the client sends it, to the column's open menu.
+                    BlockPos at = helper.absolutePos(vented.above(1));
+                    var player = TestFixtures.player(helper);
+                    player.snapTo(at.getX() + 0.5, at.getY(), at.getZ() - 1.5);
+                    var menu = controller(helper, vented, 1).createMenu(1, player.getInventory(), player);
+                    player.containerMenu = menu;
+                    player.connection.handleContainerButtonClick(new net.minecraft.network.protocol.game.ServerboundContainerButtonClickPacket(menu.containerId,
+                            net.zagdrath.arcforge.machine.GasVents.BUTTON_FIRST));
+                    helper.assertTrue(controller(helper, vented, 1).gasVents.isEnabled(0), "The vent button didn't turn the vent on");
+                    helper.assertTrue(((net.zagdrath.arcforge.menu.machine.MachineMenu) menu).ventEnabled(0), "The menu doesn't show the vent on");
+                })
+                .thenIdle(90)
+                .thenExecute(() -> {
+                    DistillationArrayBlockEntity open = controller(helper, vented, 1);
+                    helper.assertTrue(open.getProduct(Product.DIESEL).getAmount() == 350 && open.getFeed().getAmount() == 0,
+                            "With its vent on, a full gas tank still stopped it: " + open.getStatus() + ", " + open.getProduct(Product.DIESEL).getAmount()
+                                    + " mB Diesel");
+                    DistillationArrayBlockEntity shut = controller(helper, blocked, 1);
+                    helper.assertTrue(shut.getStatus() == MachineStatus.FULL && shut.getFeed().getAmount() == 1_000, "Without its vent it's " + shut.getStatus());
+                })
+                .thenSucceed();
+    }
+
     // Sour Crude Oil distils like Crude Oil, but its Diesel and Kerosene come out sour.
     static void sourCrudeFractions(GameTestHelper helper) {
         BlockPos ten = new BlockPos(0, 1, 0);

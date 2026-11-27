@@ -372,7 +372,7 @@ public class QuantumTunnelScreen extends AbstractContainerScreen<QuantumTunnelMe
         if (tabs.mouseClicked(event)) {
             return true;
         }
-        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+        if (ArcforgeGui.isPress(event)) {
             int x = leftPos, y = topPos;
             if (ArcforgeGui.isInside(event.x(), event.y(), x + TOGGLE_X, y + BUTTONS_Y, BUTTON_SIZE, BUTTON_SIZE)) {
                 makePrivate = !makePrivate;

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ICI",
+    "CNC",
+    "ICI"
+  ],
+  "key": {
+    "I": "#c:gems/iolite",
+    "C": "arcforge:arcite_tungsten_composite",
+    "N": "#c:ingots/netherite"
+  },
+  "result": {
+    "id": "arcforge:arcforged_upgrade_smithing_template",
+    "count": 1
+  }
+}

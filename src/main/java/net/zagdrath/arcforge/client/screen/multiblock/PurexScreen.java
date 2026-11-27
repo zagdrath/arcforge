@@ -125,7 +125,7 @@ public class PurexScreen extends MachineScreen<PurexMenu> {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == 0 && minecraft.gameMode != null && isHovering(MODE_X, MODE_Y, MODE_W, MODE_H, event.x(), event.y())) {
+        if (ArcforgeGui.isPress(event) && minecraft.gameMode != null && isHovering(MODE_X, MODE_Y, MODE_W, MODE_H, event.x(), event.y())) {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, PurexMenu.MODE);
             ArcforgeGui.playClickSound();
             return true;

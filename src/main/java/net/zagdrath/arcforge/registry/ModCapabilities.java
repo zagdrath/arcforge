@@ -79,6 +79,7 @@ import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.item.storage.PortableFluidHandler;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.item.tool.ArcToolItem;
+import net.zagdrath.arcforge.item.tool.ArcforgedGear;
 import net.zagdrath.arcforge.item.tool.JetpackFluidHandler;
 import net.zagdrath.arcforge.item.tool.JetpackItem;
 import net.zagdrath.arcforge.item.tool.LongFallBootsItem;
@@ -522,6 +523,12 @@ public final class ModCapabilities {
                 (stack, access) -> new ItemAccessEnergyHandler(access, ModDataComponents.ENERGY.get(),
                         LongFallBootsItem.CAPACITY, LongFallBootsItem.RECEIVE_RATE, 0),
                 ModItems.LONG_FALL_BOOTS.get(), ModItems.ARMORED_LONG_FALL_BOOTS.get());
+        // Arcforged tools and armour: charged like the other FE gear; nothing with the FE buffer off in config.
+        for (DeferredItem<? extends net.minecraft.world.item.Item> holder : ModItems.arcforgedGear()) {
+            event.registerItem(Capabilities.Energy.ITEM, (stack, access) -> ArcforgedGear.enabled()
+                    ? new ItemAccessEnergyHandler(access, ModDataComponents.ENERGY.get(), ArcforgedGear.capacity(), ArcforgedGear.receiveRate(), 0)
+                    : null, holder.get());
+        }
         for (DeferredItem<JetpackItem> holder : ModItems.jetpacks()) {
             JetpackItem item = holder.get();
             event.registerItem(Capabilities.Fluid.ITEM, (stack, access) -> new JetpackFluidHandler(access, item), item);

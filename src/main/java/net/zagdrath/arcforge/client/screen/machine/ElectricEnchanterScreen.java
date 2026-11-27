@@ -204,7 +204,7 @@ public class ElectricEnchanterScreen extends MachineScreen<ElectricEnchanterMenu
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+        if (ArcforgeGui.isPress(event)) {
             List<Holder<Enchantment>> list = candidates();
             if (isHovering(TRACK_X, TRACK_Y, TRACK_W, TRACK_H, event.x(), event.y()) && maxScroll(list.size()) > 0) {
                 dragging = true;

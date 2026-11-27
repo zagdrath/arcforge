@@ -4007,6 +4007,37 @@ public class ArcforgeConfig {
         BUILDER.pop();
     }
 
+    // --- Arcforged tools and armour ---
+
+    static {
+        BUILDER.comment("Arcforged tools and armour: each piece holds FE and, while it has charge, pays its wear in FE instead of",
+                "durability. With no charge it wears and repairs like any other gear.").push("arcforgedGear");
+    }
+
+    public static final ModConfigSpec.BooleanValue ARCFORGED_FE_BUFFER = BUILDER
+            .comment("Whether Arcforged gear holds FE at all. Off, it can't be charged and wears like any other gear.")
+            .define("feBuffer", true);
+
+    public static final ModConfigSpec.IntValue ARCFORGED_CAPACITY = BUILDER
+            .comment("FE each piece holds.")
+            .defineInRange("energyCapacity", 512_000, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue ARCFORGED_RECEIVE = BUILDER
+            .comment("Most FE a piece takes a tick while charging (Energy Cell slots, the Chargepad, Batteries).")
+            .defineInRange("chargeRate", 16_000, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue ARCFORGED_FE_PER_DURABILITY = BUILDER
+            .comment("FE paid instead of each point of durability while the piece has charge.")
+            .defineInRange("fePerDurability", 100, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue ARCFORGED_REPAIR_PER_SECOND = BUILDER
+            .comment("Durability a damaged piece restores each second from its charge, at fePerDurability each (0: never).")
+            .defineInRange("repairPerSecond", 1, 0, 10_000);
+
+    static {
+        BUILDER.pop();
+    }
+
     // --- The Foundry Suit ---
 
     static {

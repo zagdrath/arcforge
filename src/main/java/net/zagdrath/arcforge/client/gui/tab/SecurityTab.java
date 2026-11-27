@@ -109,7 +109,7 @@ public class SecurityTab extends SideTab {
     protected boolean contentClicked(MouseButtonEvent event, int localX, int localY) {
         SecuritySyncPayload data = data();
         int index = choiceAt(localX, localY);
-        if (data == null || index < 0 || event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
+        if (data == null || index < 0 || !ArcforgeGui.isPress(event)) {
             return false;
         }
         if (data.canEdit() && CHOICES.get(index) != data.effectiveMode()) {

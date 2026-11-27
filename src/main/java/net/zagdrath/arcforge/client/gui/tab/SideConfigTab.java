@@ -132,12 +132,12 @@ public class SideConfigTab extends SideTab {
 
     @Override
     protected boolean contentClicked(MouseButtonEvent event, int localX, int localY) {
-        if (isOverClear(localX, localY) && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+        if (isOverClear(localX, localY) && ArcforgeGui.isPress(event)) {
             clearAll.run();
             ArcforgeGui.playClickSound();
             return true;
         }
-        if (isOverAutoEject(localX, localY) && toggleAutoEject != null && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+        if (isOverAutoEject(localX, localY) && toggleAutoEject != null && ArcforgeGui.isPress(event)) {
             toggleAutoEject.run();
             ArcforgeGui.playClickSound();
             return true;

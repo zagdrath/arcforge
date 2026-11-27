@@ -120,7 +120,7 @@ public class ArcQuarryScreen extends MachineScreen<ArcQuarryMenu> {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && minecraft.gameMode != null) {
+        if (ArcforgeGui.isPress(event) && minecraft.gameMode != null) {
             int button = -1;
             if (isHovering(START_X, START_Y, BUTTON_SIZE, BUTTON_SIZE, event.x(), event.y())) {
                 button = ArcQuarryMenu.BUTTON_START_STOP;

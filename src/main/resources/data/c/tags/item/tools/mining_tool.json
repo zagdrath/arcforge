@@ -2,11 +2,17 @@
   "replace": false,
   "values": [
     "arcforge:steel_pickaxe",
+    "arcforge:arcforged_pickaxe",
     "arcforge:steel_axe",
+    "arcforge:arcforged_axe",
     "arcforge:steel_shovel",
+    "arcforge:arcforged_shovel",
     "arcforge:steel_hoe",
+    "arcforge:arcforged_hoe",
     "arcforge:steel_hammer",
+    "arcforge:arcforged_hammer",
     "arcforge:steel_excavator",
+    "arcforge:arcforged_excavator",
     "#arcforge:arc_tools"
   ]
 }

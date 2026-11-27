@@ -86,7 +86,7 @@ public class WaterIntakeScreen extends MachineScreen<WaterIntakeMenu> {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == 0 && menu.getCarried().isEmpty() && isOverModeButton(event.x(), event.y())) {
+        if (ArcforgeGui.isPress(event) && menu.getCarried().isEmpty() && isOverModeButton(event.x(), event.y())) {
             sendButton(WaterIntakeMenu.BUTTON_SEAWATER);
             ArcforgeGui.playClickSound();
             return true;

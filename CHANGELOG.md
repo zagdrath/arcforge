@@ -28,6 +28,18 @@ machines and Settings Cards carry over).
 
 ### Added
 
+- **Arcforged tools and armour.** A tier above netherite on the steel tools' and armour's shapes: Arcforged Sword,
+  Pickaxe, Axe, Shovel, Hoe, Hammer and Excavator (3×3, like the steel ones), Helmet, Chestplate, Leggings and Boots.
+  Tools last 3,072 uses at speed 11, mine what netherite mines and hit harder (a 9-damage sword); armour gives
+  4 / 9 / 7 / 4 armour, 4 toughness and 0.15 knockback resistance a piece. All repair with Arcforged Alloy, are fire
+  resistant like netherite, survive explosions as items, and take every enchantment and armour trim. Upgrade netherite
+  gear at the Smithing Table with the new **Arcforged Upgrade Template** (Arcite-Tungsten Composite, Iolite Crystals and a
+  Netherite Ingot; copied with Iolite Crystals and a Block of Steel) and an Arcforged Alloy, keeping enchantments, trim,
+  name and the share of wear; the Hammer and Excavator upgrade from steel with two Arcforged Alloy. Each piece holds
+  512,000 FE, charged like the other FE gear: while charged, wear costs 100 FE a point instead of durability and it
+  slowly repairs itself; empty, it wears like any gear. A cyan charge bar sits over the durability bar, and the Arcite
+  inlay (and worn armour's visor, chest and shoulder seams) glows while charged. Values are in the `arcforgedGear`
+  config section. Includes Handbook entry, JEI info, Tools & Gear quests and GameTests.
 - **Gas output vent controls.** Buttons directly beneath the gas gauges provide individual overflow toggles for refinery units, the Steam Cracker,
   chemical reactors and arrays, the Gasifier, Haber Reactor, Distillation Array, Biogas Digester, Air Separator and
   Fermenter. Vents discard excess gas while keeping the stored buffer; liquid outputs still require room. Settings
@@ -207,6 +219,12 @@ machines and Settings Cards carry over).
 
 ### Fixed
 
+- **Gas vent and other GUI buttons ignored some mice.** The vent buttons under gas gauges (Distillation Array, refinery
+  units, reactors, the Gasifier, Haber Reactor, Air Separator, Fermenter, Biogas Digester), the Electrolyzer's and the
+  Hydrothermal Carbonizer's, the redstone, security, pressure, cracking and port tabs, and the buttons in the Chunk
+  Loader, Meter, Quantum Tunnel, Arc Quarry, Electric Enchanter, Security Terminal, Vacuum Collector, PUREX Plant,
+  Industrial Water Intake and Arc Tool screens only answered button 0, so a mouse or setup that sends clicks as button 1
+  couldn't press them. They now take either button. The vent buttons are square (12×12) and the same on every machine.
 - **Jade shows the same for every block of a multiblock.** Casings, Pressure Glass, bricks, cells and the blocks inside a
   vessel now show what the controller shows. Before, most casings lost the heat bar (the Firebox Array's, the Cracking
   Unit's, the Steam Cracker's, the Greenhouse's frame and lamps, and every array's glass) and the FE and fluid bars, and

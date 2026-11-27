@@ -47,6 +47,13 @@ public final class ArcforgeGui {
         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
     }
 
+    // A press of a GUI button: the left or the right mouse button. Some mice (and swapped-button setups) send every click
+    // as button 1, so a button with one action must not answer only button 0.
+    public static boolean isPress(net.minecraft.client.input.MouseButtonEvent event) {
+        return event.button() == com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT
+                || event.button() == com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_RIGHT;
+    }
+
     public static boolean isInside(double mouseX, double mouseY, int x, int y, int width, int height) {
         return mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height;
     }

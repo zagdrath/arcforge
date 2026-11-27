@@ -147,7 +147,7 @@ public class PortsTab extends SideTab {
 
     @Override
     protected boolean contentClicked(MouseButtonEvent event, int localX, int localY) {
-        if (isOverAutoEject(localX, localY) && toggleAutoEject != null && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+        if (isOverAutoEject(localX, localY) && toggleAutoEject != null && ArcforgeGui.isPress(event)) {
             toggleAutoEject.run();
             ArcforgeGui.playClickSound();
             return true;

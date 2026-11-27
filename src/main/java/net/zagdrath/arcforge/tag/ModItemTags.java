@@ -39,6 +39,9 @@ public final class ModItemTags {
     // Steel ingots: what steel tools and armour repair with.
     public static final TagKey<Item> STEEL_INGOTS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ingots/steel"));
 
+    // Arcforged Alloy: repairs the Arcforged tools and armour.
+    public static final TagKey<Item> ARCFORGED_ALLOYS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ingots/arcforged_alloy"));
+
     // The Foundry Suit's pieces, and what repairs them (Rock Wool).
     public static final TagKey<Item> FOUNDRY_SUIT = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "foundry_suit"));
     // The Hazmat Suit's pieces and what repairs them (see HazmatSuit).

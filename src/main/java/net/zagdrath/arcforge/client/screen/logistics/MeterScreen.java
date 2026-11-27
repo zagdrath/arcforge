@@ -214,7 +214,7 @@ public class MeterScreen extends AbstractContainerScreen<MeterMenu> {
         if (tabs.mouseClicked(event)) {
             return true;
         }
-        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+        if (ArcforgeGui.isPress(event)) {
             if (ArcforgeGui.isInside(event.x(), event.y(), leftPos + ABOVE_X, topPos + MODE_Y, BUTTON_SIZE, BUTTON_SIZE)) {
                 if (menu.getMode() != MeterSettings.Mode.ABOVE) {
                     sendButton(MeterMenu.BUTTON_ABOVE);

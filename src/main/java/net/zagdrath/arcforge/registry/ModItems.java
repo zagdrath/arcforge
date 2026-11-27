@@ -51,6 +51,10 @@ import net.zagdrath.arcforge.item.storage.StorageUpgradeItem;
 import net.zagdrath.arcforge.item.storage.VaultBlockItem;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.zagdrath.arcforge.item.tool.ArcToolItem;
+import net.zagdrath.arcforge.item.tool.ArcforgedAreaToolItem;
+import net.zagdrath.arcforge.item.tool.ArcforgedItem;
+import net.zagdrath.arcforge.item.tool.ArcforgedMaterials;
+import net.zagdrath.arcforge.item.tool.ArcforgedUpgradeTemplateItem;
 import net.zagdrath.arcforge.item.tool.AreaToolItem;
 import net.zagdrath.arcforge.item.tool.DieItem;
 import net.zagdrath.arcforge.item.tool.EngineersHandbookItem;
@@ -165,6 +169,41 @@ public final class ModItems {
     public static final DeferredItem<Item> STEEL_CHESTPLATE = ITEMS.registerItem("steel_chestplate", Item::new, p -> p.humanoidArmor(SteelMaterials.STEEL_ARMOR, ArmorType.CHESTPLATE));
     public static final DeferredItem<Item> STEEL_LEGGINGS = ITEMS.registerItem("steel_leggings", Item::new, p -> p.humanoidArmor(SteelMaterials.STEEL_ARMOR, ArmorType.LEGGINGS));
     public static final DeferredItem<Item> STEEL_BOOTS = ITEMS.registerItem("steel_boots", Item::new, p -> p.humanoidArmor(SteelMaterials.STEEL_ARMOR, ArmorType.BOOTS));
+
+    // Arcforged tools and armour, one tier above netherite: the steel items' shapes and behaviour on the Arcforged
+    // materials (each tool's own attack and speed are netherite's, so every one hits at least as hard), fire resistant,
+    // holding FE that pays their wear (ArcforgedGear). Upgraded from netherite (the Hammer and Excavator from steel) at
+    // the Smithing Table with the Arcforged Upgrade Template.
+    public static final DeferredItem<ArcforgedItem> ARCFORGED_SWORD = ITEMS.registerItem("arcforged_sword", ArcforgedItem::new,
+            p -> p.sword(ArcforgedMaterials.TOOL, 3.0F, -2.4F).fireResistant());
+    public static final DeferredItem<ArcforgedItem> ARCFORGED_PICKAXE = ITEMS.registerItem("arcforged_pickaxe", ArcforgedItem::new,
+            p -> p.pickaxe(ArcforgedMaterials.TOOL, 1.0F, -2.8F).fireResistant());
+    public static final DeferredItem<ArcforgedItem> ARCFORGED_AXE = ITEMS.registerItem("arcforged_axe", ArcforgedItem::new,
+            p -> p.axe(ArcforgedMaterials.TOOL, 5.0F, -3.0F).fireResistant());
+    public static final DeferredItem<ArcforgedItem> ARCFORGED_SHOVEL = ITEMS.registerItem("arcforged_shovel", ArcforgedItem::new,
+            p -> p.shovel(ArcforgedMaterials.TOOL, 1.5F, -3.0F).fireResistant());
+    public static final DeferredItem<ArcforgedItem> ARCFORGED_HOE = ITEMS.registerItem("arcforged_hoe", ArcforgedItem::new,
+            p -> p.hoe(ArcforgedMaterials.TOOL, -4.0F, 0.0F).fireResistant());
+    public static final DeferredItem<ArcforgedAreaToolItem> ARCFORGED_HAMMER = ITEMS.registerItem("arcforged_hammer", ArcforgedAreaToolItem::new,
+            p -> p.pickaxe(ArcforgedMaterials.AREA, 2.0F, -3.2F).fireResistant());
+    public static final DeferredItem<ArcforgedAreaToolItem> ARCFORGED_EXCAVATOR = ITEMS.registerItem("arcforged_excavator", ArcforgedAreaToolItem::new,
+            p -> p.shovel(ArcforgedMaterials.AREA, 1.5F, -3.1F).fireResistant());
+    public static final DeferredItem<ArcforgedItem> ARCFORGED_HELMET = ITEMS.registerItem("arcforged_helmet", ArcforgedItem::new,
+            p -> p.humanoidArmor(ArcforgedMaterials.ARMOR, ArmorType.HELMET).fireResistant());
+    public static final DeferredItem<ArcforgedItem> ARCFORGED_CHESTPLATE = ITEMS.registerItem("arcforged_chestplate", ArcforgedItem::new,
+            p -> p.humanoidArmor(ArcforgedMaterials.ARMOR, ArmorType.CHESTPLATE).fireResistant());
+    public static final DeferredItem<ArcforgedItem> ARCFORGED_LEGGINGS = ITEMS.registerItem("arcforged_leggings", ArcforgedItem::new,
+            p -> p.humanoidArmor(ArcforgedMaterials.ARMOR, ArmorType.LEGGINGS).fireResistant());
+    public static final DeferredItem<ArcforgedItem> ARCFORGED_BOOTS = ITEMS.registerItem("arcforged_boots", ArcforgedItem::new,
+            p -> p.humanoidArmor(ArcforgedMaterials.ARMOR, ArmorType.BOOTS).fireResistant());
+    public static final DeferredItem<ArcforgedUpgradeTemplateItem> ARCFORGED_UPGRADE_TEMPLATE = ITEMS.registerItem(
+            "arcforged_upgrade_smithing_template", ArcforgedUpgradeTemplateItem::new, p -> p.fireResistant());
+
+    // Every Arcforged tool and armour piece (not the template), for the FE capability, tags and tests.
+    public static List<DeferredItem<? extends Item>> arcforgedGear() {
+        return List.of(ARCFORGED_SWORD, ARCFORGED_PICKAXE, ARCFORGED_AXE, ARCFORGED_SHOVEL, ARCFORGED_HOE, ARCFORGED_HAMMER, ARCFORGED_EXCAVATOR,
+                ARCFORGED_HELMET, ARCFORGED_CHESTPLATE, ARCFORGED_LEGGINGS, ARCFORGED_BOOTS);
+    }
 
     // The Foundry Suit (see FoundrySuit).
     public static final DeferredItem<Item> FOUNDRY_HELMET = foundry("foundry_helmet", ArmorType.HELMET);

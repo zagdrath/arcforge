@@ -89,7 +89,7 @@ public class RedstoneTab extends SideTab {
     @Override
     protected boolean contentClicked(MouseButtonEvent event, int localX, int localY) {
         RedstoneMode mode = buttonAt(localX, localY);
-        if (mode == null || event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
+        if (mode == null || !ArcforgeGui.isPress(event)) {
             return false;
         }
         if (mode != current.get()) {

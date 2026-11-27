@@ -73,6 +73,9 @@ base {
 // Mojang ships Java 25 to end users in 26.3, so mods should target Java 25.
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
+// Widens the few vanilla fields Arcforge reads (see the file); NeoForge applies it at runtime too (neoforge.mods.toml).
+minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
+
 // Default run configurations.
 // These can be tweaked, removed, or duplicated as needed.
 runs {
