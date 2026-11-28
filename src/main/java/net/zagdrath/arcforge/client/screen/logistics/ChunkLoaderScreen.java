@@ -96,7 +96,7 @@ public class ChunkLoaderScreen extends AbstractContainerScreen<ChunkLoaderMenu> 
             }
         }
         button(graphics, mouseX, mouseY, MINUS_X, "small_minus", radius > 0);
-        button(graphics, mouseX, mouseY, PLUS_X, "small_plus", radius < ChunkLoaderBlockEntity.MAX_RADIUS);
+        button(graphics, mouseX, mouseY, PLUS_X, "small_plus", canGrow());
         button(graphics, mouseX, mouseY, SHOW_X, showArea() ? "show_area" : "hide_area", true);
         String led = switch (menu.getStatus()) {
             case ACTIVE -> "led_running";
@@ -153,6 +153,13 @@ public class ChunkLoaderScreen extends AbstractContainerScreen<ChunkLoaderMenu> 
         }
     }
 
+    // A size up fits under its owner's limit beside their other loaders.
+    private boolean canGrow() {
+        int radius = menu.getRadius();
+        return radius < ChunkLoaderBlockEntity.MAX_RADIUS && menu.value(ChunkLoaderMenu.DATA_OTHERS)
+                + ChunkLoaderBlockEntity.chunksAt(radius + 1) <= menu.value(ChunkLoaderMenu.DATA_LIMIT);
+    }
+
     private Component clipped(Component text, int width) {
         String full = text.getString();
         if (font.width(full) <= width) {
@@ -169,6 +176,12 @@ public class ChunkLoaderScreen extends AbstractContainerScreen<ChunkLoaderMenu> 
             lines.add(Component.translatable("gui.arcforge.chunk_loader.radius_minus"));
         } else if (ArcforgeGui.isInside(mouseX, mouseY, leftPos + PLUS_X, topPos + BUTTONS_Y, BUTTON_SIZE, BUTTON_SIZE)) {
             lines.add(Component.translatable("gui.arcforge.chunk_loader.radius_plus"));
+            int radius = menu.getRadius();
+            if (radius < ChunkLoaderBlockEntity.MAX_RADIUS && !canGrow()) {
+                int free = Math.max(0, menu.value(ChunkLoaderMenu.DATA_LIMIT) - menu.value(ChunkLoaderMenu.DATA_OTHERS));
+                lines.add(Component.translatable("gui.arcforge.chunk_loader.radius_plus.over", ChunkLoaderBlockEntity.chunksAt(radius + 1), free)
+                        .withStyle(ChatFormatting.RED));
+            }
         } else if (ArcforgeGui.isInside(mouseX, mouseY, leftPos + SHOW_X, topPos + BUTTONS_Y, BUTTON_SIZE, BUTTON_SIZE)) {
             lines.add(Component.translatable(showArea() ? "gui.arcforge.show_area.on" : "gui.arcforge.show_area.off"));
             lines.add(Component.translatable("gui.arcforge.show_area.tooltip").withStyle(ChatFormatting.GRAY));
@@ -198,7 +211,7 @@ public class ChunkLoaderScreen extends AbstractContainerScreen<ChunkLoaderMenu> 
                 ArcforgeGui.playClickSound();
                 return true;
             }
-            if (radius < ChunkLoaderBlockEntity.MAX_RADIUS && ArcforgeGui.isInside(event.x(), event.y(), leftPos + PLUS_X, topPos + BUTTONS_Y, BUTTON_SIZE, BUTTON_SIZE)) {
+            if (canGrow() && ArcforgeGui.isInside(event.x(), event.y(), leftPos + PLUS_X, topPos + BUTTONS_Y, BUTTON_SIZE, BUTTON_SIZE)) {
                 sendButton(ChunkLoaderMenu.BUTTON_RADIUS_PLUS);
                 ArcforgeGui.playClickSound();
                 return true;

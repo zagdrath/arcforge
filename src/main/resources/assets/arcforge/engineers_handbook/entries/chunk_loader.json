@@ -7,7 +7,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Keeps the chunks round it loaded so machines keep running while you're away. The globe turns while it works.\n- Radius 0 loads its own chunk; 1 a 3x3, 2 a 5x5. Set it with − and +.\n- The GUI maps the chunks, and outlines them in the world while it's open.\n- It loads chunks for the player who placed it (security as usual). Each player may keep 25 chunks loaded in all."
+      "text": "Keeps the chunks round it loaded so machines keep running while you're away. The globe turns while it works.\n- Radius 0 loads its own chunk; 1 a 3x3, 2 a 5x5. Set it with − and +.\n- The GUI maps the chunks, and outlines them in the world while it's open.\n- It loads chunks for the player who placed it (security as usual). Each player may keep 128 chunks loaded in all."
     },
     {
       "type": "text",

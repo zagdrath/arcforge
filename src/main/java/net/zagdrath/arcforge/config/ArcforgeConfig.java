@@ -3852,7 +3852,7 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.IntValue CHUNK_LOADER_PLAYER_LIMIT = BUILDER
             .comment("Most chunks one player's Chunk Loaders may keep loaded in all.")
-            .defineInRange("chunksPerPlayer", 25, 0, 1_024);
+            .defineInRange("chunksPerPlayer", 128, 0, 1_024);
 
     public static final ModConfigSpec.BooleanValue CHUNK_LOADER_REQUIRE_ONLINE = BUILDER
             .comment("Stop loading while the owner is offline (the loaders start again when they log in).")

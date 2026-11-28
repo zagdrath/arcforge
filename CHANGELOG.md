@@ -72,6 +72,8 @@ Suggested version: **2.11.0** (minor: nine natural stones and Quicklime, stone c
 - The **Electric Composter**: the Compost Bin on FE. The same plant matter at the same chances makes the same Compost,
   an item every 2 ticks for 10 FE/t (the bin takes 10 ticks an item, then waits to be emptied), and Compost stacks in
   its output. Speed and Energy upgrades; crafted from a Compost Bin in a steel casing. Config `electricComposter`.
+- **`/arcforge config get` and `set`** for server admins: browse every setting by section (click through, changed
+  ones in gold), see a setting's value, default, range and description, and set it (checked against its range).
 - A **Battery** Curios slot: a Battery worn there charges your other FE items like a carried one, and a Chargepad
   charges it.
 
@@ -84,6 +86,10 @@ Suggested version: **2.11.0** (minor: nine natural stones and Quicklime, stone c
 - The Lye recipes (Sodium Silicate, Lye biodiesel, Thorium Dioxide, Lithium Hydroxide) take any alkali: Lye or
   Potassium Hydroxide Solution.
 - Gas in a Gas Reservoir is a darker shade of its colour and less see-through.
+- The Chunk Loader's + button is greyed out when the next size wouldn't fit under your chunk limit beside your other
+  loaders, and its tooltip says how many chunks it needs and how many you have free. The server refuses it too.
+- Each player may now keep **128** chunks loaded (was 25; `logistics.chunkLoader.chunksPerPlayer`). An existing config
+  keeps its value: `/arcforge config set logistics.chunkLoader.chunksPerPlayer 128` changes it.
 - The Electric Enchanter's GUI has a search box over its enchantment list (the GUI is 14 px taller).
 - Closing the Electric Enchanter's GUI clears its target, once anything left in the input is done, so each visit starts
   clean. An automated enchanter (auto-eject on, a Wired Machine Link, or a conduit, hopper or chest on an item face)

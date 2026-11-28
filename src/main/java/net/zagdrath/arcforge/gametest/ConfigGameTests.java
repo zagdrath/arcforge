@@ -116,6 +116,55 @@ final class ConfigGameTests {
         helper.succeed();
     }
 
+    // /arcforge config get and set: values parse by their setting's type and range (numbers with separators, booleans,
+    // lists), bad ones are refused, a section lists its children, and set (run as the console would) changes the value;
+    // it's put back in the same go, so tests running alongside never see it changed.
+    static void getAndSet(GameTestHelper helper) {
+        var limit = net.zagdrath.arcforge.config.ConfigEditor.setting("logistics.chunkLoader.chunksPerPlayer").orElse(null);
+        helper.assertTrue(limit == ArcforgeConfig.CHUNK_LOADER_PLAYER_LIMIT, "logistics.chunkLoader.chunksPerPlayer isn't the chunk limit");
+        var editor = new Object() {
+            java.util.Optional<Object> parse(net.neoforged.neoforge.common.ModConfigSpec.ConfigValue<?> setting, String text) {
+                return net.zagdrath.arcforge.config.ConfigEditor.parse(setting, text);
+            }
+        };
+        helper.assertTrue(editor.parse(limit, "128").equals(java.util.Optional.of(128)), "128 isn't a chunk limit");
+        helper.assertTrue(editor.parse(limit, "1_000").equals(java.util.Optional.of(1000)), "1_000 didn't parse");
+        helper.assertTrue(editor.parse(limit, "5000").isEmpty() && editor.parse(limit, "-1").isEmpty() && editor.parse(limit, "lots").isEmpty(),
+                "An out-of-range or non-number limit was taken");
+        helper.assertTrue(editor.parse(ArcforgeConfig.CHUNK_LOADER_REQUIRE_ONLINE, "true").equals(java.util.Optional.of(true))
+                && editor.parse(ArcforgeConfig.CHUNK_LOADER_REQUIRE_ONLINE, "maybe").isEmpty(), "Booleans don't parse");
+        helper.assertTrue(editor.parse(ArcforgeConfig.JETPACK_TANK, "16000, 64,000, 256000").isEmpty(),
+                "A list read 64,000 as one number (commas split lists)");
+        helper.assertTrue(editor.parse(ArcforgeConfig.JETPACK_TANK, "16000, 64000, 256000").equals(java.util.Optional.of(List.of(16000, 64000, 256000)))
+                && editor.parse(ArcforgeConfig.JETPACK_TANK, "16000, 0").isEmpty(), "Integer lists don't parse or check their elements");
+        helper.assertTrue(editor.parse(ArcforgeConfig.SOLAR_HOT_BIOME_TAGS, "[c:is_desert, minecraft:is_savanna]")
+                .equals(java.util.Optional.of(List.of("c:is_desert", "minecraft:is_savanna"))), "Text lists don't parse");
+        var children = net.zagdrath.arcforge.config.ConfigEditor.children("logistics");
+        helper.assertTrue(children.sections().contains("logistics.chunkLoader") && children.settings().stream().noneMatch(s -> s.startsWith("logistics.chunkLoader.")),
+                "logistics doesn't list chunkLoader as a section: " + children);
+        helper.assertTrue(net.zagdrath.arcforge.config.ConfigEditor.children("").sections().contains("logistics"), "The top doesn't list logistics");
+
+        var server = helper.getLevel().getServer();
+        double before = ArcforgeConfig.BOILER_ARRAY_HOT_SAVING.getAsDouble();
+        double set;
+        try {
+            server.getCommands().getDispatcher().execute("arcforge config get", server.createCommandSourceStack());
+            server.getCommands().getDispatcher().execute("arcforge config get logistics.chunkLoader", server.createCommandSourceStack());
+            server.getCommands().getDispatcher().execute("arcforge config get logistics.chunkLoader.chunksPerPlayer", server.createCommandSourceStack());
+            String path = ConfigReset.settings().entrySet().stream().filter(entry -> entry.getValue() == ArcforgeConfig.BOILER_ARRAY_HOT_SAVING)
+                    .map(java.util.Map.Entry::getKey).findFirst().orElseThrow();
+            server.getCommands().getDispatcher().execute("arcforge config set " + path + " 0.25", server.createCommandSourceStack());
+            set = ArcforgeConfig.BOILER_ARRAY_HOT_SAVING.getAsDouble();
+        } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+            helper.fail("/arcforge config get or set didn't parse: " + e.getMessage());
+            return;
+        } finally {
+            net.zagdrath.arcforge.config.ConfigEditor.set(ArcforgeConfig.BOILER_ARRAY_HOT_SAVING, before);
+        }
+        helper.assertTrue(set == 0.25, "config set left hotSaving at " + set);
+        helper.succeed();
+    }
+
     // Every section and setting of both config files has a name in en_us.json, so the config screen never shows a raw
     // arcforge.configuration.* key.
     static void namesTranslated(GameTestHelper helper) {

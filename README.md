@@ -1513,7 +1513,7 @@ liquid, 64,000 mB of gas and 9 item slots (config `quantumTunnel`).
 Keeps chunks loaded for the player who placed it: its own, 3x3 or 5x5 (radius 0 to 2, set in the GUI, which
 maps them and outlines them in the world).
 
-- Each player may keep 25 chunks loaded in all (`logistics.chunkLoader.chunksPerPlayer`).
+- Each player may keep 128 chunks loaded in all (`logistics.chunkLoader.chunksPerPlayer`).
 - Optional: only while its owner is online (`requireOwnerOnline`), and FE per chunk per tick (`energyPerChunk`,
   0 by default).
 - It stops when broken, when a redstone signal turns it off, or when it runs out of FE.
@@ -1692,9 +1692,15 @@ categories, most with subcategories and a page per machine:
 
 **Reset All**, at the bottom of the first page, puts every value back to its default.
 
-On a server, admins (permission level 3) can reset the server's `arcforge-common.toml` with a command, in game or
-from the console, without editing the file:
+On a server, admins (permission level 3) can read, set and reset the server's `arcforge-common.toml` with a command,
+in game or from the console, without editing the file:
 
+- `/arcforge config get` lists the top sections. Click one (or `/arcforge config get <section>`) to see its
+  subsections and settings with their values, changed ones in gold; click a setting to fill in its set command.
+- `/arcforge config get <setting>` shows its value, default, what it takes (a range, true or false, a list) and its
+  description.
+- `/arcforge config set <setting> <value>` sets it, for example `/arcforge config set logistics.chunkLoader.chunksPerPlayer
+  128`. Numbers may use `_` or `,` (`1_000`); lists are comma separated (`c:is_desert, minecraft:is_savanna`).
 - `/arcforge config reset all` lists the settings that differ from their defaults; nothing changes yet.
 - `/arcforge config reset all confirm` resets every one of them.
 - `/arcforge config reset <path>` resets one setting (`power.steam.steamBoilerArray.hotSaving`) or a whole section

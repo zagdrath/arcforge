@@ -64,6 +64,8 @@ public class ChunkLoaderBlockEntity extends BlockEntity implements Owned, MenuPr
     // The chunks it holds tickets for (from ChunkLoaders when it first ticks).
     private @Nullable Set<Long> held;
     private int ownerTotal;
+    // Chunks its owner's other loaders and chunk-loading tunnels hold: what the limit leaves this one is the rest.
+    private int othersTotal;
 
     public ChunkLoaderBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.CHUNK_LOADER.get(), pos, state);
@@ -77,6 +79,7 @@ public class ChunkLoaderBlockEntity extends BlockEntity implements Owned, MenuPr
                     case ChunkLoaderMenu.DATA_STATUS -> status.ordinal();
                     case ChunkLoaderMenu.DATA_LOADED -> held != null ? held.size() : 0;
                     case ChunkLoaderMenu.DATA_OWNER_TOTAL -> ownerTotal;
+                    case ChunkLoaderMenu.DATA_OTHERS -> othersTotal;
                     case ChunkLoaderMenu.DATA_LIMIT -> ArcforgeConfig.CHUNK_LOADER_PLAYER_LIMIT.getAsInt();
                     case ChunkLoaderMenu.DATA_ENERGY -> energy.getAmountAsInt();
                     case ChunkLoaderMenu.DATA_CAPACITY -> energy.getCapacityAsInt();
@@ -94,6 +97,17 @@ public class ChunkLoaderBlockEntity extends BlockEntity implements Owned, MenuPr
 
     public int getRadius() {
         return radius;
+    }
+
+    // Chunks a loader of this radius holds (a square 2r+1 a side).
+    public static int chunksAt(int radius) {
+        int side = 2 * radius + 1;
+        return side * side;
+    }
+
+    // Whether its owner's limit has room for it at this radius, beside their other loaders.
+    public boolean fitsRadius(int radius) {
+        return othersTotal + chunksAt(radius) <= ArcforgeConfig.CHUNK_LOADER_PLAYER_LIMIT.getAsInt();
     }
 
     public void setRadius(int radius) {
@@ -224,6 +238,7 @@ public class ChunkLoaderBlockEntity extends BlockEntity implements Owned, MenuPr
         if (owner != null) {
             loaders.put(here, owner, List.copyOf(held));
             ownerTotal = loaders.chunksOf(owner, null);
+            othersTotal = loaders.chunksOf(owner, here);
         }
         boolean active = status == ChunkLoaderStatus.ACTIVE;
         if (state.getValue(ChunkLoaderBlock.ACTIVE) != active) {

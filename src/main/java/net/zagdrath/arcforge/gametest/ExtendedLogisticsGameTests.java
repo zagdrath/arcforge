@@ -323,6 +323,8 @@ public final class ExtendedLogisticsGameTests {
                 })
                 .thenWaitUntil(() -> helper.assertTrue(9 + 25 <= limit ? b.getStatus() == ChunkLoaderStatus.ACTIVE : b.getStatus() == ChunkLoaderStatus.LIMIT,
                         "Loader B is " + b.getStatus()))
+                .thenExecute(() -> helper.assertTrue(b.fitsRadius(2) == (9 + 25 <= limit) && b.fitsRadius(0),
+                        "B says radius 2 " + (b.fitsRadius(2) ? "fits" : "doesn't fit") + " beside A's 9 under " + limit))
                 .thenExecute(() -> helper.setBlock(aPos.above(), Blocks.REDSTONE_BLOCK))
                 .thenWaitUntil(() -> helper.assertTrue(a.getStatus() == ChunkLoaderStatus.DISABLED && a.getHeld().isEmpty(), "Redstone didn't stop A"))
                 .thenExecute(() -> {
