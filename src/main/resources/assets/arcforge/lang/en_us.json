@@ -2266,7 +2266,7 @@
   "container.arcforge.hydroponic_cell": "Hydroponic Cell",
   "tooltip.arcforge.info.glass_cloche": "Grows a crop by itself, no power needed: give it a soil, a seed and water. The harvest drops out of the bottom. Fertilizer speeds it up.",
   "tooltip.arcforge.info.grow_chamber": "A lamp-lit farm that grows crops 3 times as fast as the Glass Cloche, with FE and water. Takes fertilizer, Speed and Energy upgrades.",
-  "tooltip.arcforge.info.hydroponic_cell": "Grows crops 6 times as fast as the Glass Cloche, with FE and Nutrient Solution and no soil. Also grows saplings, flowers and Hops. Carbon Dioxide speeds it up more.",
+  "tooltip.arcforge.info.hydroponic_cell": "Grows crops 6 times as fast as the Glass Cloche, with FE and Nutrient Solution and no soil. Also grows saplings, flowers, Hops and Kelp. Carbon Dioxide speeds it up more.",
   "gui.arcforge.status.growing": "Growing",
   "gui.arcforge.status.no_soil": "Needs soil",
   "gui.arcforge.status.cant_grow": "Can't grow here",

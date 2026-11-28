@@ -42,6 +42,35 @@ public final class SettingsCardGameTests {
         return player;
     }
 
+    // Through a real click (the server's use-item-on path, as a player's): a plain use pastes onto the machine instead
+    // of opening its GUI, and sneaking copies. Pasting used to run after the block's interaction, which opened the GUI.
+    static void pasteByClick(GameTestHelper helper) {
+        BlockPos aPos = new BlockPos(1, 1, 1);
+        BlockPos bPos = new BlockPos(3, 1, 1);
+        helper.setBlock(aPos, ModBlocks.ARC_MELTER.get());
+        helper.setBlock(bPos, ModBlocks.ARC_MELTER.get());
+        ArcMelterBlockEntity a = helper.getBlockEntity(aPos, ArcMelterBlockEntity.class);
+        ArcMelterBlockEntity b = helper.getBlockEntity(bPos, ArcMelterBlockEntity.class);
+        a.setRedstoneMode(RedstoneMode.LOW);
+        ServerPlayer player = player(helper);
+        ItemStack card = new ItemStack(ModItems.SETTINGS_CARD.get());
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, card);
+        java.util.function.Consumer<BlockPos> click = at -> {
+            BlockPos absolute = helper.absolutePos(at);
+            player.gameMode.useItemOn(player, helper.getLevel(), player.getMainHandItem(), net.minecraft.world.InteractionHand.MAIN_HAND,
+                    new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(absolute), net.minecraft.core.Direction.UP,
+                            absolute, false));
+        };
+        player.setShiftKeyDown(true);
+        click.accept(aPos);
+        helper.assertTrue(SettingsCardItem.data(player.getMainHandItem()) != null, "Sneak-clicking A didn't copy it");
+        player.setShiftKeyDown(false);
+        click.accept(bPos);
+        helper.assertTrue(b.getRedstoneMode() == RedstoneMode.LOW, "Clicking B didn't paste: its redstone is " + b.getRedstoneMode());
+        helper.assertTrue(player.containerMenu == player.inventoryMenu, "Clicking B opened its GUI instead of pasting");
+        helper.succeed();
+    }
+
     // Arc Melter A's sides, redstone and auto-eject land on B; A's Speed Upgrade doesn't.
     static void copyPaste(GameTestHelper helper) {
         BlockPos aPos = new BlockPos(1, 1, 1);

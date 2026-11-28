@@ -63,25 +63,33 @@ public class SettingsCardItem extends Item {
         return Component.empty();
     }
 
+    // Runs from onItemUseFirst, before the block's own interaction: a plain use on a machine opens its GUI, so pasting
+    // from useOn never happened (copying worked only because sneaking skips the block). Sneak-use copies; a plain use
+    // with a filled card pastes onto anything it can configure; anything else (an empty card, a chest) goes through to
+    // the block as usual.
     @Override
-    public InteractionResult useOn(UseOnContext context) {
+    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         Level level = context.getLevel();
         Player player = context.getPlayer();
         if (player == null) {
             return InteractionResult.PASS;
         }
+        BlockPos pos = context.getClickedPos();
+        SettingsCopyable target = target(level, pos);
+        ItemStack card = context.getItemInHand();
+        boolean copying = player.isSecondaryUseActive();
+        if (!copying && (data(card) == null || target == null)) {
+            return InteractionResult.PASS;
+        }
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
-        BlockPos pos = context.getClickedPos();
         var owned = SecurityRules.of(level, pos);
         if (owned.isPresent() && !SecurityRules.canAccess(player, owned.get())) {
             SecurityRules.deny(player, owned.get(), false);
             return InteractionResult.FAIL;
         }
-        SettingsCopyable target = target(level, pos);
-        ItemStack card = context.getItemInHand();
-        if (player.isSecondaryUseActive()) {
+        if (copying) {
             copy(level, player, card, target);
         } else {
             paste(level, player, card, target, pos);

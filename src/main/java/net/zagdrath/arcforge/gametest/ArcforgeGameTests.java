@@ -271,6 +271,7 @@ public final class ArcforgeGameTests {
         TESTS.put("security_first_open_claims", SecurityGameTests::firstOpenClaims);
         TESTS.put("security_windows_are_secured", SecurityGameTests::windowsAreSecured);
         TESTS.put("settings_card_copy_paste", SettingsCardGameTests::copyPaste);
+        TESTS.put("settings_card_paste_by_click", SettingsCardGameTests::pasteByClick);
         TESTS.put("settings_card_refuses_mismatch", SettingsCardGameTests::refusesMismatch);
         TESTS.put("settings_card_conduit_filter", SettingsCardGameTests::conduitFilter);
         TESTS.put("ethanol_burns_in_fuel_burner", FermenterGameTests::burnsInFuelBurner);

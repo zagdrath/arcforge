@@ -173,6 +173,10 @@ public final class ClocheGameTests {
         ClochePlants.Plant recipe = ClochePlants.find(level, new ItemStack(Items.WHEAT_SEEDS), new ItemStack(Items.DIRT), false);
         helper.assertTrue(recipe != null && recipe.recipe() != null, "The wheat recipe lost to the fallback");
         helper.assertTrue(ClochePlants.find(level, new ItemStack(Items.WHEAT_SEEDS), new ItemStack(Items.SAND), false) == null, "Wheat grows in sand");
+        // Kelp grows in water: the Hydroponic Cell grows it, a soil farm doesn't.
+        ClochePlants.Plant kelp = ClochePlants.find(level, new ItemStack(Items.KELP), ItemStack.EMPTY, true);
+        helper.assertTrue(kelp != null && kelp.recipe() != null, "The Hydroponic Cell doesn't grow kelp");
+        helper.assertTrue(ClochePlants.find(level, new ItemStack(Items.KELP), new ItemStack(Items.SAND), false) == null, "Kelp grows in sand");
         helper.succeed();
     }
 
@@ -180,7 +184,7 @@ public final class ClocheGameTests {
     static void recipes(GameTestHelper helper) {
         var level = helper.getLevel();
         List<RecipeHolder<ClocheRecipe>> all = level.recipeAccess().recipeMap().byType(ModRecipes.CLOCHE.get()).stream().toList();
-        helper.assertTrue(all.size() == 29, all.size() + " cloche recipes, not 29");
+        helper.assertTrue(all.size() == 30, all.size() + " cloche recipes, not 30");
         for (RecipeHolder<ClocheRecipe> holder : all) {
             ClocheRecipe recipe = holder.value();
             helper.assertTrue(recipe.seed().items().findAny().isPresent(), holder.id() + " has no seed");

@@ -74,6 +74,7 @@ Suggested version: **2.11.0** (minor: nine natural stones and Quicklime, stone c
   its output. Speed and Energy upgrades; crafted from a Compost Bin in a steel casing. Config `electricComposter`.
 - **`/arcforge config get` and `set`** for server admins: browse every setting by section (click through, changed
   ones in gold), see a setting's value, default, range and description, and set it (checked against its range).
+- The Hydroponic Cell grows **Kelp** (3 a harvest), so it can be farmed.
 - A **Battery** Curios slot: a Battery worn there charges your other FE items like a carried one, and a Chargepad
   charges it.
 
@@ -103,6 +104,9 @@ Suggested version: **2.11.0** (minor: nine natural stones and Quicklime, stone c
 
 ### Fixed
 
+- The Settings Card pastes again: using it on a machine opened the machine's GUI instead, so settings could be copied
+  (sneak-use) but never applied. It now acts before the block does; an empty card, or one used on something it can't
+  configure, still lets the block open as usual.
 - Arcforge's creative tabs (and its addons') stay side by side: another mod's tab no longer lands between them.
 - Heat Pipes can no longer be seen through their core slots at a shallow angle: the slots now have walls.
 - Glass conduits and other see-through blocks behind a Fluid or Gas Reservoir now show tinted through its contents.

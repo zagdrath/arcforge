@@ -1,0 +1,17 @@
+{
+  "type": "arcforge:cloche",
+  "seed": "minecraft:kelp",
+  "results": [
+    {
+      "item": {
+        "id": "minecraft:kelp",
+        "count": 3
+      }
+    }
+  ],
+  "hydroponic_only": true,
+  "render": {
+    "block": "minecraft:kelp_plant",
+    "grow": "scale"
+  }
+}
