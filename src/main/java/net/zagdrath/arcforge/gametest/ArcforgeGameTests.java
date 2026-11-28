@@ -423,6 +423,7 @@ public final class ArcforgeGameTests {
         TESTS.put("processing_oil_press_makes_oil", ProcessingGameTests::oilPressMakesOil);
         TESTS.put("processing_seed_oil_lubricates", ProcessingGameTests::seedOilLubricates);
         TESTS.put("processing_seed_extractor_threshes", ProcessingGameTests::seedExtractorThreshes);
+        TESTS.put("processing_electric_composter_composts", ProcessingGameTests::electricComposterComposts);
         TESTS.put("processing_grain_dryer_needs_heat", ProcessingGameTests::grainDryerNeedsHeat);
         TESTS.put("processing_fermenter_hops_and_co2", ProcessingGameTests::fermenterHopsAndCarbonDioxide);
         TESTS.put("processing_gas_output_side_mode", ProcessingGameTests::gasOutputSideMode);
@@ -435,6 +436,7 @@ public final class ArcforgeGameTests {
         TESTS.put("chemistry_npk_enriches_loam", FarmChemistryGameTests::npkEnrichesLoam);
         TESTS.put("chemistry_digester_forms", FarmChemistryGameTests::digesterForms);
         TESTS.put("chemistry_digester_digests", FarmChemistryGameTests::digesterDigests);
+        TESTS.put("chemistry_digester_heat_speed", FarmChemistryGameTests::digesterHeatSpeed);
         TESTS.put("chemistry_fuels_and_gases", FarmChemistryGameTests::fuelsAndGases);
         TESTS.put("chemistry_recipes", FarmChemistryGameTests::recipes);
         TESTS.put("cloche_glass_needs_soil_and_water", ClocheGameTests::glassClocheNeedsSoilAndWater);
@@ -547,6 +549,7 @@ public final class ArcforgeGameTests {
         TESTS.put("silica_recipes", ChemistryDropGameTests::silicaRecipes);
         TESTS.put("enchanter_costs", ChemistryDropGameTests::enchanterCosts);
         TESTS.put("enchanter_enchants", ChemistryDropGameTests::enchanterEnchants);
+        TESTS.put("enchanter_target_resets", ChemistryDropGameTests::enchanterTargetResets);
         TESTS.put("reactor_array_runs_three_lanes", ChemistryDropGameTests::reactorArrayRunsThreeLanes);
         TESTS.put("auto_eject", InductionGameTests::autoEject);
         FLAKY_TESTS.put("creosote_moves", InductionGameTests::creosoteMoves);

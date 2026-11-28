@@ -7,7 +7,9 @@ package net.zagdrath.arcforge.menu.machine;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.zagdrath.arcforge.blockentity.machine.ElectricEnchanterBlockEntity;
@@ -16,7 +18,7 @@ import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 
-// The Electric Enchanter's menu (176x222, gui_layouts.json "electric_enchanter"): the input, Lapis and output slots at
+// The Electric Enchanter's menu (176x236, gui_layouts.json "electric_enchanter"): the input, Lapis and output slots at
 // the top, the target list under them (drawn by the screen, set with EnchanterTargetPayload), the inventory below.
 public class ElectricEnchanterMenu extends MachineMenu {
     public static final int DATA_ENERGY = 0;
@@ -39,7 +41,7 @@ public class ElectricEnchanterMenu extends MachineMenu {
     public static final int INPUT_X = 43, INPUT_Y = 19;
     public static final int LAPIS_X = 43, LAPIS_Y = 47;
     public static final int OUTPUT_X = 93, OUTPUT_Y = 19;
-    public static final int INVENTORY_Y = 140;
+    public static final int INVENTORY_Y = 154;
 
     // Client constructor, called with the block position written by the server.
     public ElectricEnchanterMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -53,6 +55,19 @@ public class ElectricEnchanterMenu extends MachineMenu {
         addMachineSlot(ElectricEnchanterBlockEntity.SLOT_LAPIS, LAPIS_X, LAPIS_Y);
         addMachineSlot(ElectricEnchanterBlockEntity.SLOT_OUTPUT, OUTPUT_X, OUTPUT_Y);
         finish(inventory, INVENTORY_Y);
+    }
+
+    // The last player to close the GUI lets a hand-fed enchanter forget its target (ElectricEnchanterBlockEntity.onMenuClosed).
+    @Override
+    public void removed(Player player) {
+        super.removed(player);
+        if (player.level() instanceof ServerLevel level && level.getBlockEntity(getPos()) instanceof ElectricEnchanterBlockEntity enchanter) {
+            boolean stillOpen = level.players().stream().anyMatch(other -> other != player
+                    && other.containerMenu instanceof ElectricEnchanterMenu menu && menu.getPos().equals(getPos()));
+            if (!stillOpen) {
+                enchanter.onMenuClosed(level);
+            }
+        }
     }
 
     @Override

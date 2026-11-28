@@ -99,6 +99,54 @@ public final class ChemistryDropGameTests {
         helper.succeed();
     }
 
+    // Closing the GUI clears a hand-fed enchanter's target: at once with the input empty, else once the input empties
+    // (reopening first keeps it); with a chest on an Input face (automated) it stays.
+    static void enchanterTargetResets(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 2, 1);
+        helper.setBlock(pos, ModBlocks.ELECTRIC_ENCHANTER.get());
+        ElectricEnchanterBlockEntity enchanter = helper.getBlockEntity(pos, ElectricEnchanterBlockEntity.class);
+        var level = helper.getLevel();
+        var input = enchanter.getItems();
+        enchanter.setTarget(Enchantments.EFFICIENCY, 3);
+        helper.assertTrue(!enchanter.isAutomated(level), "A lone enchanter counts as automated");
+        enchanter.onMenuClosed(level);
+        helper.assertTrue(enchanter.getTarget().isEmpty(), "Closing with the input empty kept the target");
+        // An item in the input (no FE, so it waits): the target stays until the input empties.
+        enchanter.setTarget(Enchantments.EFFICIENCY, 3);
+        input.setStack(ElectricEnchanterBlockEntity.SLOT_INPUT, new ItemStack(Items.IRON_PICKAXE));
+        enchanter.onMenuClosed(level);
+        helper.assertTrue(!enchanter.getTarget().isEmpty(), "Closing cancelled the job in the input");
+        helper.startSequence()
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    helper.assertTrue(!enchanter.getTarget().isEmpty(), "The target cleared with the item still in");
+                    input.setStack(ElectricEnchanterBlockEntity.SLOT_INPUT, ItemStack.EMPTY);
+                })
+                .thenWaitUntil(() -> helper.assertTrue(enchanter.getTarget().isEmpty(), "The target didn't clear once the input emptied"))
+                .thenExecute(() -> {
+                    // Reopened before the input empties: kept.
+                    enchanter.setTarget(Enchantments.EFFICIENCY, 3);
+                    input.setStack(ElectricEnchanterBlockEntity.SLOT_INPUT, new ItemStack(Items.IRON_PICKAXE));
+                    enchanter.onMenuClosed(level);
+                    enchanter.onMenuOpened();
+                    input.setStack(ElectricEnchanterBlockEntity.SLOT_INPUT, ItemStack.EMPTY);
+                })
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    helper.assertTrue(!enchanter.getTarget().isEmpty(), "Reopening didn't keep the target");
+                    // A chest on an Input face: automated, so closing keeps it.
+                    var inputFace = java.util.Arrays.stream(net.zagdrath.arcforge.machine.config.RelativeSide.values())
+                            .filter(side -> enchanter.getSideMode(side) == net.zagdrath.arcforge.machine.config.SideMode.INPUT)
+                            .findFirst().orElseThrow();
+                    BlockPos chest = helper.absolutePos(pos).relative(inputFace.toDirection(enchanter.getFacing()));
+                    level.setBlockAndUpdate(chest, net.minecraft.world.level.block.Blocks.CHEST.defaultBlockState());
+                    helper.assertTrue(enchanter.isAutomated(level), "A chest on an Input face doesn't count as automated");
+                    enchanter.onMenuClosed(level);
+                    helper.assertTrue(!enchanter.getTarget().isEmpty(), "An automated enchanter lost its target on close");
+                })
+                .thenSucceed();
+    }
+
     // Set to Efficiency III and Unbreaking II, with FE, Lapis and Liquid Experience: a pickaxe comes out with both (its
     // costs drawn), a Book comes out an Enchanted Book, and a pickaxe that already has them passes straight through.
     static void enchanterEnchants(GameTestHelper helper) {

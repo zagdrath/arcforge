@@ -106,6 +106,20 @@ public final class ProcessingMachineSpecs {
                 })
                 .build());
 
+        // Progress is the heap's layers; what it's working toward is a heap's Compost.
+        MachineControls.register(ModBlockEntityTypes.ELECTRIC_COMPOSTER.get(),
+                MachineControlSpec.builder(net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity.class)
+                .energy(EnergyRole.CONSUMER, net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity::getEnergy,
+                        net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity::getUsage)
+                .slot(net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity.SLOT_INPUT, SlotRole.INPUT)
+                .slot(net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity.SLOT_OUTPUT, SlotRole.OUTPUT)
+                .items(net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity::getItems, be -> be.getItemHandler(null))
+                .progress(net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity::getHeap,
+                        be -> net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity.HEAP)
+                .outputs(be -> List.of(new net.minecraft.world.item.ItemStack(net.zagdrath.arcforge.registry.ModItems.COMPOST.get(),
+                        net.zagdrath.arcforge.config.ArcforgeConfig.COMPOST_BIN_YIELD.getAsInt())))
+                .build());
+
         MachineControls.register(ModBlockEntityTypes.SEED_EXTRACTOR.get(), MachineControlSpec.builder(SeedExtractorBlockEntity.class)
                 .energy(EnergyRole.CONSUMER, SeedExtractorBlockEntity::getEnergy, SeedExtractorBlockEntity::getUsage)
                 .slot(SeedExtractorBlockEntity.SLOT_INPUT, SlotRole.INPUT)

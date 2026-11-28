@@ -320,6 +320,7 @@ public final class ModCreativeTabs {
             .icon(() -> ModItems.COMPOST_BIN.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.COMPOST_BIN.get());
+                output.accept(ModItems.ELECTRIC_COMPOSTER.get());
                 output.accept(ModItems.LOAM.get());
                 output.accept(ModItems.IRRIGATED_LOAM_FARMLAND.get());
                 output.accept(ModItems.COMPOST.get());

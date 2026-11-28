@@ -189,7 +189,7 @@ final class AlloyGameTests {
         // Blend and Silicon Carbide Mesh), the Nuclear Turbine Casing, and seven equipment recipes (three armored
         // jetpacks, two armored tier upgrades and both Long Fall Boots variants), the Chunk Loading Upgrade, and the Arcforged Upgrade Template and its
         // duplication.
-        helper.assertTrue(crafting == 433, crafting + " crafting/ recipes, not 433");
+        helper.assertTrue(crafting == 434, crafting + " crafting/ recipes, not 434");
         // Plus the fluorite-fluxed steel, Graphite from Coal Coke and from Carbon Dust, Zircaloy, Lead-Bismuth, Ferrosilicon
         // and Metallurgical Silicon.
         helper.assertTrue(smelting == 15, smelting + " arcforge_smelting/ recipes, not 15");

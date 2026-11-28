@@ -64,6 +64,7 @@ import net.zagdrath.arcforge.blockentity.machine.MillBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.OilPressBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.SecurityTerminalBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.SeedExtractorBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.VacuumCollectorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.VulcanizerBlockEntity;
@@ -153,6 +154,8 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(OilPressBlockEntity::new, ModBlocks.OIL_PRESS.get()));
     public static final Supplier<BlockEntityType<SeedExtractorBlockEntity>> SEED_EXTRACTOR = BLOCK_ENTITY_TYPES.register("seed_extractor",
             () -> new BlockEntityType<>(SeedExtractorBlockEntity::new, ModBlocks.SEED_EXTRACTOR.get()));
+    public static final Supplier<BlockEntityType<ElectricComposterBlockEntity>> ELECTRIC_COMPOSTER = BLOCK_ENTITY_TYPES.register("electric_composter",
+            () -> new BlockEntityType<>(ElectricComposterBlockEntity::new, ModBlocks.ELECTRIC_COMPOSTER.get()));
     public static final Supplier<BlockEntityType<GrainDryerBlockEntity>> GRAIN_DRYER = BLOCK_ENTITY_TYPES.register("grain_dryer",
             () -> new BlockEntityType<>(GrainDryerBlockEntity::new, ModBlocks.GRAIN_DRYER.get()));
     public static final Supplier<BlockEntityType<VulcanizerBlockEntity>> VULCANIZER = BLOCK_ENTITY_TYPES.register("vulcanizer",

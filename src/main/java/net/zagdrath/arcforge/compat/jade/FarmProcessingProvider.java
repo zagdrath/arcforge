@@ -70,6 +70,9 @@ public enum FarmProcessingProvider implements StreamServerDataProvider<BlockAcce
                     lines.add(Component.translatable("gui.arcforge.percent", 100 * press.getProgress() / press.getTotal()));
                 }
             }
+            case net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity composter ->
+                    lines.add(Component.translatable("gui.arcforge.electric_composter.heap", composter.getHeap(),
+                            net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity.HEAP));
             case SeedExtractorBlockEntity extractor -> {
                 if (extractor.getStatus() == MachineStatus.EXTRACTING && extractor.getLane().getTotal() > 0) {
                     lines.add(Component.translatable("gui.arcforge.percent", 100 * extractor.getLane().getProgress() / extractor.getLane().getTotal()));

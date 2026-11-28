@@ -108,6 +108,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
                 net.zagdrath.arcforge.blockentity.machine.MillBlockEntity.class,
                 net.zagdrath.arcforge.blockentity.machine.OilPressBlockEntity.class,
                 net.zagdrath.arcforge.blockentity.machine.SeedExtractorBlockEntity.class,
+                net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity.class,
                 net.zagdrath.arcforge.blockentity.machine.GrainDryerBlockEntity.class,
                 net.zagdrath.arcforge.blockentity.machine.VulcanizerBlockEntity.class,
                 net.zagdrath.arcforge.blockentity.machine.FermenterBlockEntity.class)) {
@@ -275,6 +276,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
                 net.zagdrath.arcforge.block.machine.MillBlock.class,
                 net.zagdrath.arcforge.block.machine.OilPressBlock.class,
                 net.zagdrath.arcforge.block.machine.SeedExtractorBlock.class,
+                net.zagdrath.arcforge.block.machine.ElectricComposterBlock.class,
                 net.zagdrath.arcforge.block.machine.GrainDryerBlock.class,
                 net.zagdrath.arcforge.block.machine.VulcanizerBlock.class,
                 net.zagdrath.arcforge.block.machine.FermenterBlock.class)) {

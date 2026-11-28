@@ -94,6 +94,8 @@ public enum MachineStatus {
     MILLING("milling", "led_running"),
     EXTRACTING("extracting", "led_running"),
     DRYING("drying", "led_running"),
+    // The Electric Composter.
+    COMPOSTING("composting", "led_running"),
     // Farm chemistry: the Air Separator (NO_AIR in the End), the Haber Reactor and the Biogas Digester.
     SEPARATING("separating", "led_running"),
     NO_AIR("no_air", "led_blocked"),

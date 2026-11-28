@@ -227,6 +227,22 @@ public final class FarmChemistryGameTests {
                 .thenSucceed();
     }
 
+    // Hotter is faster: 1x at minTemperature rising evenly to hotSpeed at maxTemperature, nothing below; it takes Speed and
+    // Heat upgrades.
+    static void digesterHeatSpeed(GameTestHelper helper) {
+        int min = net.zagdrath.arcforge.config.ArcforgeConfig.DIGESTER_MIN_TEMPERATURE.getAsInt();
+        int max = net.zagdrath.arcforge.config.ArcforgeConfig.DIGESTER_MAX_TEMPERATURE.getAsInt();
+        double hot = net.zagdrath.arcforge.config.ArcforgeConfig.DIGESTER_HOT_SPEED.getAsDouble();
+        helper.assertTrue(BiogasDigesterBlockEntity.temperatureSpeed(min - 1) == 0.0, "It digests below its minimum temperature");
+        helper.assertTrue(BiogasDigesterBlockEntity.temperatureSpeed(min) == 1.0, "Not 1x at its minimum temperature");
+        helper.assertTrue(Math.abs(BiogasDigesterBlockEntity.temperatureSpeed(max) - hot) < 1e-9, "Not hotSpeed at its maximum temperature");
+        double mid = BiogasDigesterBlockEntity.temperatureSpeed((min + max) / 2);
+        helper.assertTrue(mid > 1.0 && mid < hot, "Not between 1x and hotSpeed halfway: " + mid);
+        helper.assertTrue(BiogasDigesterBlockEntity.UPGRADES.contains(net.zagdrath.arcforge.upgrade.UpgradeType.SPEED)
+                && BiogasDigesterBlockEntity.UPGRADES.contains(net.zagdrath.arcforge.upgrade.UpgradeType.HEAT), "No Speed or Heat upgrades");
+        helper.succeed();
+    }
+
     // Cold, it waits; at 35°C or hotter it digests four wheat at once, each into 60 mB of Biogas for 100 mB of water.
     static void digesterDigests(GameTestHelper helper) {
         BlockPos controller = buildDigester(helper, new BlockPos(0, 1, 0), Direction.SOUTH);

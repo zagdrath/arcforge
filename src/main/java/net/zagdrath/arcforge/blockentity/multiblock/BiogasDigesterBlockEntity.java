@@ -88,7 +88,7 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
     public static final int SLOT_DIGESTATE = 1;
     public static final int SLOT_SULFUR = 2;
     public static final int MACHINE_SLOTS = 3;
-    public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
+    public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.HEAT);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.GAS_OUTPUT, SideMode.BYPRODUCT, SideMode.HEAT,
             SideMode.SULFUR);
     private static final int REDSTONE_CHECK_INTERVAL = 10;
@@ -115,6 +115,9 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
     private int[] laneProgress;
     private int[] laneTotal;
     private int heatUsage;
+    // Progress ticks and HU owed below a whole one, carried to the next tick (speed and heat cost are fractional).
+    private double progressOwed;
+    private double heatOwed;
     private boolean running;
     // Sulfur Dust owed below a whole one, carried to the next batch of Biogas.
     private double sulfurOwed;
@@ -314,8 +317,31 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
         }
     }
 
+    // How fast it digests at this temperature: 1 at minTemperature, rising evenly to hotSpeed at maxTemperature.
+    public static double temperatureSpeed(int celsius) {
+        int min = ArcforgeConfig.DIGESTER_MIN_TEMPERATURE.getAsInt();
+        int max = ArcforgeConfig.DIGESTER_MAX_TEMPERATURE.getAsInt();
+        if (celsius < min) {
+            return 0.0;
+        }
+        double along = max > min ? Math.min(1.0, (celsius - min) / (double) (max - min)) : 1.0;
+        return 1.0 + (ArcforgeConfig.DIGESTER_HOT_SPEED.getAsDouble() - 1.0) * along;
+    }
+
+    // Lane ticks gained a tick: the temperature's speed times the Speed Upgrades'.
+    public double digestSpeed() {
+        return temperatureSpeed(heat.getTemperature()) * speedMultiplier();
+    }
+
+    // HU/t used while digesting: Speed Upgrades raise it (as they raise a machine's FE), Heat Upgrades cut it; the
+    // temperature's own speed-up is free, the heat that keeps it hot having been paid for already.
+    public double heatPerTick() {
+        return ArcforgeConfig.DIGESTER_HEAT_PER_TICK.getAsInt() * speedMultiplier()
+                * UpgradeType.energyCostMultiplier(upgrades(UpgradeType.HEAT));
+    }
+
     private MachineStatus digest(ServerLevel level) {
-        int heatPerTick = ArcforgeConfig.DIGESTER_HEAT_PER_TICK.getAsInt();
+        int heatPerTick = (int) Math.ceil(heatPerTick() + heatOwed);
         if (heat.getTemperature() < minTemperature() || heat.getStored() < heatPerTick) {
             // Too cool to digest: busy lanes keep their progress. Idle with nothing to do, it's just idle.
             return busyLanes() > 0 || !items.getStack(SLOT_INPUT).isEmpty() ? MachineStatus.TOO_COLD : MachineStatus.IDLE;
@@ -324,10 +350,19 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
         if (busyLanes() == 0) {
             return waiting;
         }
-        heatUsage = heat.remove(heatPerTick);
+        heatOwed += heatPerTick();
+        int heatDue = (int) Math.floor(heatOwed);
+        heatOwed -= heatDue;
+        heatUsage = heat.remove(heatDue);
+        progressOwed += digestSpeed();
+        int steps = (int) Math.floor(progressOwed);
+        progressOwed -= steps;
         for (int lane = 0; lane < laneRecipe.length; lane++) {
-            if (laneRecipe[lane] != null && ++laneProgress[lane] >= laneTotal[lane]) {
-                finishLane(level, lane);
+            if (laneRecipe[lane] != null) {
+                laneProgress[lane] += steps;
+                if (laneProgress[lane] >= laneTotal[lane]) {
+                    finishLane(level, lane);
+                }
             }
         }
         setChanged();

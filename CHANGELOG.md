@@ -69,6 +69,9 @@ Suggested version: **2.11.0** (minor: nine natural stones and Quicklime, stone c
     Volcanic Ash and Slaked Lime make Pozzolan concrete powder.
   - Config: `farming.growing.fertilizers` gypsum, volcanicAsh and agriculturalLime; `refineryFuels` acetyleneHeatPerMb
     and acetyleneBurnTemperature.
+- The **Electric Composter**: the Compost Bin on FE. The same plant matter at the same chances makes the same Compost,
+  an item every 2 ticks for 10 FE/t (the bin takes 10 ticks an item, then waits to be emptied), and Compost stacks in
+  its output. Speed and Energy upgrades; crafted from a Compost Bin in a steel casing. Config `electricComposter`.
 - A **Battery** Curios slot: a Battery worn there charges your other FE items like a carried one, and a Chargepad
   charges it.
 
@@ -81,6 +84,13 @@ Suggested version: **2.11.0** (minor: nine natural stones and Quicklime, stone c
 - The Lye recipes (Sodium Silicate, Lye biodiesel, Thorium Dioxide, Lithium Hydroxide) take any alkali: Lye or
   Potassium Hydroxide Solution.
 - Gas in a Gas Reservoir is a darker shade of its colour and less see-through.
+- The Electric Enchanter's GUI has a search box over its enchantment list (the GUI is 14 px taller).
+- Closing the Electric Enchanter's GUI clears its target, once anything left in the input is done, so each visit starts
+  clean. An automated enchanter (auto-eject on, a Wired Machine Link, or a conduit, hopper or chest on an item face)
+  keeps it.
+- The Biogas Digester digests faster the hotter it is: 1x at 35°C rising evenly to 2x at 80°C (config
+  `biogasDigester.hotSpeed`; Jade shows its speed). It takes Speed Upgrades (which use more heat to match) and Heat
+  Upgrades (which cut the heat it uses).
 
 ### Fixed
 

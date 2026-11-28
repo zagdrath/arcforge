@@ -965,6 +965,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> MILL = ITEMS.registerSimpleBlockItem(ModBlocks.MILL);
     public static final DeferredItem<BlockItem> OIL_PRESS = ITEMS.registerSimpleBlockItem(ModBlocks.OIL_PRESS);
     public static final DeferredItem<BlockItem> SEED_EXTRACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.SEED_EXTRACTOR);
+    public static final DeferredItem<BlockItem> ELECTRIC_COMPOSTER = ITEMS.registerSimpleBlockItem(ModBlocks.ELECTRIC_COMPOSTER);
     public static final DeferredItem<BlockItem> GRAIN_DRYER = ITEMS.registerSimpleBlockItem(ModBlocks.GRAIN_DRYER);
     public static final DeferredItem<BlockItem> VULCANIZER = ITEMS.registerSimpleBlockItem(ModBlocks.VULCANIZER);
     public static final DeferredItem<BlockItem> HYDROTHERMAL_CARBONIZER = ITEMS.registerSimpleBlockItem(ModBlocks.HYDROTHERMAL_CARBONIZER);

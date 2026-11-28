@@ -45,6 +45,7 @@ import net.zagdrath.arcforge.menu.machine.MillMenu;
 import net.zagdrath.arcforge.menu.machine.OilPressMenu;
 import net.zagdrath.arcforge.menu.machine.SecurityTerminalMenu;
 import net.zagdrath.arcforge.menu.machine.SeedExtractorMenu;
+import net.zagdrath.arcforge.menu.machine.ElectricComposterMenu;
 import net.zagdrath.arcforge.menu.machine.SteamBoilerMenu;
 import net.zagdrath.arcforge.menu.machine.ThermoelectricPlantMenu;
 import net.zagdrath.arcforge.menu.machine.VacuumCollectorMenu;
@@ -136,6 +137,8 @@ public final class ModMenuTypes {
             () -> IMenuTypeExtension.create(OilPressMenu::new));
     public static final Supplier<MenuType<SeedExtractorMenu>> SEED_EXTRACTOR = MENU_TYPES.register("seed_extractor",
             () -> IMenuTypeExtension.create(SeedExtractorMenu::new));
+    public static final Supplier<MenuType<ElectricComposterMenu>> ELECTRIC_COMPOSTER = MENU_TYPES.register("electric_composter",
+            () -> IMenuTypeExtension.create(ElectricComposterMenu::new));
     public static final Supplier<MenuType<GrainDryerMenu>> GRAIN_DRYER = MENU_TYPES.register("grain_dryer",
             () -> IMenuTypeExtension.create(GrainDryerMenu::new));
     public static final Supplier<MenuType<VulcanizerMenu>> VULCANIZER = MENU_TYPES.register("vulcanizer",

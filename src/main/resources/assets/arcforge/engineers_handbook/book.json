@@ -191,6 +191,7 @@
       "description": "Compost, fertilizers, rich soil, the crops that grow in it, and what to make of them.",
       "entries": [
         "compost_bin",
+        "electric_composter",
         "loam_farmland",
         "fertilizers",
         "crops",

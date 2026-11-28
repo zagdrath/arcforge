@@ -100,6 +100,7 @@ import net.zagdrath.arcforge.block.machine.MillBlock;
 import net.zagdrath.arcforge.block.machine.OilPressBlock;
 import net.zagdrath.arcforge.block.machine.SecurityTerminalBlock;
 import net.zagdrath.arcforge.block.machine.SeedExtractorBlock;
+import net.zagdrath.arcforge.block.machine.ElectricComposterBlock;
 import net.zagdrath.arcforge.block.machine.ThermoelectricPlantBlock;
 import net.zagdrath.arcforge.block.machine.VacuumCollectorBlock;
 import net.zagdrath.arcforge.block.machine.VulcanizerBlock;
@@ -1289,6 +1290,9 @@ public final class ModBlocks {
             OilPressBlock::new, p -> machineProperties(p, 0));
     public static final DeferredBlock<SeedExtractorBlock> SEED_EXTRACTOR = BLOCKS.registerBlock("seed_extractor",
             SeedExtractorBlock::new, p -> machineProperties(p, 0));
+    // The Electric Composter: the Compost Bin on FE (see ElectricComposterBlockEntity).
+    public static final DeferredBlock<ElectricComposterBlock> ELECTRIC_COMPOSTER = BLOCKS.registerBlock("electric_composter",
+            ElectricComposterBlock::new, p -> machineProperties(p, 0));
     // The heating element glows while it dries.
     public static final DeferredBlock<GrainDryerBlock> GRAIN_DRYER = BLOCKS.registerBlock("grain_dryer",
             GrainDryerBlock::new, p -> machineProperties(p, 7));

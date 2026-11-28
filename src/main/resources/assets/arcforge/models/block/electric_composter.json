@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/electric_composter_front",
+    "south": "arcforge:block/electric_composter_back",
+    "east": "arcforge:block/electric_composter_side",
+    "west": "arcforge:block/electric_composter_side",
+    "up": "arcforge:block/electric_composter_top",
+    "down": "arcforge:block/electric_composter_bottom",
+    "particle": "arcforge:block/electric_composter_side"
+  }
+}

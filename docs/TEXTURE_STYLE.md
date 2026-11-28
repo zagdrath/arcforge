@@ -697,6 +697,9 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   - Mill: a buhrstone runner edge-on over its bed stone on a steel spindle; the dressing grooves move and flour falls.
   - Oil Press: a steel ram and platen over a seed bed in a trough, an amber oil pan; the platen presses down and drips.
   - Seed Extractor: a threshing drum with rasp bars over a sieve; the bars turn and seeds fall.
+  - Electric Composter: a compost heap (the Compost item's browns, lit `#8A6A4C` top-left) on a perforated aeration floor;
+    running, air shows through the floor holes in turn, the heap's specks shift as it's turned and two wisps of steam
+    rise. Its sides, top, back and bottom are the Seed Extractor's (the same default ports).
   - Grain Dryer: three slatted racks of cones and grain over a heating element, `#3A2C23` off and heat orange on.
 - Buhrstone (millstones) is a warm grit stone, not machine steel: `#4A4436 #6A614E #8A7F66 #A89C80 #C2B79B`.
 - Millstone: a rustic UV-unwrapped model (see "Rustic farming machines") on one 64x64 sheet. A treated-wood table on

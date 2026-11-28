@@ -3136,6 +3136,33 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Electric Composter: the Compost Bin's heap on FE. It takes the same plant matter at the same chances and gives",
+                "compostBin.compostPerBatch Compost a full heap, but works items faster and never waits to be emptied.")
+                .push("electricComposter");
+    }
+
+    public static final ModConfigSpec.IntValue ELECTRIC_COMPOSTER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue ELECTRIC_COMPOSTER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue ELECTRIC_COMPOSTER_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while composting, before upgrades.")
+            .defineInRange("energyPerTick", 10, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue ELECTRIC_COMPOSTER_TICKS_PER_ITEM = BUILDER
+            .comment("Ticks per item worked, before Speed upgrades (the Compost Bin takes compostBin.itemInterval, 10, and then",
+                    "waits readyDelay with a full heap).")
+            .defineInRange("ticksPerItem", 2, 1, 1_200);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Grain Dryer: dries Hop Cones, grain and sorghum with heat (HU), no FE. Recipes (arcforge:drying) set the time "
                 + "and HU/t.").push("grainDryer");
     }
@@ -3329,6 +3356,11 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue DIGESTER_HEAT_PER_TICK = BUILDER
             .comment("HU/t it uses while digesting (to stay warm), however many lanes are busy.")
             .defineInRange("heatPerTick", 2, 0, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue DIGESTER_HOT_SPEED = BUILDER
+            .comment("How fast it digests at maxTemperature, against minTemperature (1.0): it speeds up evenly in between, as",
+                    "warmer (thermophilic) digestion does. 1.0 turns it off. Speed Upgrades multiply on top.")
+            .defineInRange("hotSpeed", 2.0, 1.0, 10.0);
 
     public static final ModConfigSpec.IntValue DIGESTER_OUTPUT_RATE = BUILDER
             .comment("Most mB/t of Biogas it pushes out of its Gas Output ports (shared across them).")

@@ -1,0 +1,13 @@
+{
+  "title": "Electric Composter",
+  "icon": "arcforge:electric_composter",
+  "items": [
+    "arcforge:electric_composter"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The Compost Bin on FE. It takes the same plant matter (seeds, crops, leaves, saplings, flowers, food scraps) at the same chances, each item raising a 7-layer heap, and a full heap gives the same Compost.\nIt works an item every 2 ticks for 10 FE/t, where the bin takes 10 ticks an item and then waits for its full heap to be emptied, so it makes Compost several times faster. Compost stacks in its output and a new heap starts at once.\nPlant matter in on top, Compost out underneath, FE at the back (its default sides). Speed and Energy upgrades work."
+    }
+  ]
+}

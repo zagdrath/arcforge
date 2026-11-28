@@ -151,6 +151,35 @@ public final class ProcessingGameTests {
                 .thenSucceed();
     }
 
+    // Unpowered it waits; powered it works a stack of wheat into Compost (a heap's worth per compostPerBatch) in a few
+    // seconds, where a Compost Bin takes 10 ticks an item. It takes only what a composter takes.
+    static void electricComposterComposts(GameTestHelper helper) {
+        helper.setBlock(POS, ModBlocks.ELECTRIC_COMPOSTER.get());
+        var composter = helper.getBlockEntity(POS, net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity.class);
+        int input = net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity.SLOT_INPUT;
+        int output = net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity.SLOT_OUTPUT;
+        helper.assertTrue(!net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity.isItemValid(helper.getLevel(), input,
+                net.neoforged.neoforge.transfer.item.ItemResource.of(Items.COBBLESTONE)), "It takes cobblestone");
+        composter.getItems().setStack(input, new ItemStack(Items.WHEAT, 64));
+        long[] started = new long[1];
+        helper.startSequence()
+                .thenIdle(5)
+                .thenExecute(() -> {
+                    helper.assertTrue(composter.getStatus() == MachineStatus.NO_POWER, "Unpowered it's " + composter.getStatus());
+                    CrushingGameTests.charge(composter.getEnergy(), 20_000);
+                    started[0] = helper.getLevel().getGameTime();
+                })
+                .thenWaitUntil(() -> helper.assertTrue(composter.getItems().getStack(input).isEmpty(), "Wheat left"))
+                .thenExecute(() -> {
+                    long took = helper.getLevel().getGameTime() - started[0];
+                    int binTicks = 64 * net.zagdrath.arcforge.config.ArcforgeConfig.COMPOST_BIN_ITEM_INTERVAL.getAsInt();
+                    helper.assertTrue(took * 3 < binTicks, "Took " + took + " ticks for 64 wheat; a Compost Bin takes " + binTicks);
+                    ItemStack compost = composter.getItems().getStack(output);
+                    helper.assertTrue(compost.is(ModItems.COMPOST.get()) && compost.getCount() >= 3, "Made " + compost + " from 64 wheat");
+                })
+                .thenSucceed();
+    }
+
     // Cold it waits; with its buffer half full (well over 60°C) it dries Hop Cones into Dried Hops.
     static void grainDryerNeedsHeat(GameTestHelper helper) {
         helper.setBlock(POS, ModBlocks.GRAIN_DRYER.get());

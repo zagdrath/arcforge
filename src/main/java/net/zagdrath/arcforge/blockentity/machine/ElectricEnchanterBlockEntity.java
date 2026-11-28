@@ -46,6 +46,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
@@ -53,11 +54,13 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.block.machine.MachineBlock;
+import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.experience.LiquidExperience;
 import net.zagdrath.arcforge.machine.MachineStatus;
+import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.machine.interaction.FluidInteractable;
@@ -114,6 +117,8 @@ public class ElectricEnchanterBlockEntity extends MachineBlockEntity implements 
     private int xpCost;
     // The item the progress is on: another one starts over.
     private ItemStack working = ItemStack.EMPTY;
+    // The GUI was closed with an item still in the input: the target clears once the input is empty (see onMenuClosed).
+    private boolean resetPending;
 
     public ElectricEnchanterBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.ELECTRIC_ENCHANTER.get(), pos, state, MACHINE_SLOTS, ElectricEnchanterBlockEntity::isItemValid, UPGRADES,
@@ -227,6 +232,57 @@ public class ElectricEnchanterBlockEntity extends MachineBlockEntity implements 
         return true;
     }
 
+    // The last player to have the GUI open closed it. A hand-fed enchanter forgets its target, so the next visit starts
+    // clean: at once with the input empty, else once what's in it has gone (so closing doesn't cancel the job just set
+    // up). An automated one (isAutomated) keeps it, as the Settings Card and conduit-fed enchanting rely on it.
+    public void onMenuClosed(ServerLevel level) {
+        if (target.isEmpty() || isAutomated(level)) {
+            return;
+        }
+        if (items.getStack(SLOT_INPUT).isEmpty()) {
+            setTargetMap(Map.of());
+        } else {
+            resetPending = true;
+            setChanged();
+        }
+    }
+
+    // Opening the GUI again before the job finishes keeps the target after all.
+    public void onMenuOpened() {
+        if (resetPending) {
+            resetPending = false;
+            setChanged();
+        }
+    }
+
+    // Automated: auto-eject is on, a Wired Machine Link is attached, or an Input or Output face has something attached
+    // that moves items (an item conduit connected on that side, or any block with an item inventory: a hopper, a chest,
+    // another mod's pipe).
+    public boolean isAutomated(ServerLevel level) {
+        if (isAutoEject() || linkedSide() != null) {
+            return true;
+        }
+        for (RelativeSide side : RelativeSide.values()) {
+            SideMode mode = getSideMode(side);
+            if (mode != SideMode.INPUT && mode != SideMode.OUTPUT) {
+                continue;
+            }
+            Direction direction = side.toDirection(getFacing());
+            BlockPos next = worldPosition.relative(direction);
+            if (!level.isLoaded(next)) {
+                continue;
+            }
+            if (level.getBlockEntity(next) instanceof ConduitBlockEntity conduit) {
+                if (conduit.getConduitType() == ConduitType.ITEM && !conduit.isSideDisabled(direction.getOpposite())) {
+                    return true;
+                }
+            } else if (level.getCapability(Capabilities.Item.BLOCK, next, direction.getOpposite()) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void setTargetMap(Map<ResourceKey<Enchantment>, Integer> map) {
         target.clear();
         target.putAll(map);
@@ -321,6 +377,10 @@ public class ElectricEnchanterBlockEntity extends MachineBlockEntity implements 
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         usage = 0;
+        if (resetPending && items.getStack(SLOT_INPUT).isEmpty()) {
+            resetPending = false;
+            setTargetMap(Map.of());
+        }
         if (!canRun(level)) {
             status = stoppedStatus();
         } else {
@@ -531,6 +591,7 @@ public class ElectricEnchanterBlockEntity extends MachineBlockEntity implements 
         progress = input.getIntOr("progress", 0);
         paidLapis = input.getIntOr("paid_lapis", 0);
         paidXp = input.getIntOr("paid_xp", 0);
+        resetPending = input.getBooleanOr("reset_pending", false);
         target.clear();
         input.read(TARGET_KEY, TARGET_CODEC).ifPresent(target::putAll);
     }
@@ -543,6 +604,7 @@ public class ElectricEnchanterBlockEntity extends MachineBlockEntity implements 
         output.putInt("progress", progress);
         output.putInt("paid_lapis", paidLapis);
         output.putInt("paid_xp", paidXp);
+        output.putBoolean("reset_pending", resetPending);
         output.store(TARGET_KEY, TARGET_CODEC, new LinkedHashMap<>(target));
     }
 
@@ -563,6 +625,7 @@ public class ElectricEnchanterBlockEntity extends MachineBlockEntity implements 
 
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
+        onMenuOpened();
         return new ElectricEnchanterMenu(containerId, inventory, worldPosition, items, data);
     }
 }

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PHP",
+    "GCG",
+    "PBP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "H": "minecraft:hopper",
+    "G": "#c:gears/steel",
+    "C": "arcforge:compost_bin",
+    "B": "#c:storage_blocks/redstone"
+  },
+  "result": {
+    "id": "arcforge:electric_composter",
+    "count": 1
+  }
+}

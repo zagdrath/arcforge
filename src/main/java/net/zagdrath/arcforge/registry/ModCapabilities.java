@@ -287,6 +287,10 @@ public final class ModCapabilities {
                 net.zagdrath.arcforge.blockentity.machine.SeedExtractorBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.SEED_EXTRACTOR.get(),
                 net.zagdrath.arcforge.blockentity.machine.SeedExtractorBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ELECTRIC_COMPOSTER.get(),
+                net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ELECTRIC_COMPOSTER.get(),
+                net.zagdrath.arcforge.blockentity.machine.ElectricComposterBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.GRAIN_DRYER.get(),
                 net.zagdrath.arcforge.blockentity.machine.GrainDryerBlockEntity::getItemHandler);
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.GRAIN_DRYER.get(),

@@ -132,6 +132,7 @@
     "arcforge:mill",
     "arcforge:oil_press",
     "arcforge:seed_extractor",
+    "arcforge:electric_composter",
     "arcforge:grain_dryer",
     "arcforge:air_separator",
     "arcforge:haber_reactor",

@@ -257,6 +257,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.MILL.get(), MillScreen::new);
         event.register(ModMenuTypes.OIL_PRESS.get(), OilPressScreen::new);
         event.register(ModMenuTypes.SEED_EXTRACTOR.get(), SeedExtractorScreen::new);
+        event.register(ModMenuTypes.ELECTRIC_COMPOSTER.get(), net.zagdrath.arcforge.client.screen.machine.ElectricComposterScreen::new);
         event.register(ModMenuTypes.GRAIN_DRYER.get(), GrainDryerScreen::new);
         event.register(ModMenuTypes.VULCANIZER.get(), VulcanizerScreen::new);
         event.register(ModMenuTypes.AIR_SEPARATOR.get(), net.zagdrath.arcforge.client.screen.machine.AirSeparatorScreen::new);

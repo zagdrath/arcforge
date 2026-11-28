@@ -6,12 +6,17 @@
 package net.zagdrath.arcforge.client.screen.machine;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+
+import org.jspecify.annotations.Nullable;
 
 import com.mojang.blaze3d.platform.InputConstants;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.Holder;
@@ -33,9 +38,10 @@ import net.zagdrath.arcforge.menu.machine.ElectricEnchanterMenu;
 import net.zagdrath.arcforge.network.EnchanterTargetPayload;
 import net.zagdrath.arcforge.registry.ModFluids;
 
-// Layout follows gui_layouts.json "electric_enchanter" (176x222). The top holds the energy gauge, the Liquid
+// Layout follows gui_layouts.json "electric_enchanter" (176x236). The top holds the energy gauge, the Liquid
 // Experience tank, the input and Lapis slots, the progress arrow, the output and the status with this item's cost. Under
-// it the target list: every enchantment on offer (those the input item supports when there is one), each with its
+// it a search field (in the recess at y 74, magnifier drawn into the background) and the target list: every
+// enchantment on offer (those the input item supports when there is one) whose name holds the search, each with its
 // target level and - / + buttons; clicking a name sets it to its max level or clears it. A row that clashes with a
 // target is greyed (setting it drops the one it clashes with).
 public class ElectricEnchanterScreen extends MachineScreen<ElectricEnchanterMenu> {
@@ -46,9 +52,11 @@ public class ElectricEnchanterScreen extends MachineScreen<ElectricEnchanterMenu
     private static final int STATUS_X = 74, STATUS_Y = 46;
     private static final int COST_X = 66, COST_Y = 58;
     // The target list: rows of ROW_H from LIST_Y, LIST_W wide, with the scrollbar track to their right.
-    private static final int LIST_X = 8, LIST_Y = 76, LIST_W = 146, ROW_H = 12, ROWS = 4;
+    private static final int LIST_X = 8, LIST_Y = 90, LIST_W = 146, ROW_H = 12, ROWS = 4;
     private static final int MINUS_DX = 108, LEVEL_DX = 124, PLUS_DX = 135, BUTTON = 9;
-    private static final int TRACK_X = 157, TRACK_Y = 76, TRACK_W = 12, TRACK_H = 48, THUMB_H = 15;
+    private static final int TRACK_X = 157, TRACK_Y = 90, TRACK_W = 12, TRACK_H = 48, THUMB_H = 15;
+    // The search field's recess (x 7, y 74, 163x12); the text starts after the magnifier.
+    private static final int SEARCH_X = 19, SEARCH_Y = 76, SEARCH_W = 148, SEARCH_H = 9, SEARCH_MAX = 32;
     private static final int CLASH = 0xFF6E6E6E;
     private static final int TARGETED = 0xFFC9A6FF;
     private static final Identifier SCROLLER = ArcforgeGui.sprite("container/crate/scroller");
@@ -70,10 +78,40 @@ public class ElectricEnchanterScreen extends MachineScreen<ElectricEnchanterMenu
     private int scroll;
     private boolean dragging;
     private int mouseX, mouseY;
+    private @Nullable EditBox search;
 
     public ElectricEnchanterScreen(ElectricEnchanterMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, "electric_enchanter", List.of(EnergyTab.usage(menu::getEnergy, menu::getUsage)), true, 222);
+        super(menu, inventory, title, "electric_enchanter", List.of(EnergyTab.usage(menu::getEnergy, menu::getUsage)), true, 236);
         enableAutoEject();
+    }
+
+    @Override
+    public void init() {
+        super.init();
+        String text = search != null ? search.getValue() : "";
+        search = new EditBox(font, leftPos + SEARCH_X, topPos + SEARCH_Y, SEARCH_W, SEARCH_H,
+                Component.translatable("gui.arcforge.enchanter.search"));
+        search.setBordered(false);
+        search.setMaxLength(SEARCH_MAX);
+        search.setTextColor(ArcforgeGui.TEXT);
+        search.setHint(Component.translatable("gui.arcforge.enchanter.search"));
+        search.setValue(text);
+        search.setResponder(value -> scroll = 0);
+        addRenderableWidget(search);
+    }
+
+    // Typing goes to the search box while it has focus (Escape still closes, so the inventory key doesn't).
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        if (search != null && search.isFocused() && search.canConsumeInput() && !event.isEscape()) {
+            search.keyPressed(event);
+            return true;
+        }
+        return super.keyPressed(event);
+    }
+
+    private String query() {
+        return search == null ? "" : search.getValue().trim().toLowerCase(Locale.ROOT);
     }
 
     @Override
@@ -87,11 +125,20 @@ public class ElectricEnchanterScreen extends MachineScreen<ElectricEnchanterMenu
         return menu.getSlotFor(ElectricEnchanterBlockEntity.SLOT_INPUT).getItem();
     }
 
-    private List<Holder<Enchantment>> candidates() {
+    // Every enchantment the input can take, before the search.
+    private List<Holder<Enchantment>> offered() {
         if (minecraft.level == null) {
             return List.of();
         }
         return ElectricEnchanterBlockEntity.candidates(minecraft.level.registryAccess(), input(), menu.treasureOffered());
+    }
+
+    // The rows: those whose name holds the search.
+    private List<Holder<Enchantment>> candidates() {
+        String query = query();
+        List<Holder<Enchantment>> list = offered();
+        return query.isEmpty() ? list
+                : list.stream().filter(e -> e.value().description().getString().toLowerCase(Locale.ROOT).contains(query)).toList();
     }
 
     private Map<ResourceKey<Enchantment>, Integer> target() {
@@ -185,7 +232,8 @@ public class ElectricEnchanterScreen extends MachineScreen<ElectricEnchanterMenu
         }
         List<Holder<Enchantment>> list = candidates();
         if (list.isEmpty()) {
-            graphics.text(font, Component.translatable("gui.arcforge.enchanter.none"), LIST_X + 3, LIST_Y + 2, ArcforgeGui.LABEL, false);
+            Component empty = Component.translatable(query().isEmpty() ? "gui.arcforge.enchanter.none" : "gui.arcforge.enchanter.no_match");
+            graphics.text(font, empty, LIST_X + 3, LIST_Y + 2, ArcforgeGui.LABEL, false);
         }
         for (int i = 0; i < ROWS && scroll + i < list.size(); i++) {
             Holder<Enchantment> enchantment = list.get(scroll + i);
