@@ -61,6 +61,13 @@ public final class VesselStructure {
             return max.get(axis) - min.get(axis) + 1;
         }
 
+        // The frame its model is built in (and its shapes, see ModelFrame): x across the front, u back from it, over the
+        // whole box.
+        public ModelFrame frame() {
+            Direction along = front.getOpposite();
+            return ModelFrame.toward(along, size(along.getClockWise().getAxis()), size(Direction.Axis.Y), size(along.getAxis()));
+        }
+
         public int interiorVolume() {
             return (size(Direction.Axis.X) - 2) * (size(Direction.Axis.Y) - 2) * (size(Direction.Axis.Z) - 2);
         }

@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
 import net.zagdrath.arcforge.client.screen.machine.MachineScreen;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
@@ -39,7 +40,7 @@ public class WaterIntakeScreen extends MachineScreen<WaterIntakeMenu> {
     private final Identifier tankGauge = sprite("tank_gauge");
 
     public WaterIntakeScreen(WaterIntakeMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, "water_intake", List.of(), false);
+        super(menu, inventory, title, "water_intake", List.of(EnergyTab.usage(menu::getEnergy, menu::getUsage)), false);
     }
 
     @Override

@@ -1037,7 +1037,7 @@ public final class ModBlocks {
     // The Cryogenic Distillation Column: air or Helium-Rich Natural Gas, split by boiling point.
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselCasingBlock> CRYOGENIC_COLUMN_CASING = BLOCKS.registerBlock("cryogenic_column_casing",
             p -> new net.zagdrath.arcforge.block.multiblock.VesselCasingBlock(() -> net.zagdrath.arcforge.multiblock.FusionPlants.CRYOGENIC_COLUMN, p),
-            p -> columnProperties(p).forceSolidOn());
+            p -> columnProperties(p).forceSolidOn().dynamicShape());
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselControllerBlock<net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity>> CRYOGENIC_COLUMN_CONTROLLER = BLOCKS.registerBlock(
             "cryogenic_column_controller", p -> new net.zagdrath.arcforge.block.multiblock.VesselControllerBlock<>(() -> net.zagdrath.arcforge.multiblock.FusionPlants.CRYOGENIC_COLUMN,
                     ModBlockEntityTypes.CRYOGENIC_COLUMN, net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity::cryogenicColumn, p),

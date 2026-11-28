@@ -1343,6 +1343,29 @@ public abstract class ModelMesh {
         }
     }
 
+    // A flat end on a tube from a to b (as tube builds it: radius r, sides facets), at b facing on along it when atB, else
+    // at a facing back: its corners are the tube's own, so no sliver of the tube's inside shows round it (a disc's
+    // corners sit at other angles).
+    void tubeCap(float[] a, float[] b, float r, int sides, boolean atB, Paint lit, Paint shade) {
+        float[] axis = normalize(sub(b, a));
+        float[] helper = Math.abs(axis[1]) < 0.9F ? new float[] { 0, 1, 0 } : new float[] { 1, 0, 0 };
+        float[] b1 = normalize(cross(axis, helper));
+        float[] b2 = cross(axis, b1);
+        float[] centre = atB ? b : a;
+        double step = 2.0 * Math.PI / sides;
+        List<float[]> rim = new ArrayList<>();
+        for (int f = 0; f < sides; f++) {
+            // Counter-clockwise seen from along the axis (b1 x b2 is the axis); turned round for an end facing back.
+            int k = atB ? f : sides - 1 - f;
+            double ang = k * step + step / 2.0;
+            float c = (float) Math.cos(ang), s = (float) Math.sin(ang);
+            rim.add(new float[] { centre[0] + (b1[0] * c + b2[0] * s) * r, centre[1] + (b1[1] * c + b2[1] * s) * r,
+                    centre[2] + (b1[2] * c + b2[2] * s) * r });
+        }
+        float[] normal = atB ? axis : new float[] { -axis[0], -axis[1], -axis[2] };
+        discRim(centre, normal, rim, r, lit, shade);
+    }
+
     // --- Building blocks for upright parts (round vessels, stacks) ---
 
     // A polygon tube standing upright about (x, u): its outline as (y, radius) points from the bottom, its facets

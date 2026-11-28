@@ -65,7 +65,7 @@ public class ReservoirContentsRenderer implements SpecialModelRenderer<FluidStac
         int color;
         float top;
         if (kind == ReservoirKind.GAS) {
-            sprite = ReservoirRenderer.gasSprite();
+            sprite = ReservoirRenderer.gasSprite(fluid);
             color = ReservoirRenderer.gasColor(ConduitTints.gasColor(fluid), share);
             top = max;
         } else {

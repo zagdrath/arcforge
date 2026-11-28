@@ -89,6 +89,7 @@ public class FusionReactorMenu extends MachineMenu {
     public static final int DATA_FUEL = 63;          // mB/s x 10
     public static final int DATA_MODULES = 64;       // 4 bits per FusionModuleBlock.Kind
     public static final int DATA_HELIUM_LOOP = 65;   // 1 while the wall is helium-cooled
+    public static final int DATA_ENERGY_USE = 66;    // FE/t, averaged over the last second
     public static final int DATA_HISTORY = 70;       // 3 series x HISTORY
     public static final int DATA_VALUES = DATA_HISTORY + 3 * FusionReactorBlockEntity.HISTORY;
 

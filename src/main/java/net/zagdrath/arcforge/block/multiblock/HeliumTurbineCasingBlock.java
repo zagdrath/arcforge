@@ -28,12 +28,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.steam.HeliumTurbineLayout;
 
 // A casing of the Helium Gas Turbine (Arcforged tier): a tube 15 to 31 blocks long along either horizontal axis, its
-// cross-section 5x5, all casings (it has no windows). Formed, it's drawn as one closed-cycle turbine-generator set (see
-// HeliumTurbineLayout), and each casing collides as the pieces of the model in it (see HeliumTurbineHitbox), so players
-// walk its deck between the crossover ducts; it's picked as a full block, so the whole turbine is one target with one
-// outline (see TurbineOutline). Loose, a full block.
+// cross-section 5x5, all casings (it has no windows: Pressure Glass never forms part of it, see
+// ShellStructure.casingsOnly). Formed, it's drawn as one closed-cycle turbine-generator set (see HeliumTurbineLayout),
+// and each casing collides as the pieces of the model in it (see HeliumTurbineHitbox), so players walk its deck between
+// the crossover ducts; it's picked as a full block, so the whole turbine is one target with one outline (see
+// TurbineOutline). Loose, a full block.
 public class HeliumTurbineCasingBlock extends ShellCasingBlock {
-    public static final ShellStructure STRUCTURE = new ShellStructure(block -> block instanceof HeliumTurbineCasingBlock,
+    public static final ShellStructure STRUCTURE = ShellStructure.casingsOnly(block -> block instanceof HeliumTurbineCasingBlock,
             EnumSet.of(Direction.Axis.X, Direction.Axis.Z), (axis, x, y, z) -> {
                 int width = axis == Direction.Axis.X ? z : x, length = axis == Direction.Axis.X ? x : z;
                 return width == HeliumTurbineLayout.WIDTH && y == HeliumTurbineLayout.HEIGHT && length >= HeliumTurbineLayout.MIN_LENGTH

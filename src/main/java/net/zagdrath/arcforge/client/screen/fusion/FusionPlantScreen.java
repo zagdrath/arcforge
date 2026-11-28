@@ -18,6 +18,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
 import net.zagdrath.arcforge.client.screen.machine.MachineScreen;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.fusion.FusionPlantMenu;
@@ -43,7 +44,7 @@ public class FusionPlantScreen extends MachineScreen<FusionPlantMenu> {
     private final int right;
 
     public FusionPlantScreen(FusionPlantMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, menu.kind().id(), List.of(), false);
+        super(menu, inventory, title, menu.kind().id(), List.of(EnergyTab.usage(() -> menu.get(FusionPlantMenu.DATA_ENERGY), () -> menu.get(FusionPlantMenu.DATA_ENERGY_USE))), false);
         this.outputX = switch (menu.kind()) {
             case CRYOGENIC_PLANT -> new int[] { 155 };
             case CRYOGENIC_COLUMN -> new int[] { 125, 140, 155 };
@@ -120,8 +121,13 @@ public class FusionPlantScreen extends MachineScreen<FusionPlantMenu> {
     protected void drawText(GuiGraphicsExtractor graphics) {
         graphics.text(font, Component.translatable(key() + ".size"), LEFT, TANK_Y + 2, ArcforgeGui.LABEL, false);
         textRight(graphics, Component.literal(Integer.toString(menu.get(FusionPlantMenu.DATA_SIZE))), right, TANK_Y + 2, ArcforgeGui.TEXT);
-        graphics.text(font, Component.translatable("gui.arcforge.fusion_plant.made"), LEFT, TANK_Y + 2 + ROW, ArcforgeGui.LABEL, false);
-        textRight(graphics, Component.literal(menu.get(FusionPlantMenu.DATA_LAST_MADE) + " mB"), right, TANK_Y + 2 + ROW, ArcforgeGui.TEXT);
+        Component made = Component.translatable("gui.arcforge.fusion_plant.made");
+        Component amount = Component.literal(ArcforgeGui.grouped(menu.get(FusionPlantMenu.DATA_LAST_MADE)) + " mB");
+        graphics.text(font, made, LEFT, TANK_Y + 2 + ROW, ArcforgeGui.LABEL, false);
+        // The Tritium Plant's four output tanks leave its screen narrow: the amount goes on the row below when it
+        // doesn't fit beside the label.
+        boolean fits = font.width(made) + 4 + font.width(amount) <= right - LEFT;
+        textRight(graphics, amount, right, TANK_Y + 2 + (fits ? ROW : 2 * ROW), ArcforgeGui.TEXT);
         graphics.text(font, clipped(menu.getStatus().getDescription(), right - LEFT - 8), LEFT + 8, TANK_Y + 4 * ROW + 1, ArcforgeGui.TEXT, false);
     }
 

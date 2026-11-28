@@ -37,6 +37,10 @@ import net.zagdrath.arcforge.block.storage.ItemReservoirBlock;
 // A face edge carries the frame unless the block beyond it is a Reservoir whose same face is also open (an edge where
 // two Reservoirs join drops out); at a concave edge (the block beyond is a Reservoir but the block diagonally out in
 // front of the face is one too) it stays. Faces toward another Reservoir are left out; the others are culled like glass.
+// Each drawn face of a Fluid or Gas Reservoir also gets its back: the same quadrant, mirrored, on the same plane but facing
+// into the tank. A tank is solid Reservoir blocks with no faces between them, so without the backs the far walls' frame
+// (the back corner posts and edges) didn't show through the near glass. A back is culled from the front, so the two
+// never z-fight, and like the face it is cutout, so it sits behind the contents rather than over them.
 // ReservoirRenderer draws the fluid or gas inside.
 //
 // The Item Reservoir ("connect": "item_reservoir") is the same quadrant scheme on a solid block: panel / rim / rim_h /
@@ -56,6 +60,8 @@ final class ReservoirModel implements DynamicBlockStateModel {
     private final boolean store;
     // [face][piece][quadrant: 0 top-left, 1 top-right, 2 bottom-left, 3 bottom-right]
     private final Map<Direction, BakedQuad[][]> quads = new EnumMap<>(Direction.class);
+    // The same, facing into the tank (Fluid and Gas Reservoirs only)
+    private final Map<Direction, BakedQuad[][]> backs = new EnumMap<>(Direction.class);
     // [face][edge: 0 top, 1 bottom, 2 left, 3 right] (Item Reservoir only)
     private final Map<Direction, BakedQuad[]> bands = new EnumMap<>(Direction.class);
     private final int materialFlags;
@@ -83,6 +89,7 @@ final class ReservoirModel implements DynamicBlockStateModel {
         }
         for (Direction face : Direction.values()) {
             BakedQuad[][] faceQuads = new BakedQuad[Piece.values().length][4];
+            BakedQuad[][] backQuads = store ? null : new BakedQuad[Piece.values().length][4];
             for (Piece piece : Piece.values()) {
                 for (int quadrant = 0; quadrant < 4; quadrant++) {
                     float u0 = (quadrant & 1) != 0 ? 8 : 0, v0 = (quadrant & 2) != 0 ? 8 : 0;
@@ -90,11 +97,29 @@ final class ReservoirModel implements DynamicBlockStateModel {
                             u0, v0, u0 + 8, v0 + 8, Quadrant.R0);
                     faceQuads[piece.ordinal()][quadrant] = quad;
                     flags |= quad.materialInfo().flags();
+                    if (backQuads != null) {
+                        backQuads[piece.ordinal()][quadrant] = back(baker, face, u0, v0, pieces[piece.ordinal()]);
+                    }
                 }
             }
             quads.put(face, faceQuads);
+            if (backQuads != null) {
+                backs.put(face, backQuads);
+            }
         }
         this.materialFlags = flags;
+    }
+
+    // The back of face's quadrant at face-local (u0, v0): the opposite face moved a block in onto face's plane, covering
+    // the same rectangle with the texture mirrored (across u for a side face, across v for the top or bottom, the axis
+    // the two faces' local coordinates run opposite ways on), so it reads as the same pane seen from behind.
+    private static BakedQuad back(ModelBaker baker, Direction face, float u0, float v0, Material.Baked texture) {
+        float u1 = u0 + 8, v1 = v0 + 8;
+        Direction inward = face.getOpposite();
+        if (face.getAxis() == Direction.Axis.Y) {
+            return ConnectedModel.Baked.bake(baker, inward, u0, 16 - v1, u1, 16 - v0, -16, texture, u0, v1, u1, v0, Quadrant.R0);
+        }
+        return ConnectedModel.Baked.bake(baker, inward, 16 - u1, v0, 16 - u0, v1, -16, texture, u1, v0, u0, v1, Quadrant.R0);
     }
 
     // Another block of the same Reservoir (a Fluid Reservoir joins only Fluid Reservoirs, a Gas Reservoir Gas Reservoirs).
@@ -127,6 +152,7 @@ final class ReservoirModel implements DynamicBlockStateModel {
             }
             Direction up = WindowQuadrants.up(face), right = WindowQuadrants.right(face);
             BakedQuad[][] faceQuads = quads.get(face);
+            BakedQuad[][] backQuads = backs.get(face);
             for (int quadrant = 0; quadrant < 4; quadrant++) {
                 Direction vertical = (quadrant & 2) != 0 ? up.getOpposite() : up;
                 Direction horizontal = (quadrant & 1) != 0 ? right : right.getOpposite();
@@ -144,6 +170,9 @@ final class ReservoirModel implements DynamicBlockStateModel {
                     piece = !isReservoir(level, diagonal, state) || isReservoir(level, diagonal.relative(face), state) ? Piece.CORNERS : Piece.GLASS;
                 }
                 builder.addCulledFace(face, faceQuads[piece.ordinal()][quadrant]);
+                if (backQuads != null) {
+                    builder.addCulledFace(face, backQuads[piece.ordinal()][quadrant]);
+                }
             }
             if (store && face.getAxis() != length) {
                 for (Direction.AxisDirection sign : Direction.AxisDirection.values()) {

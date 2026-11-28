@@ -19,6 +19,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
 import net.zagdrath.arcforge.client.screen.machine.MachineScreen;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.multiblock.PurexMenu;
@@ -44,7 +45,7 @@ public class PurexScreen extends MachineScreen<PurexMenu> {
     private int mouseX, mouseY;
 
     public PurexScreen(PurexMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, "purex_plant", List.of(), false, PurexMenu.HEIGHT);
+        super(menu, inventory, title, "purex_plant", List.of(EnergyTab.usage(() -> menu.get(PurexMenu.DATA_ENERGY), () -> menu.get(PurexMenu.DATA_USAGE))), false, PurexMenu.HEIGHT);
         enableAutoEject();
     }
 

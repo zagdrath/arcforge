@@ -136,7 +136,7 @@ def fusion_reactor():
                                                        "toggle_on", "toggle_off", "silence", "silence_hover", "tank_gauge", "liquid_fill", "gas_fill",
                                                        "led_blocked", "led_idle", "led_off", "led_running"])
     folder = GUI + "sprites/container/fusion_reactor/"
-    # Run (the Reset button's look) and Fast Shutdown (SCRAM's, stretched to 66).
+    # Run (the Reset button's look) and Fast Shutdown (SCRAM's, stretched to 66; its .png.mcmeta nine-slices it to the screen's 82).
     shutil.copy(GUI + "sprites/container/fission_reactor/reset.png", folder + "run.png")
     shutil.copy(GUI + "sprites/container/fission_reactor/reset_hover.png", folder + "run_hover.png")
     for name, out in (("scram", "shutdown"), ("scram_hover", "shutdown_hover")):

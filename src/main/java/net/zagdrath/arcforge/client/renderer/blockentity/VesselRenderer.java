@@ -139,9 +139,7 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
 
     // The model's frame: x across the front, u back from it, over the whole box.
     public static ModelFrame frame(VesselStructure.Box box) {
-        Direction along = box.front().getOpposite();
-        int width = box.size(along.getClockWise().getAxis()), length = box.size(along.getAxis());
-        return ModelFrame.toward(along, width, box.size(Direction.Axis.Y), length);
+        return box.frame();
     }
 
     // What the model is laid out from besides its box and ports (compared with equals to tell when to rebuild).

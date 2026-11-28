@@ -19,6 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
 import net.zagdrath.arcforge.client.screen.machine.MachineScreen;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.multiblock.CentrifugeCascadeMenu;
@@ -50,7 +51,7 @@ public class CentrifugeCascadeScreen extends MachineScreen<CentrifugeCascadeMenu
     private int mouseX, mouseY;
 
     public CentrifugeCascadeScreen(CentrifugeCascadeMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, "centrifuge_cascade", List.of(), false, WIDTH, HEIGHT, true);
+        super(menu, inventory, title, "centrifuge_cascade", List.of(EnergyTab.usage(menu::getEnergy, menu::getEnergyUse)), false, WIDTH, HEIGHT, true);
     }
 
     @Override

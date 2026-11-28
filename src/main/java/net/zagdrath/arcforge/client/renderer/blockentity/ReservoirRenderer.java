@@ -19,14 +19,12 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.zagdrath.arcforge.client.ConduitTints;
 import net.zagdrath.arcforge.client.renderer.ArcforgeRenderTypes;
-import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.storage.ReservoirBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.ReservoirKind;
 
@@ -35,9 +33,10 @@ import net.zagdrath.arcforge.blockentity.storage.ReservoirKind;
 //   the shares line up into one body: toward a neighbouring Fluid Reservoir holding the same fluid the box runs to the
 //   block's edge and the face between them is left out (at the same level, or over a full block below), so the fluid reads
 //   as one volume at its shared level. Toward anything else it stops just inside the glass.
-// - Gas Reservoir: the gas fills its whole block, not to a level: a flat translucent fill (block/gas_reservoir/fill, a plain
-//   white tile) in the gas's tint, from GAS_ALPHA_EMPTY to GAS_ALPHA_FULL opaque by how full it is. Its tank shares the gas
-//   evenly, so neighbouring blocks match and the faces between them are left out: the gas reads as one volume.
+// - Gas Reservoir: the gas fills its whole block, not to a level: the gas's own still texture (the wispy vapour the gases
+//   share) in the gas's tint, its alpha scaled from GAS_ALPHA_EMPTY to GAS_ALPHA_FULL by how full the block is. (A flat
+//   white tile at 0.12 to 0.72 alpha left a nearly empty vessel of a pale gas, like Propylene, all but invisible.) Its tank
+//   shares the gas evenly, so neighbouring blocks match and the faces between them are left out: the gas reads as one volume.
 // Glowing contents render at their light level. Clear contents don't write depth, so glass conduits and other
 // translucent blocks behind a Reservoir still show through them; opaque ones (crude oil) do, so nothing shows through
 // them (see ArcforgeRenderTypes.fluid).
@@ -45,8 +44,9 @@ public class ReservoirRenderer implements BlockEntityRenderer<ReservoirBlockEnti
     // Just inside the glass and frame, so no fluid face lies on a model face.
     public static final float INSET = 0.01F;
     private static final float SAME_LEVEL = 0.001F;
-    public static final Identifier GAS_FILL = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/gas_reservoir/fill");
-    private static final float GAS_ALPHA_EMPTY = 0.12F, GAS_ALPHA_FULL = 0.72F;
+    // Times the texture's own alpha (0.25 to 0.7 for the vapour), so even an almost empty vessel stays above the volume
+    // pipeline's 0.1 alpha cutout and shows its wisps.
+    private static final float GAS_ALPHA_EMPTY = 0.6F, GAS_ALPHA_FULL = 1.0F;
 
     public static class State extends BlockEntityRenderState {
         public @Nullable TextureAtlasSprite sprite;
@@ -129,7 +129,7 @@ public class ReservoirRenderer implements BlockEntityRenderer<ReservoirBlockEnti
     // The whole block filled, toward a neighbouring Gas Reservoir with the same gas to its edge with the face between left
     // out; as opaque as the block is full.
     private static void extractGas(ReservoirBlockEntity reservoir, State state, Level level, FluidStack gas, int tint) {
-        state.sprite = gasSprite();
+        state.sprite = gasSprite(gas);
         state.color = gasColor(tint, Math.min(1.0F, gas.getAmount() / (float) reservoir.capacity()));
         BlockPos pos = reservoir.getBlockPos();
         float[] min = new float[3], max = new float[3];
@@ -156,12 +156,13 @@ public class ReservoirRenderer implements BlockEntityRenderer<ReservoirBlockEnti
         state.skip = skip;
     }
 
-    // The flat tile a gas is drawn with. Shared with the Reservoir item renderer, like gasColor and surface below.
-    public static TextureAtlasSprite gasSprite() {
-        return SteamBoilerArrayRenderer.sprite(GAS_FILL);
+    // The texture a gas is drawn with: its fluid model's still texture. Shared with the Reservoir item renderer, like
+    // gasColor and surface below.
+    public static TextureAtlasSprite gasSprite(FluidStack gas) {
+        return Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(gas.getFluid().defaultFluidState()).stillMaterial().sprite();
     }
 
-    // A gas's tint, as opaque as the block is full (share, 0..1).
+    // A gas's tint, more opaque the fuller the block is (share, 0..1).
     public static int gasColor(int tint, float share) {
         int alpha = Math.round(255 * (GAS_ALPHA_EMPTY + (GAS_ALPHA_FULL - GAS_ALPHA_EMPTY) * share));
         return (tint & 0x00FFFFFF) | alpha << 24;

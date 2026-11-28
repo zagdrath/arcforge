@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
 import net.zagdrath.arcforge.client.screen.machine.MachineScreen;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.multiblock.HeavyWaterTowerMenu;
@@ -38,7 +39,7 @@ public class HeavyWaterTowerScreen extends MachineScreen<HeavyWaterTowerMenu> {
     private final Identifier progressBar = sprite("progress");
 
     public HeavyWaterTowerScreen(HeavyWaterTowerMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, "heavy_water_tower", List.of(), false);
+        super(menu, inventory, title, "heavy_water_tower", List.of(EnergyTab.usage(() -> menu.get(HeavyWaterTowerMenu.DATA_ENERGY), () -> menu.get(HeavyWaterTowerMenu.DATA_ENERGY_USE))), false);
     }
 
     @Override

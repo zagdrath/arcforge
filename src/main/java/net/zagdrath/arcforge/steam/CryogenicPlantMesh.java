@@ -92,11 +92,14 @@ public final class CryogenicPlantMesh extends FusionPlantMesh {
         // A saddle on the column's crown.
         box(x - 2.0F, y - 1.0F, u - 2.0F, x + 2.0F, cy - r + 0.5F, u + 2.0F, Paint.PLAIN, Paint.MID, null, SKIP_DOWN);
         float x0 = x - 5.0F, x1 = x + 4.0F;
-        tube(new float[] { x0, cy, u }, new float[] { x1, cy, u }, r, 10, Paint.BANDED);
-        disc(new float[] { x1, cy, u }, new float[] { 1, 0, 0 }, r, 10, Paint.MID, Paint.SHADE);
-        // Its flange and the line off its far end, down into the cold box's side.
-        tube(new float[] { x0 - 1.0F, cy, u }, new float[] { x0, cy, u }, r + 1.0F, 10, Paint.BANDED);
-        disc(new float[] { x0 - 1.0F, cy, u }, new float[] { -1, 0, 0 }, r + 1.0F, 10, Paint.MID, Paint.SHADE);
+        float[] e0 = { x0, cy, u }, e1 = { x1, cy, u }, f0 = { x0 - 1.0F, cy, u };
+        tube(e0, e1, r, 10, Paint.BANDED);
+        tubeCap(e0, e1, r, 10, true, Paint.MID, Paint.SHADE);
+        // Its flange (closed both sides: the cartridge's end is narrower) and the line off its far end, down into the
+        // cold box's side.
+        tube(f0, e0, r + 1.0F, 10, Paint.BANDED);
+        tubeCap(f0, e0, r + 1.0F, 10, false, Paint.MID, Paint.SHADE);
+        tubeCap(f0, e0, r + 1.0F, 10, true, Paint.MID, Paint.SHADE);
         if (x0 - 1.0F > boxX1 + 2.0F) {
             if (cy <= boxTop - 3.0F) {
                 line(new float[] { x0 - 1.0F, cy, u }, new float[] { boxX1 - 0.5F, cy, u });
@@ -122,9 +125,13 @@ public final class CryogenicPlantMesh extends FusionPlantMesh {
         for (float s : new float[] { b0 + 2.0F, b1 - 3.0F }) {
             box(cx - r + 1.0F, y, s, cx + r - 1.0F, cy - r + 1.0F, s + 1.5F, Paint.PLAIN, Paint.MID, null, SKIP_DOWN);
         }
-        tube(new float[] { cx, cy, b0 }, new float[] { cx, cy, b1 }, r, 12, Paint.BANDED);
-        disc(new float[] { cx, cy, b0 - 1.0F }, new float[] { 0, 0, -1 }, r + 1.0F, 12, Paint.MID, Paint.SHADE);
-        tube(new float[] { cx, cy, b0 - 1.0F }, new float[] { cx, cy, b0 }, r + 1.0F, 12, Paint.BANDED);
+        float[] c0 = { cx, cy, b0 }, c1 = { cx, cy, b1 }, cf = { cx, cy, b0 - 1.0F };
+        tube(c0, c1, r, 12, Paint.BANDED);
+        // Its back end (the coupling guard runs into it), and the front flange closed both sides.
+        tubeCap(c0, c1, r, 12, true, Paint.MID, Paint.SHADE);
+        tube(cf, c0, r + 1.0F, 12, Paint.BANDED);
+        tubeCap(cf, c0, r + 1.0F, 12, false, Paint.MID, Paint.SHADE);
+        tubeCap(cf, c0, r + 1.0F, 12, true, Paint.MID, Paint.SHADE);
         solidCylinders.add(new float[] { cx, cy, r, b0, b1 });
         // The motor: a ribbed box behind it, its coupling guard between.
         float m0 = b1 + 1.5F, mh = 2.0F * r;

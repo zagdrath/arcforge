@@ -53,9 +53,12 @@ public class PressureGlassBlock extends TransparentBlock {
         return state.getBlock() instanceof PressureGlassBlock && state.getValue(FORMED);
     }
 
-    // The steam arrays and the Gas Turbine Array can use glass.
+    // The steam arrays and the Gas Turbine Array can use glass. The Nuclear Steam Turbine and Helium Gas Turbine can't
+    // (see ShellStructure.casingsOnly), but a save from before they refused it can hold a turbine formed round a pane:
+    // they're listed so breaking that pane still takes the turbine apart (forming from glass does nothing for them).
     private static List<ShellStructure> structures() {
-        return List.of(SteamBoilerArrayCasingBlock.STRUCTURE, SteamTurbineArrayCasingBlock.STRUCTURE, GasTurbineArrayCasingBlock.STRUCTURE);
+        return List.of(SteamBoilerArrayCasingBlock.STRUCTURE, SteamTurbineArrayCasingBlock.STRUCTURE, GasTurbineArrayCasingBlock.STRUCTURE,
+                NuclearTurbineCasingBlock.STRUCTURE, HeliumTurbineCasingBlock.STRUCTURE);
     }
 
     // The master of the formed array the pane at pos is a window of, or null. Glass isn't a MultiblockPart (it never

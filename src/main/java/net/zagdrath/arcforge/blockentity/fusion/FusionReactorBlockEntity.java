@@ -142,6 +142,9 @@ public class FusionReactorBlockEntity extends MachineBlockEntity implements Mult
 
     // --- The plant ---
     private final ConsumerEnergyHandler energy;
+    // FE spent on the Central Solenoid and the coils this second, and last second's average a tick (for the GUI).
+    private long feSpent;
+    private int energyUse;
     private final FilteredFluidTank water, hotCoolant, leadLithium, hotLeadLithium, liquidHelium, liquidNitrogen;
     private final ResourceHandler<FluidResource> input;
     private final ResourceHandler<FluidResource> coolantOutput;
@@ -433,6 +436,7 @@ public class FusionReactorBlockEntity extends MachineBlockEntity implements Mult
         if (shape == null) {
             status = MachineStatus.NOT_FORMED;
             setLit(false);
+            energyUse = 0;
             return;
         }
         if (!scanned || level.getGameTime() % SCAN_INTERVAL == 0) {
@@ -446,6 +450,8 @@ public class FusionReactorBlockEntity extends MachineBlockEntity implements Mult
         carryHeat();
         pushOutputs(level);
         if (level.getGameTime() % 20 == 0) {
+            energyUse = (int) (feSpent / 20);
+            feSpent = 0;
             second(level);
         }
     }
@@ -492,6 +498,7 @@ public class FusionReactorBlockEntity extends MachineBlockEntity implements Mult
         }
         int take = (int) Math.min(energy.getAmountAsInt(), Math.ceil(csNeeded - csCharge));
         if (take > 0 && energy.consume(take)) {
+            feSpent += take;
             csCharge += take;
         }
     }
@@ -713,6 +720,7 @@ public class FusionReactorBlockEntity extends MachineBlockEntity implements Mult
             double price = cost * (next * next - field * field) / (full * full);
             int pay = (int) Math.min(energy.getAmountAsInt(), Math.ceil(price));
             if (pay > 0 && energy.consume(pay)) {
+                feSpent += pay;
                 field = pay >= price ? next : Math.sqrt(field * field + full * full * pay / cost);
             }
             energised = field > 0.0;
@@ -1514,6 +1522,7 @@ public class FusionReactorBlockEntity extends MachineBlockEntity implements Mult
             case FusionReactorMenu.DATA_CS_CHARGE -> (int) Math.round(getCsCharge() * 1000.0);
             case FusionReactorMenu.DATA_ENERGY -> energy.getAmountAsInt();
             case FusionReactorMenu.DATA_ENERGY_CAPACITY -> energy.getCapacityAsInt();
+            case FusionReactorMenu.DATA_ENERGY_USE -> energyUse;
             case FusionReactorMenu.DATA_WATER -> water.getAmount();
             case FusionReactorMenu.DATA_HOT_COOLANT -> hotCoolant.getAmount();
             case FusionReactorMenu.DATA_HELIUM_LOOP -> heliumCooled() ? 1 : 0;

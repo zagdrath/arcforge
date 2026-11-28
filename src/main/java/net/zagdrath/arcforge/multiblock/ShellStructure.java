@@ -34,7 +34,8 @@ import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 // cross-section 3-7 wide and 3-7 tall; the Gas Turbine Array keeps its 3x3 cross-section, 5-9 long. The
 // eight corners must be casings. In a 3x3 cross-section the rest of the skin may be casing or glass, as it
 // always could, so a window can take a whole wall; in a larger one the twelve edges must be casings too,
-// and the faces between them may be casing or glass. Everything inside (the core) must be air.
+// and the faces between them may be casing or glass (unless the structure is casingsOnly: the Nuclear Steam Turbine and
+// Helium Gas Turbine have no windows). Everything inside (the core) must be air.
 //
 // Every casing's block entity remembers the shell it belongs to; the one at the minimum corner (always a
 // casing) is the master that runs the machine and holds its contents.
@@ -187,6 +188,10 @@ public final class ShellStructure {
     // Whether the middle blocks of the two end faces must be casings, not glass (the Gas Turbine Array's
     // intake and exhaust).
     private final boolean casingEndCenters;
+    // Whether Pressure Glass may stand in its skin. The Nuclear Steam Turbine and the Helium Gas Turbine have no
+    // windows: their models are drawn over the whole shell and hide only casings, so a pane in one would draw itself
+    // across the model, and glass isn't a part they listen to, so breaking it would leave them formed.
+    private final boolean glass;
     // Per level, the structures formed or broken in the last tick, and when (see justSettled).
     private final Map<Level, List<Settled>> settled = new WeakHashMap<>();
     // Per level, the formed structures whose core was found empty this tick, and the tick (see coreCheckedNow).
@@ -199,10 +204,20 @@ public final class ShellStructure {
     }
 
     public ShellStructure(Predicate<Block> casing, Set<Direction.Axis> axes, SizeRule sizes, boolean casingEndCenters) {
+        this(casing, axes, sizes, casingEndCenters, true);
+    }
+
+    private ShellStructure(Predicate<Block> casing, Set<Direction.Axis> axes, SizeRule sizes, boolean casingEndCenters, boolean glass) {
         this.casing = casing;
         this.axes = axes;
         this.sizes = sizes;
         this.casingEndCenters = casingEndCenters;
+        this.glass = glass;
+    }
+
+    // A structure all of casings: Pressure Glass never forms part of it (the Nuclear Steam Turbine, the Helium Gas Turbine).
+    public static ShellStructure casingsOnly(Predicate<Block> casing, Set<Direction.Axis> axes, SizeRule sizes) {
+        return new ShellStructure(casing, axes, sizes, false, false);
     }
 
     // A rule for a 3x3 tube minLength to maxLength long (the Gas Turbine Array).
@@ -314,7 +329,7 @@ public final class ShellStructure {
         if (isCasing(state)) {
             return !(level.getBlockEntity(pos) instanceof ShellMultiblockBlockEntity part) || part.getShell() == null;
         }
-        return state.getBlock() instanceof PressureGlassBlock && !PressureGlassBlock.isFormed(state);
+        return glass && state.getBlock() instanceof PressureGlassBlock && !PressureGlassBlock.isFormed(state);
     }
 
     private boolean isValid(Level level, Shell shell) {
@@ -347,7 +362,7 @@ public final class ShellStructure {
                 if (level.getBlockEntity(pos) instanceof ShellMultiblockBlockEntity part && part.getShell() != null && !shell.equals(part.getShell())) {
                     return false;
                 }
-            } else if (edgesCasing && shell.isEdge(pos)) {
+            } else if (!glass || edgesCasing && shell.isEdge(pos)) {
                 return false;
             } else if (!(state.getBlock() instanceof PressureGlassBlock) || PressureGlassBlock.isFormed(state)) {
                 return false;
@@ -407,7 +422,7 @@ public final class ShellStructure {
     // A casing or glass was placed at pos: forms the structure it completes, if any. preferred: the axis
     // to try first (the placing player's facing), for a cube that could run either way.
     public void rebuild(ServerLevel level, BlockPos pos, Direction.@Nullable Axis preferred, @Nullable Direction facing) {
-        if (findFormed(level, pos) != null) {
+        if (!glass && !isCasing(level.getBlockState(pos)) || findFormed(level, pos) != null) {
             return;
         }
         Shell shell = find(level, pos, preferred);

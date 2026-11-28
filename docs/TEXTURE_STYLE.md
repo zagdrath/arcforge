@@ -871,7 +871,8 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   textures by which of its two edges carry the frame: `frame` (both: an outer corner), `frame_h` (top or bottom only),
   `frame_v` (left or right only), `glass` (neither) or `frame_corners` (neither, but the frame turns there: the 2×2 corner
   of `frame`, closing an inner corner). An edge where two Fluid Reservoirs join drops its frame; a concave edge keeps it. Faces
-  between Reservoirs aren't drawn. The liquid is ReservoirRenderer's: one body at the shared level, run to the block edge
+  between Reservoirs aren't drawn; every outer face also has its back (the same piece, mirrored, facing into the tank),
+  so the far walls' frame shows through the near glass. The liquid is ReservoirRenderer's: one body at the shared level, run to the block edge
   toward a neighbour with the same liquid, full-bright for glowing fluids. Nothing is painted into the glass.
 - **Gas Reservoir** (`block/gas_reservoir/`): a pressure vessel in the Steam Boiler Array's steel, on the same five
   quadrant pieces and ConnectedModel "reservoir" (it joins only Gas Reservoirs). `frame` is a 6×6 heavy corner piece at each
@@ -883,8 +884,8 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   are both outer edges of the vessel gets the corner piece, so the pieces land on the vessel's outer corners and merged
   tanks show beams only round the outside. Glass is alpha 0 with the two glints moved off the corners and beams (a 3 px
   `#DCE8EE` streak (8,4)-(6,6) with a 2 px `#A9BCC6` one beside it, and a 2 px `#A9BCC6` one at (12,7)-(11,8)), so no
-  piece clips a glint. The gas is ReservoirRenderer's: `block/gas_reservoir/fill` (plain white, tinted) filling each block
-  to 0.01 inside its outer faces and to the edge toward the same gas, alpha 0.12 empty to 0.72 full, full-bright for
+  piece clips a glint. The gas is ReservoirRenderer's: the gas's own still texture (the tinted steam vapour) filling each block
+  to 0.01 inside its outer faces and to the edge toward the same gas, its alpha times 0.6 empty to 1.0 full, full-bright for
   glowing gases. Nothing is painted into the glass.
 - **Item Reservoir** (`block/item_reservoir/`): fully solid, no glass. ConnectedModel "item_reservoir" (ReservoirModel's
   quadrant scheme on `panel` / `rim` / `rim_h` / `rim_v` / `rim_corners`), joined only between FORMED blocks, so a formed
@@ -2128,10 +2129,13 @@ which made many fluids the same pattern in different colours.
     16 px sections) carries the turbo-expander's drum lying on its crown; the compressor skid is a DECK footing, a BANDED
     barrel on saddles with a flanged end, a hazard-striped coupling guard and an M_MOTOR motor; a big plant adds a gas
     buffer vessel behind the skid. The Liquid Nitrogen dewar has a sight glass.
-  - Cryogenic Distillation Column: the plated column (radius 7–11 px) in 24 px tray sections, its head and the
-    narrower condenser drum and vent on top, a caged ladder (rails, rungs every 4 px, hoops every two blocks from 40 px
-    up), three draw-off nozzles with jacketed lines down to the plinth, the reboiler kettle on saddles at its foot with
-    its vapour and liquid lines and a sight glass on its end.
+  - Cryogenic Distillation Column: the plated column (radius 18 px, 3 px in from the middle of each side) in 24 px
+    tray sections, its head and the narrower condenser drum (radius 10) and vent on top, grating platforms every four
+    blocks and a top deck over the head (decks with a well where the ladder comes up), a ladder a block wide up the
+    left side (1 px stiles 14 px apart, rungs every 4 px, stand-off brackets every two blocks, no cage), three draw-off
+    nozzles with jacketed lines down to the plinth, the reboiler kettle on saddles at its foot with its vapour and
+    liquid lines and a sight glass on its end. Its bands are closed underneath, and a plant's control panel runs back
+    to the part behind it.
   - Tritium Plant: the glovebox line in the light generator steel (riveted sides, plain front, a dark underside) on
     four-legged stands, each with its lit window and two glove ports (a BANDED ring, its dark glove disc); the line
     leaves the controller's panel clear (a narrower single box fills a short run). Behind: the palladium permeator

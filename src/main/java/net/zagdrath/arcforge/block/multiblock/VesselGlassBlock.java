@@ -29,7 +29,8 @@ import net.zagdrath.arcforge.multiblock.VesselStructure;
 
 // A vessel's window (Reactor Glass: leaded, so it shields like a wall; see the radiation_shielding data map). It never
 // does IO; clicking a formed pane opens the vessel. The Fission Reactor shows its Cherenkov glow through it while it
-// runs. Reactor Glass is also a tokamak's viewport, so a pane belongs to a Fusion Reactor when no vessel holds it.
+// runs. Reactor Glass is also a tokamak's viewport, so a pane belongs to a Fusion Reactor when no vessel holds it (the
+// tokamak sets FORMED on it too, so it hides while the reactor's renderer draws the window).
 public class VesselGlassBlock extends TransparentBlock implements VesselPart {
     private final Supplier<VesselStructure> structure;
 
@@ -79,7 +80,11 @@ public class VesselGlassBlock extends TransparentBlock implements VesselPart {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        // A tokamak leaves its viewports unformed; useOnPart opens the reactor whose formed shape holds the pane.
-        return state.getValue(FORMED) ? structure().useOnPart(level, pos, player) : TokamakStructure.useOnPart(level, pos, player);
+        // FORMED is set by a vessel or by a tokamak (whose viewport it is): open whichever holds the pane.
+        if (!state.getValue(FORMED)) {
+            return InteractionResult.PASS;
+        }
+        InteractionResult vessel = structure().useOnPart(level, pos, player);
+        return vessel != InteractionResult.PASS ? vessel : TokamakStructure.useOnPart(level, pos, player);
     }
 }

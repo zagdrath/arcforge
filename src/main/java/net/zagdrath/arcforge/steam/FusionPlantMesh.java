@@ -8,6 +8,8 @@ package net.zagdrath.arcforge.steam;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 import net.zagdrath.arcforge.multiblock.ModelFrame;
 
 // What the fusion tier's plant vessels' models share (the Cryogenic Plant, the Cryogenic Distillation Column and the
@@ -63,6 +65,35 @@ public abstract class FusionPlantMesh extends VesselMesh {
     // What stands on the plinth.
     abstract void parts();
 
+    // The control panel's cabinet, run back from the wall's face to what stands behind it (a round vessel sits well
+    // inside the footprint, so a cabinet at the wall's face alone would float in front of it). Nothing within a block
+    // behind it: it stands on the plinth as it is.
+    @Override
+    float @Nullable [] panelBox(int bx, int by) {
+        float[] cabinet = super.panelBox(bx, by);
+        if (cabinet == null) {
+            return null;
+        }
+        float reach = 0.0F;
+        boolean hit = false;
+        float[] xs = { cabinet[0] + 0.25F, (cabinet[0] + cabinet[3]) / 2.0F, cabinet[3] - 0.25F };
+        float[] ys = { cabinet[1] + 1.0F, (cabinet[1] + cabinet[4]) / 2.0F, cabinet[4] - 1.0F };
+        for (float x : xs) {
+            for (float y : ys) {
+                float d = ray(new float[] { x, y, cabinet[5] }, new float[] { 0, 0, 1 });
+                if (d >= 0.0F && d <= PX) {
+                    hit = true;
+                    reach = Math.max(reach, d);
+                }
+            }
+        }
+        if (hit && reach > 0.01F) {
+            // Half a pixel into it, so no gap shows round a curved face.
+            cabinet[5] += reach + 0.5F;
+        }
+        return cabinet;
+    }
+
     // A face drawn only while the plant runs, a hair out from where it's given.
     void running(float[] origin, float[] right, float[] up, float w, float h, Paint paint) {
         float[] n = normalize(cross(right, up));
@@ -93,9 +124,21 @@ public abstract class FusionPlantMesh extends VesselMesh {
         uprights.add(new float[] { x, u, r, y0, y1 });
     }
 
-    // A band round an upright part at (x, u): radius r from y0 to y1, its top a plain ring.
+    // A band round an upright part at (x, u): radius r from y0 to y1, its top a plain ring and its underside a shaded
+    // ring back in to the part (so it can't be seen into from below).
     void band(float x, float u, float r, float y0, float y1, int sides) {
-        uprightTube(x, u, new float[][] { { y0, r }, { y1, r } }, sides, Math.PI / sides, Paint.BANDED, Paint.PLAIN);
+        double start = Math.PI / sides, step = 2.0 * Math.PI / sides;
+        uprightTube(x, u, new float[][] { { y0, r }, { y1, r } }, sides, start, Paint.BANDED, Paint.PLAIN);
+        float inner = Math.max(0.0F, r - 1.5F);
+        float[] down = { 0, -1, 0 };
+        for (int f = 0; f < sides; f++) {
+            double a0 = start + f * step, a1 = a0 + step;
+            float[] o0 = { x + (float) Math.cos(a0) * r, y0, u + (float) Math.sin(a0) * r };
+            float[] o1 = { x + (float) Math.cos(a1) * r, y0, u + (float) Math.sin(a1) * r };
+            float[] i0 = { x + (float) Math.cos(a0) * inner, y0, u + (float) Math.sin(a0) * inner };
+            float[] i1 = { x + (float) Math.cos(a1) * inner, y0, u + (float) Math.sin(a1) * inner };
+            orient(o0, o1, i1, i0, down, Paint.SHADE);
+        }
     }
 
     // A vacuum-jacketed line through these points (px, in the frame): the jacket between them with bellows along it, a
@@ -111,8 +154,8 @@ public abstract class FusionPlantMesh extends VesselMesh {
                 float[] p0 = { a[0] + dir[0] * s, a[1] + dir[1] * s, a[2] + dir[2] * s };
                 float[] p1 = { p0[0] + dir[0] * BELLOWS_L, p0[1] + dir[1] * BELLOWS_L, p0[2] + dir[2] * BELLOWS_L };
                 tube(p0, p1, BELLOWS_R, PIPE_SIDES, Paint.BANDED);
-                disc(p0, new float[] { -dir[0], -dir[1], -dir[2] }, BELLOWS_R, PIPE_SIDES, Paint.MID, Paint.SHADE);
-                disc(p1, dir, BELLOWS_R, PIPE_SIDES, Paint.MID, Paint.SHADE);
+                tubeCap(p0, p1, BELLOWS_R, PIPE_SIDES, false, Paint.MID, Paint.SHADE);
+                tubeCap(p0, p1, BELLOWS_R, PIPE_SIDES, true, Paint.MID, Paint.SHADE);
             }
             if (i > 0) {
                 float h = JACKET_R + 0.6F;

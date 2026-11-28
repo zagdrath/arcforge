@@ -23,6 +23,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.zagdrath.arcforge.block.fusion.FusionModuleBlock;
 import net.zagdrath.arcforge.blockentity.fusion.FusionReactorBlockEntity;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
 import net.zagdrath.arcforge.client.screen.machine.MachineScreen;
 import net.zagdrath.arcforge.fusion.FusionAlarm;
 import net.zagdrath.arcforge.machine.config.SideMode;
@@ -46,8 +47,8 @@ public class FusionReactorScreen extends MachineScreen<FusionReactorMenu> {
 
     private static final int LEFT = 11, VALUE_RIGHT = 142, TOP = 19, LINE = 10;
     private static final int RIGHT = 152, RIGHT_END = 288;
-    private static final int STATUS_Y = 137, LED_X = 11, STATUS_X = 19, STATUS_W = 140;
-    private static final int PAGE_X = 166, RUN_X = 182, SHUTDOWN_X = 222, CONTROL_Y = 135, CONTROL_H = 12, PAGE_W = 12, WIDE = 36, SHUTDOWN_W = 66;
+    private static final int STATUS_Y = 137, LED_X = 11, STATUS_X = 19, STATUS_W = 127;
+    private static final int PAGE_X = 150, RUN_X = 166, SHUTDOWN_X = 206, CONTROL_Y = 135, CONTROL_H = 12, PAGE_W = 12, WIDE = 36, SHUTDOWN_W = 82;
     private static final int BUTTON = 7;
     private static final int GRAPH_X = RIGHT, GRAPH_W = RIGHT_END - RIGHT, GRAPH_Y = 96, GRAPH_H = 32;
     // Tanks: the inputs (Water, Lead-Lithium, Liquid Helium, Liquid Nitrogen) left of the inventory, the outputs (Hot
@@ -59,8 +60,9 @@ public class FusionReactorScreen extends MachineScreen<FusionReactorMenu> {
     // Wear bars on the Plant page.
     private static final int WEAR_X = RIGHT + 54, WEAR_W = RIGHT_END - RIGHT - 54, WEAR_H = 5;
     private static final String[] WEAR = { "first_wall", "divertor", "blanket", "coils" };
-    // The setpoints on the Control page: label, then - value +.
-    private static final int SET_MINUS = 246, SET_PLUS = 281, SET_VALUE_RIGHT = 278;
+    // The setpoints on the Control page: label, then - value +, the value right-aligned just left of + with room for the
+    // widest ("1000 MW", 39 px) before -.
+    private static final int SET_PLUS = RIGHT_END - BUTTON, SET_VALUE_RIGHT = SET_PLUS - 3, SET_VALUE_W = 40, SET_MINUS = SET_VALUE_RIGHT - SET_VALUE_W - 3 - BUTTON;
     private static final String[] SETPOINTS = { "heating", "density", "current", "field" };
     private static final int ALARM_RED = 0xFFE8483A, ALARM_AMBER = 0xFFE0A020, GOOD = 0xFF6CC832, TRACK = 0xFF161616, PLASMA = 0xFFE07AD8;
 
@@ -85,7 +87,7 @@ public class FusionReactorScreen extends MachineScreen<FusionReactorMenu> {
     private int mouseX, mouseY;
 
     public FusionReactorScreen(FusionReactorMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, "fusion_reactor", List.of(), false, FusionReactorMenu.WIDTH, FusionReactorMenu.HEIGHT, true);
+        super(menu, inventory, title, "fusion_reactor", List.of(EnergyTab.usage(() -> menu.get(FusionReactorMenu.DATA_ENERGY), () -> menu.get(FusionReactorMenu.DATA_ENERGY_USE))), false, FusionReactorMenu.WIDTH, FusionReactorMenu.HEIGHT, true);
     }
 
     @Override
@@ -370,9 +372,9 @@ public class FusionReactorScreen extends MachineScreen<FusionReactorMenu> {
         for (int i = 0; i < WEAR.length; i++) {
             graphics.text(font, Component.translatable("gui.arcforge.fusion_reactor.wear." + WEAR[i]), RIGHT, lineY(i), ArcforgeGui.LABEL, false);
         }
-        StringBuilder modules = new StringBuilder();
+        java.util.StringJoiner modules = new java.util.StringJoiner(" ");
         for (FusionModuleBlock.Kind kind : FusionModuleBlock.Kind.values()) {
-            modules.append(menu.modules(kind)).append(kind == FusionModuleBlock.Kind.DIAGNOSTICS ? "" : " ");
+            modules.add(String.valueOf(menu.modules(kind)));
         }
         reading(graphics, RIGHT, RIGHT_END, 4, "modules", Component.literal(modules.toString()), ArcforgeGui.TEXT);
         List<FusionAlarm> up = alarms();

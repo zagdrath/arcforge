@@ -133,13 +133,16 @@ Battery charging, the Quantum Tunnel Upgrades tab and the NPK and Nutrient Solut
   Solution (from 4,000 mB of water; was 1,000), so one fertilizer feeds 80 Hydroponic Cell harvests. The Basic Slag NPK
   recipe takes Wood Ash or Potash. The Gasifier leaves Wood Ash half the time (`ashChance` 0.5, was 0.25), and an Arc
   Crusher makes 6 Bone Meal from a bone (was 5).
-
-### Changed
-
 - The Curios Jetpack slot shows a jetpack outline when empty.
-
 - Arcforged gear repairs itself 10 points a second from its charge, up from 1. The config key is now `selfRepairPerSecond`
   (was `repairPerSecond`), so existing configs take the new default.
+- The Cryogenic Distillation Column is wider (its shell now fills most of the 3×3) and its ladder is a block wide,
+  without the cage. **The ladder can be climbed:** step into the gap in front of it on the column's left side and
+  climb to a new deck on top of the column, round the condenser, where you can walk. The column's blocks now take the
+  shape of the model (shell, platforms, railings) instead of full blocks.
+- Every machine and multiblock that uses FE shows the Energy tab on the left: the Cryogenic Plant, Cryogenic
+  Distillation Column, Tritium Plant, Fusion Reactor (its FE use averaged over the last second), Centrifuge Cascade,
+  Heavy Water Tower, PUREX Plant and Water Intake now have it too.
 
 ### Fixed
 
@@ -153,6 +156,29 @@ Battery charging, the Quantum Tunnel Upgrades tab and the NPK and Nutrient Solut
   pays wear from its charge.
 - JEI now shows the Arcforged gear upgrades at the Smithing Table (template, netherite or steel piece, Arcforged Alloy;
   two for the Hammer and Excavator).
+- The Tritium Plant's "Last made" amount no longer runs into its label: it moves to the line below when it doesn't
+  fit beside it.
+- The Cryogenic Distillation Column, Cryogenic Plant and Tritium Plant: the control panel no longer floats in front of
+  the column or cold box (it runs back to meet it), and you can no longer see into the flange bands from below or
+  through gaps round the jacketed lines' bellows, the expander's flange and the compressor's barrel.
+- The Mercury Vapour Lamp's cage no longer flickers where its rails met the corner bars.
+- The Helium Gas Turbine and Nuclear Steam Turbine no longer form with Pressure Glass in their walls (they're all
+  casings), which drew the glass as a stray sheet over the formed model. In a world where one already formed round
+  glass, breaking a pane now takes the turbine apart instead of leaving its model, outline and glass frames behind.
+- Reactor Glass in a formed Fusion Reactor's wall no longer shows as square glass blocks sticking out of the reactor:
+  the reactor draws its windows, and the glass comes back when the reactor is broken. Right-clicking it opens the
+  reactor.
+- The Fusion Reactor's Control page fits its setpoint values between the − and + buttons, and the Fast Shutdown button
+  is wide enough for its label. The Plant page's module counts no longer run together.
+- Formed Fluid and Gas Reservoirs show the frame on their far side (back corners and edges) through the glass, not just
+  the near edges.
+- Gas Reservoirs show the gas they hold: it fills the vessel as tinted vapour in the gas's own texture, denser the
+  fuller it is, instead of an almost invisible tint (a nearly empty one, or a pale gas like Propylene, showed nothing).
+
+### Upgrading
+
+- A Helium Gas Turbine or Nuclear Steam Turbine built with Pressure Glass in its walls stays formed until a block of
+  it is broken; after that it only forms again with casings in place of the glass.
 
 ## [2.9.0] - 2026-11-27
 

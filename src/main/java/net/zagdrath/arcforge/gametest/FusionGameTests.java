@@ -156,6 +156,41 @@ public final class FusionGameTests {
         return at;
     }
 
+    // A formed column's ladder: the middle block of its left side can be climbed all the way up (its neighbour can't),
+    // the well in front of the ladder is open (a player stands in it, against the shell), and the top deck can be stood
+    // on.
+    private static void columnLadder(GameTestHelper helper, FusionPlantBlockEntity column) {
+        var level = helper.getLevel();
+        var box = column.getBox();
+        helper.assertTrue(box != null, "The column has no box");
+        var frame = box.frame();
+        float h = frame.height() * 16.0F;
+        for (int y = 0; y < frame.height(); y++) {
+            BlockPos ladder = world(box.min(), frame.worldBlock(8.0F, y * 16.0F + 8.0F, 24.0F));
+            BlockPos beside = world(box.min(), frame.worldBlock(8.0F, y * 16.0F + 8.0F, 8.0F));
+            var state = level.getBlockState(ladder);
+            helper.assertTrue(state.isLadder(level, ladder, null) == net.zagdrath.arcforge.steam.CryogenicColumnMesh.isLadderBlock(0, y, 1, h),
+                    "Ladder block " + y + " climbable: " + state.isLadder(level, ladder, null));
+            helper.assertFalse(level.getBlockState(beside).isLadder(level, beside, null), "The block beside the ladder can be climbed");
+            // The well: the outer 5 px of the ladder's block, across the middle 10 px, clear of the bottom deck up.
+            if (y > 0) {
+                float[] a = frame.worldPoint(0.5F, y * 16.0F + 1.0F, 19.0F), b = frame.worldPoint(5.5F, y * 16.0F + 15.0F, 29.0F);
+                var well = new net.minecraft.world.phys.AABB(a[0] / 16.0, a[1] / 16.0, a[2] / 16.0, b[0] / 16.0, b[1] / 16.0, b[2] / 16.0)
+                        .move(box.min());
+                for (var part : state.getCollisionShape(level, ladder).toAabbs()) {
+                    helper.assertFalse(part.move(ladder).intersects(well), "Something solid in the ladder's well at " + y + ": " + part);
+                }
+            }
+        }
+        float deck = net.zagdrath.arcforge.steam.CryogenicColumnMesh.topDeck(h);
+        BlockPos corner = world(box.min(), frame.worldBlock(4.0F, deck - 0.5F, 4.0F));
+        helper.assertFalse(level.getBlockState(corner).getCollisionShape(level, corner).isEmpty(), "Nothing to stand on at the top deck's corner");
+    }
+
+    private static BlockPos world(BlockPos min, int[] offset) {
+        return min.offset(offset[0], offset[1], offset[2]);
+    }
+
     // The Cryogenic Plant liquefies Nitrogen; the column distils air with no feed; the Tritium Plant splits Fusion
     // Exhaust.
     static void plants(GameTestHelper helper) {
@@ -171,6 +206,7 @@ public final class FusionGameTests {
                         helper.assertTrue(plant.isFormed(), plant.getKind() + " didn't form");
                         CrushingGameTests.charge(plant.getEnergy(), 1_000_000);
                     }
+                    columnLadder(helper, helper.getBlockEntity(column, FusionPlantBlockEntity.class));
                     FusionPlantBlockEntity plant = helper.getBlockEntity(cold, FusionPlantBlockEntity.class);
                     helper.assertTrue(fill(plant.getInput(), FluidResource.of(ModFluids.NITROGEN.get()), 4_000) > 0, "The Cryogenic Plant refused Nitrogen");
                     FusionPlantBlockEntity separator = helper.getBlockEntity(tritium, FusionPlantBlockEntity.class);

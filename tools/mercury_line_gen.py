@@ -364,12 +364,15 @@ def uv(region, scale):
     return [x / scale, y / scale, (x + w) / scale, (y + h) / scale]
 
 
-def cube(frm, to, side, top, tex='#t', emissive=False, cull_down=False, bottom=None):
+def cube(frm, to, side, top, tex='#t', emissive=False, cull_down=False, bottom=None, skip=()):
     faces = {}
     for f in ('north', 'south', 'east', 'west'):
         faces[f] = {'texture': tex, 'uv': side}
     faces['up'] = {'texture': tex, 'uv': top}
     faces['down'] = {'texture': tex, 'uv': bottom or top}
+    # Faces buried against another part (drawn, they would fight it for the same pixels).
+    for f in skip:
+        del faces[f]
     if cull_down:
         faces['down']['cullface'] = 'down'
     element = {'from': frm, 'to': to, 'faces': faces}
@@ -391,11 +394,15 @@ def lamp_model(lit):
     ]
     # Four cage bars at the corners, the rails, the cap.
     for x, z in ((4, 4), (11, 4), (4, 11), (11, 11)):
-        elements.append(cube([x, 4, z], [x + 1, 12, z + 1], sh['bar'], uv((16, 0, 1, 1), s)))
-    # Rails round the cage: one at its foot (closing it onto the holder) and one round its middle.
+        elements.append(cube([x, 4, z], [x + 1, 12, z + 1], sh['bar'], uv((16, 0, 1, 1), s), skip=('up',)))
+    # Rails round the cage: one at its foot (closing it onto the holder) and one round its middle, each between two
+    # bars (not through them, which made their faces flicker against the bars').
+    # 6 px long: the last 6 px of the rail strips, so they still end on their dark px.
+    rail, rail_top = uv((2, 12, 6, 1), s), uv((2, 13, 6, 1), s)
     for y in (4, 8):
-        for frm, to in (([4, y, 4], [12, y + 1, 5]), ([4, y, 11], [12, y + 1, 12]), ([4, y, 5], [5, y + 1, 11]), ([11, y, 5], [12, y + 1, 11])):
-            elements.append(cube(frm, to, sh['rail'], sh['rail_top']))
+        for frm, to, ends in (([5, y, 4], [11, y + 1, 5], ('east', 'west')), ([5, y, 11], [11, y + 1, 12], ('east', 'west')),
+                              ([4, y, 5], [5, y + 1, 11], ('north', 'south')), ([11, y, 5], [12, y + 1, 11], ('north', 'south'))):
+            elements.append(cube(frm, to, rail, rail_top, skip=ends))
     elements.append(cube([4, 12, 4], [12, 13, 12], sh['cap_side'], sh['cap_top']))
     return {
         'parent': 'minecraft:block/block',

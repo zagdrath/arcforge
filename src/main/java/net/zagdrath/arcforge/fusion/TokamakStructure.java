@@ -152,9 +152,11 @@ public final class TokamakStructure {
         return state.hasProperty(TokamakPartBlock.FORMED) && state.getValue(TokamakPartBlock.FORMED);
     }
 
-    // The block that's always part of a reactor once it's formed: those carry FORMED.
+    // The blocks of a formed reactor that carry FORMED: its own parts, and the Reactor Glass in its wall (its windows,
+    // which hide while the renderer draws them; isValid keeps a pane a Fission Reactor holds out of a tokamak).
     private static boolean isOwnPart(BlockState state) {
-        return state.getBlock() instanceof TokamakPartBlock || state.getBlock() instanceof FusionReactorControllerBlock;
+        return state.getBlock() instanceof TokamakPartBlock || state.getBlock() instanceof FusionReactorControllerBlock
+                || state.is(ModBlocks.REACTOR_GLASS.get());
     }
 
     // --- Finding the reactor round a controller ---

@@ -19,7 +19,7 @@
     },
     {
       "type": "text",
-      "text": "# Cryogenic Distillation Column\nA tower of Cryogenic Column Casing, always 3 across and 6 to 16 tall, empty inside. Formed, it's a cold tower with a platform every four blocks. Every block of its inside's height is a stage; every second, each stage twice:\n- splits 100 mB of Helium-Rich Natural Gas into 90 mB of Natural Gas and 10 mB of Helium, or\n- with no feed, splits the air round it into 780 mB of Nitrogen, 210 mB of Oxygen and 10 mB of Argon.\nA 3×3×16 has 14 stages. It uses 80 FE/t per block of its height. Products leave by port: Output (first), By-product (second), Tails (third)."
+      "text": "# Cryogenic Distillation Column\nA tower of Cryogenic Column Casing, always 3 across and 6 to 16 tall, empty inside. Formed, it's a cold tower with a platform every four blocks and a deck on top round the condenser: climb the ladder up its left side to reach it. Every block of its inside's height is a stage; every second, each stage twice:\n- splits 100 mB of Helium-Rich Natural Gas into 90 mB of Natural Gas and 10 mB of Helium, or\n- with no feed, splits the air round it into 780 mB of Nitrogen, 210 mB of Oxygen and 10 mB of Argon.\nA 3×3×16 has 14 stages. It uses 80 FE/t per block of its height. Products leave by port: Output (first), By-product (second), Tails (third)."
     },
     {
       "type": "multiblock",
