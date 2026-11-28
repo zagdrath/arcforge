@@ -22,9 +22,7 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
-Suggested version: **2.10.0** (minor: the fusion tier with its cryogenics, tritium and helium loop, and the mercury
-line, from vanilla Cinnabar to Mercury, amalgams and the Mercury Vapour Lamp, plus the Long Fall Boots slot, carried
-Battery charging, the Quantum Tunnel Upgrades tab and the NPK and Nutrient Solution rebalance with Potash).
+## [2.10.0] - 2026-11-27
 
 ### Added
 
@@ -2424,7 +2422,8 @@ First version.
   Steam Turbine, and the Steam Boiler and Steam Turbine Arrays.
 - Materials: steel, coal coke, slag and rock wool, dusts, copper and steel parts, and treated wood.
 
-[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.9.0+26.3...HEAD
+[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.10.0+26.3...HEAD
+[2.10.0]: https://github.com/zagdrath/arcforge/compare/v2.9.0+26.3...v2.10.0+26.3
 [2.9.0]: https://github.com/zagdrath/arcforge/compare/v2.8.1+26.3...v2.9.0+26.3
 [2.8.1]: https://github.com/zagdrath/arcforge/compare/v2.8.0+26.3...v2.8.1+26.3
 [2.8.0]: https://github.com/zagdrath/arcforge/compare/v2.7.0+26.3...v2.8.0+26.3
