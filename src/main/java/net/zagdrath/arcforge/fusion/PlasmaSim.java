@@ -401,6 +401,8 @@ public final class PlasmaSim {
         double target = Math.min(ipTarget, maxCurrent() * 1.5);
         if (flux > 0.0) {
             if (ip < target) {
+                // Switched back on partway through a ramp-down: running again, fuelled.
+                rampDown = false;
                 double step = Math.min(p.ipRampRate, target - ip);
                 double cost = step * fluxPerMa();
                 if (cost <= flux) {
@@ -412,6 +414,11 @@ public final class PlasmaSim {
                 }
             } else if (ip > target) {
                 ip = Math.max(target, ip - p.ipRampRate);
+                // Switched off (no current wanted): a planned ramp-down like a pulse's end, the fuelling off and the
+                // falling density limit no cause for a disruption.
+                if (target <= 0.0) {
+                    rampDown = true;
+                }
             }
             flux = Math.max(0.0, flux - vLoop);
         } else {

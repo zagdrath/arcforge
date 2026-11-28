@@ -216,6 +216,9 @@ Battery charging, the Quantum Tunnel Upgrades tab and the NPK and Nutrient Solut
   radiation (which grows with the density squared) outgrew the heating, and the plasma fell into a cold state at under
   half a keV that radiated everything and burnt through the solenoid's flux. The fuelling now holds the density where
   radiation takes at most 60% of the power in.
+- Stopping a Fusion Reactor mid-pulse no longer disrupts it on the density limit (which could melt its wall and
+  unform it): the current's ramp-down when switched off now counts as planned, like a pulse's end, with the fuelling
+  off. Switching it back on partway through ramps it up again, fuelled.
 - The density alarm no longer sounds as a pulse ends: the current's ramp-down lowers the density limit a moment ahead
   of the density, but a planned ramp-down can't disrupt on it. "Pulse ending" still shows.
 - Looking into a Fusion Reactor's viewport: no sky shows through a crack round the top and foot of the centre column; a

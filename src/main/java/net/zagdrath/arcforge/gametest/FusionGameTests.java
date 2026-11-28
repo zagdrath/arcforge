@@ -66,6 +66,28 @@ public final class FusionGameTests {
         helper.assertTrue(end == PlasmaSim.Event.PULSE_END, "An R3 pulse ended with " + end);
         // A finished pulse is out (so the controller recharges the solenoid and, repeating, starts the next one).
         helper.assertFalse(r3.alive, "The plasma was still alive after its pulse ended");
+        // Switched off mid-pulse (Stop: no current wanted, the heating and fuelling off), an R3 on one Cryopump ramps its
+        // current down without disrupting, its density limit falling faster than the density drains.
+        PlasmaSim stopped = new PlasmaSim(new TokamakLayout(3).majorRadiusMetres(), false, new PlasmaSim.Params());
+        stopped.pumping = 0.25;
+        stopped.impurity = ArcforgeConfig.FUSION_BASE_IMPURITY.getAsDouble();
+        stopped.bField = 8.0;
+        stopped.ready = true;
+        PlasmaSim.Event stopEnd = PlasmaSim.Event.NONE;
+        for (int sec = 0; sec < 300 && !stopEnd.name().contains("DISRUPTION"); sec++) {
+            boolean running = sec < 120;
+            stopped.ipTarget = running ? stopped.maxCurrent() : 0.0;
+            stopped.pEch = sec < 30 ? 10.0 : 0.0;
+            stopped.pNbi = running ? 50.0 : 0.0;
+            double fuel = stopped.alive ? stopped.fuelDemand(running ? 0.85 : 0.0, 1.0) : 2.0;
+            stopped.srcD = fuel / 2.0;
+            stopped.srcT = fuel / 2.0;
+            stopEnd = stopped.step();
+            if (!running && stopped.alive && stopped.ip <= 0.2) {
+                break;
+            }
+        }
+        helper.assertFalse(stopEnd.name().contains("DISRUPTION"), "Stopping an R3 mid-pulse ended with " + stopEnd);
         // With impurities (the config's clean plasma, and a dirtier one), the fuelling holds the density where radiation
         // can't take over: the burn holds through the pulse instead of collapsing into a cold, radiating plasma.
         for (double impurity : new double[] { ArcforgeConfig.FUSION_BASE_IMPURITY.getAsDouble(), 0.002 }) {
