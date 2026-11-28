@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "arcforge:slate",
+    "arcforge:sandpaper"
+  ],
+  "result": {
+    "id": "arcforge:polished_slate",
+    "count": 1
+  }
+}

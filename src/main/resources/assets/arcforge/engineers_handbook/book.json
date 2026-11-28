@@ -175,6 +175,7 @@
       "entries": [
         "ores",
         "natural_stones",
+        "stone_chemistry",
         "dusts",
         "lithium",
         "parts",

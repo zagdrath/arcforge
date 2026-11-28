@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "GG",
+    "GG",
+    "W "
+  ],
+  "key": {
+    "G": "arcforge:gypsum",
+    "W": "minecraft:water_bucket"
+  },
+  "result": {
+    "id": "arcforge:plaster",
+    "count": 4
+  }
+}

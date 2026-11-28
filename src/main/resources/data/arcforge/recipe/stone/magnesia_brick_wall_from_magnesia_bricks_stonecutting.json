@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:magnesia_bricks",
+  "result": {
+    "count": 1,
+    "id": "arcforge:magnesia_brick_wall"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "#arcforge:calcium_carbonate_stones",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "tag": "c:brine",
+      "amount": 1000
+    },
+    {
+      "fluid": "arcforge:ammonia",
+      "amount": 100
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:soda_ash",
+    "count": 2
+  },
+  "byproduct": {
+    "id": "arcforge:calcium_chloride",
+    "count": 1
+  },
+  "time": 120,
+  "energy_per_tick": 40,
+  "heat_per_tick": 10,
+  "min_temperature": 200
+}

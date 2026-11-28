@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "arcforge:scoria",
+    "arcforge:sandpaper"
+  ],
+  "result": {
+    "id": "arcforge:polished_scoria",
+    "count": 1
+  }
+}

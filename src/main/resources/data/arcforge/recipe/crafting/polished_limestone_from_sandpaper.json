@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "arcforge:limestone",
+    "arcforge:sandpaper"
+  ],
+  "result": {
+    "id": "arcforge:polished_limestone",
+    "count": 1
+  }
+}

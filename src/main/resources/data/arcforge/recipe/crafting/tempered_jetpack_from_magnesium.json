@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "PTP",
+    "CXC",
+    "RGR"
+  ],
+  "key": {
+    "P": "#arcforge:plastics",
+    "T": "arcforge:tempered_alloy",
+    "C": "arcforge:tempered_gas_cartridge",
+    "X": "#c:ingots/magnesium",
+    "R": "arcforge:wrought_pressurized_conduit",
+    "G": "arcforge:rubber_gasket"
+  },
+  "result": {
+    "id": "arcforge:tempered_jetpack",
+    "count": 1
+  }
+}

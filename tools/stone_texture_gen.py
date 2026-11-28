@@ -71,6 +71,14 @@ PLAN = {
 }
 # A few tiles need turning or repeating to be a block face: the 8-wide pillar halves are laid twice across, and two
 # layered faces are stood on end to read as a column's grain.
+# Blocks made from the stones' chemistry (tools/stone_minerals_data_gen.py), not stones: Cody's own picks, sampled from his
+# screenshots onto their 16 px grid. Plaster: his soft pink tile, on a warm pearl white. Magnesia Bricks: his blue-green
+# bricks, on a chalky grey-white with a buff cast.
+EXTRA = {
+    "plaster": ("pick_plaster", hexes("#8E877C", "#A9A296", "#C0BAAE", "#D4CFC4", "#E3DFD6", "#EFECE5", "#F8F6F1")),
+    "magnesia_bricks": ("pick_bricks", hexes("#6A6660", "#86827A", "#A09C93", "#B7B3AA", "#CAC7BF", "#DBD8D1", "#EAE8E2")),
+}
+
 TRANSFORM = {"t_p1": "twice", "t_p2": "twice", "f10": "rot90", "b15": "rot90"}
 # Faces given softer contrast and a light smoothing (no lone pixels, a soft blend), and the ramp they use instead.
 # Limestone's cobble keeps its crisp stones (only its ramp changes); its natural face is softened too.
@@ -279,6 +287,10 @@ def load(spec, caps=(True, True)):
     """The tile's brightness, worked as the spec says. caps: whether a pillar side shows its capital (top) and its
     base (bottom); a pillar joined to the next one along its axis leaves that end plain."""
     parts = spec.split(":")
+    if parts[0] == "flip":
+        return load(spec[len("flip:"):], caps)[:, ::-1].copy()
+    if parts[0] == "smooth":
+        return smooth(load(spec[len("smooth:"):], caps))
     if parts[0] == "seamless":
         lum = load(spec[len("seamless:"):], caps)
         lum[0:2] = lum[2:4]
@@ -309,6 +321,14 @@ def load(spec, caps=(True, True)):
     if parts[0] == "noface":
         return luminance(noface(raw(parts[1])))
     return luminance(raw(spec))
+
+
+def smooth(lum):
+    """Ground smooth as polish(), but seamless: no bevel, so a wall of it reads as one surface (plaster)."""
+    for _ in range(2):
+        blur = sum(np.roll(np.roll(lum, dy, 0), dx, 1) for dy in (-1, 0, 1) for dx in (-1, 0, 1)) / 9
+        lum = lum * 0.5 + blur * 0.5
+    return lum.mean() + (lum - lum.mean()) * 0.5
 
 
 def soften(lum):
@@ -385,6 +405,8 @@ def build():
                 continue
             out[FACES[face].format(stone)] = Image.fromarray(
                     recolour(load(tile), ramp, soft is not None, LIFT.get(key, 0), SHIFT.get(key, 0), FLOOR.get(key, 0)))
+    for name, (tile, ramp) in EXTRA.items():
+        out[name] = Image.fromarray(recolour(load(tile), ramp))
     return out
 
 

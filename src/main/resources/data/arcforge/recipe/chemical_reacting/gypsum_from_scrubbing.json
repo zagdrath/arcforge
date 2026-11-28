@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "arcforge:slaked_lime",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "tag": "c:sulfur_dioxide",
+      "amount": 250
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:gypsum",
+    "count": 1
+  },
+  "time": 80,
+  "energy_per_tick": 30
+}

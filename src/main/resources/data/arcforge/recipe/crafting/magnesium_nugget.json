@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:ingots/magnesium"
+  ],
+  "result": {
+    "id": "arcforge:magnesium_nugget",
+    "count": 9
+  }
+}

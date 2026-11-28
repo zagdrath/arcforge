@@ -26,6 +26,17 @@
     "#c:dusts/zirconium",
     "#c:dusts/rare_earth",
     "#c:dusts/silica",
-    "#c:dusts/cinnabar"
+    "#c:dusts/cinnabar",
+    "#c:dusts/soda_ash",
+    "#c:dusts/calcium_chloride",
+    "#c:dusts/slaked_lime",
+    "#c:dusts/gypsum",
+    "#c:dusts/magnesia",
+    "#c:dusts/magnesium",
+    "#c:dusts/potassium_hydroxide",
+    "#c:dusts/magnesite",
+    "#c:dusts/chromite",
+    "#c:dusts/volcanic_ash",
+    "#c:dusts/agricultural_lime"
   ]
 }

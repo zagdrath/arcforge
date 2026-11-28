@@ -108,6 +108,8 @@ public final class ModItems {
             p -> new net.zagdrath.arcforge.item.tool.SifterMeshItem(net.zagdrath.arcforge.item.tool.SifterMeshItem.Tier.STEEL, p.enchantable(10)));
     public static final DeferredItem<net.zagdrath.arcforge.item.tool.SifterMeshItem> INVAR_MESH = ITEMS.registerItem("invar_mesh",
             p -> new net.zagdrath.arcforge.item.tool.SifterMeshItem(net.zagdrath.arcforge.item.tool.SifterMeshItem.Tier.INVAR, p.enchantable(10)));
+    public static final DeferredItem<net.zagdrath.arcforge.item.tool.SifterMeshItem> GARNET_MESH = ITEMS.registerItem("garnet_mesh",
+            p -> new net.zagdrath.arcforge.item.tool.SifterMeshItem(net.zagdrath.arcforge.item.tool.SifterMeshItem.Tier.GARNET, p.enchantable(10)));
     public static final DeferredItem<net.zagdrath.arcforge.item.tool.SifterMeshItem> TUNGSTEN_MESH = ITEMS.registerItem("tungsten_mesh",
             p -> new net.zagdrath.arcforge.item.tool.SifterMeshItem(net.zagdrath.arcforge.item.tool.SifterMeshItem.Tier.TUNGSTEN, p.enchantable(10)));
     public static final DeferredItem<net.zagdrath.arcforge.item.tool.SifterMeshItem> SILICON_CARBIDE_MESH = ITEMS.registerItem("silicon_carbide_mesh",
@@ -431,6 +433,10 @@ public final class ModItems {
             p -> new BucketItem(ModFluids.BRINE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> LITHIUM_BRINE_BUCKET = ITEMS.registerItem("lithium_brine_bucket",
             p -> new BucketItem(ModFluids.LITHIUM_BRINE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> POTASH_BRINE_BUCKET = ITEMS.registerItem("potash_brine_bucket",
+            p -> new BucketItem(ModFluids.POTASH_BRINE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> POTASSIUM_HYDROXIDE_SOLUTION_BUCKET = ITEMS.registerItem("potassium_hydroxide_solution_bucket",
+            p -> new BucketItem(ModFluids.POTASSIUM_HYDROXIDE_SOLUTION.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> LYE_BUCKET = ITEMS.registerItem("lye_bucket",
             p -> new BucketItem(ModFluids.LYE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> HYDROCHLORIC_ACID_BUCKET = ITEMS.registerItem("hydrochloric_acid_bucket",
@@ -851,6 +857,8 @@ public final class ModItems {
         buckets.add(BRINE_BUCKET);
         buckets.add(LYE_BUCKET);
         buckets.add(LITHIUM_BRINE_BUCKET);
+        buckets.add(POTASH_BRINE_BUCKET);
+        buckets.add(POTASSIUM_HYDROXIDE_SOLUTION_BUCKET);
         buckets.add(SODIUM_SILICATE_BUCKET);
         buckets.add(TRICHLOROSILANE_BUCKET);
         for (OreSlurry slurry : OreSlurry.values()) {

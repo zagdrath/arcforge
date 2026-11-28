@@ -7,6 +7,9 @@
     "arcforge:mixed_fertilizer",
     "arcforge:seed_meal",
     "arcforge:npk_fertilizer",
-    "arcforge:digestate"
+    "arcforge:digestate",
+    "arcforge:gypsum",
+    "arcforge:volcanic_ash",
+    "arcforge:agricultural_lime"
   ]
 }

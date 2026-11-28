@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "arcforge:serpentine",
+    "arcforge:sandpaper"
+  ],
+  "result": {
+    "id": "arcforge:polished_serpentine",
+    "count": 1
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "arcforge:soda_ash",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "tag": "minecraft:water",
+      "amount": 500
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:lye",
+    "amount": 500
+  },
+  "time": 80,
+  "energy_per_tick": 20
+}

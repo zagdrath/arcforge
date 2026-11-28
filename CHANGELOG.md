@@ -22,7 +22,7 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
-Suggested version: **2.11.0** (minor: nine natural stones and Quicklime, and the Battery Curios slot).
+Suggested version: **2.11.0** (minor: nine natural stones and Quicklime, stone chemistry, and the Battery Curios slot).
 
 ### Added
 
@@ -43,12 +43,43 @@ Suggested version: **2.11.0** (minor: nine natural stones and Quicklime, and the
   Serpentine, Pumice and Scoria crush with a chance of Silica, Nickel or Iron Dust. The cobbles make stone tools and
   furnaces.
 - An Engineer's Handbook entry, Natural Stones, in the Materials chapter.
+- **Stone chemistry**, all in the machines you have (Handbook: Stone Chemistry, after Natural Stones):
+  - **Soda Ash** by the Solvay process: a calcium carbonate stone, 1,000 mB Brine and 100 mB Ammonia in a heated Chemical
+    Reactor (200 °C) give 2 Soda Ash and 1 Calcium Chloride. Soda Ash makes 6 Glass from 4 sand in the Arcforge Furnace
+    and Lye with water.
+  - **Calcium Carbide**: 2 Quicklime and 2 Coal Coke in the Arcforge Furnace at 1,550 °C. With water it gives
+    **Acetylene**, a gas and the hottest fuel (70 HU/mB at 1,450 °C in the Fuel Burner and Firebox Array, and on
+    oxy-fuel), and Slaked Lime.
+  - **Slaked Lime** (Quicklime and water) scrubs Sulfur Dioxide into **Gypsum**, a fertilizer, which sets with water into
+    **Plaster** (with stairs, a slab and a wall).
+  - **Magnesium**: Dolomite calcines to Magnesia (and a Quicklime); Magnesia and Ferrosilicon make Magnesium Ingots in
+    the Arcforge Furnace (the Pidgeon process). Magnesium has a nugget, dust and block, can stand in for steel in the
+    Tempered Jetpack and Tempered Arc Drill and Saw, and Magnesia makes **Magnesia Bricks** (with stairs, a slab and a
+    wall).
+  - **Potassium Hydroxide**: Potash dissolves into Potash Brine, which the Electrolyzer splits into Hydrogen, Chlorine and
+    Potassium Hydroxide Solution; that serves wherever Lye does, and the Thermal Evaporator Array dries it.
+  - **Magnesite**: Serpentine or Olivine with Carbon Dioxide in a heated reactor locks the CO2 away; Magnesite calcines
+    back to Magnesia.
+  - New minerals from the Sifter: **Garnet** and **Olivine** from Cobbled Kimberlite, **Mica** from Cobbled Slate,
+    **Chromite** from Cobbled Serpentine. Garnet makes **Sandpaper**, which polishes a stone by hand, and the **Garnet
+    Mesh** (4 Garnet and 4 Invar Rods), a Sifter Mesh between Invar and Tungsten: chances x1.5, 1.75x as fast, 768
+    blocks, no tungsten needed (config `garnetMeshChance`, `garnetMeshSpeed`). Olivine and Clay
+    make **Foundry Sand** for cheaper dies; Mica can replace a plate in the Tungsten Heating Coil.
+  - **Volcanic Ash** (crushed Scoria) and **Agricultural Lime** (crushed Limestone or Travertine) are fertilizers;
+    Volcanic Ash and Slaked Lime make Pozzolan concrete powder.
+  - Config: `farming.growing.fertilizers` gypsum, volcanicAsh and agriculturalLime; `refineryFuels` acetyleneHeatPerMb
+    and acetyleneBurnTemperature.
 - A **Battery** Curios slot: a Battery worn there charges your other FE items like a carried one, and a Chargepad
   charges it.
 
 ### Changed
 
 - The Long Fall Boots Curios slot's outline is a pair of boots.
+- Dolomite no longer calcines into 2 Quicklime: it gives 2 Magnesia, 1 Quicklime and the same Carbon Dioxide.
+- Scoria crushes into 2 Volcanic Ash (still with a 12% chance of Iron Dust) instead of gravel.
+- Cobbled Kimberlite also sifts Garnet (20%) and Olivine (25%).
+- The Lye recipes (Sodium Silicate, Lye biodiesel, Thorium Dioxide, Lithium Hydroxide) take any alkali: Lye or
+  Potassium Hydroxide Solution.
 - Gas in a Gas Reservoir is a darker shade of its colour and less see-through.
 
 ### Fixed

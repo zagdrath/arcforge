@@ -189,10 +189,10 @@ final class AlloyGameTests {
         // Blend and Silicon Carbide Mesh), the Nuclear Turbine Casing, and seven equipment recipes (three armored
         // jetpacks, two armored tier upgrades and both Long Fall Boots variants), the Chunk Loading Upgrade, and the Arcforged Upgrade Template and its
         // duplication.
-        helper.assertTrue(crafting == 406, crafting + " crafting/ recipes, not 406");
+        helper.assertTrue(crafting == 433, crafting + " crafting/ recipes, not 433");
         // Plus the fluorite-fluxed steel, Graphite from Coal Coke and from Carbon Dust, Zircaloy, Lead-Bismuth, Ferrosilicon
         // and Metallurgical Silicon.
-        helper.assertTrue(smelting == 12, smelting + " arcforge_smelting/ recipes, not 12");
+        helper.assertTrue(smelting == 15, smelting + " arcforge_smelting/ recipes, not 15");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {
             helper.assertTrue(recipe(helper, old) == null, "Old recipe " + old + " is still there");
         }

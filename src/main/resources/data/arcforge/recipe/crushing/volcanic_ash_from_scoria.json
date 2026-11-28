@@ -5,8 +5,8 @@
     "arcforge:cobbled_scoria"
   ],
   "result": {
-    "count": 1,
-    "id": "minecraft:gravel"
+    "count": 2,
+    "id": "arcforge:volcanic_ash"
   },
   "bonus": {
     "count": 1,

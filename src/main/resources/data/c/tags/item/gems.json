@@ -5,6 +5,8 @@
     "#c:gems/iolite",
     "#c:gems/monazite",
     "#c:gems/zircon",
-    "#c:gems/silicon_carbide"
+    "#c:gems/silicon_carbide",
+    "#c:gems/garnet",
+    "#c:gems/olivine"
   ]
 }

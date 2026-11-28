@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:arcforge_smelting",
+  "metal": {
+    "ingredient": "#c:sands",
+    "count": 4
+  },
+  "additive": {
+    "ingredient": "arcforge:soda_ash",
+    "count": 1
+  },
+  "coke": 0,
+  "result": {
+    "id": "minecraft:glass",
+    "count": 6
+  },
+  "time": 200,
+  "min_temp": 1200,
+  "experience": 0.1
+}

@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:sifting",
+  "ingredient": "arcforge:cobbled_serpentine",
+  "outputs": [
+    {
+      "item": {
+        "id": "arcforge:chromite"
+      },
+      "chance": 0.12
+    },
+    {
+      "item": {
+        "id": "arcforge:nickel_dust"
+      },
+      "chance": 0.05
+    }
+  ]
+}

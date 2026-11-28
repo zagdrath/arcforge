@@ -25,6 +25,18 @@
         "id": "arcforge:nickel_dust"
       },
       "chance": 0.06
+    },
+    {
+      "item": {
+        "id": "arcforge:garnet"
+      },
+      "chance": 0.2
+    },
+    {
+      "item": {
+        "id": "arcforge:olivine"
+      },
+      "chance": 0.25
     }
   ]
 }

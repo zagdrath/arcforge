@@ -1,9 +1,12 @@
+agricultural_lime.png
 ammonium_diuranate.png
 ancient_debris_dust.png
 arcite_dust.png
 basic_slag.png
 bismuth_dust.png
+calcium_chloride.png
 carbon_dust.png
+chromite.png
 cinnabar_dust.png
 copper_dust.png
 depleted_uranium_dioxide.png
@@ -11,7 +14,9 @@ depleted_uranium_dust.png
 enriched_lithium_fluoride.png
 flour.png
 fluorite_dust.png
+foundry_sand.png
 gold_dust.png
+gypsum.png
 invar_dust.png
 iolite_dust.png
 iron_dust.png
@@ -19,12 +24,16 @@ lead_dust.png
 lithium_6_fluoride.png
 lithium_fluoride.png
 lithium_hydroxide.png
+magnesia.png
+magnesite.png
+magnesium_dust.png
 monazite_dust.png
 mox_blend.png
 nether_quartz_dust.png
 nickel_dust.png
 plutonium_oxide.png
 potash.png
+potassium_hydroxide.png
 rare_earth_dust.png
 recovered_uranium.png
 salt.png
@@ -32,6 +41,8 @@ seed_meal.png
 silica_dust.png
 silicon_carbide_blend.png
 silver_dust.png
+slaked_lime.png
+soda_ash.png
 spodumene_dust.png
 sulfur_dust.png
 thorium_dioxide.png
@@ -42,6 +53,7 @@ uraninite_dust.png
 uranium_233_oxide.png
 uranium_dioxide.png
 uranium_tetrafluoride.png
+volcanic_ash.png
 wood_ash.png
 yellowcake.png
 zircon_dust.png

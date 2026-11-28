@@ -63,6 +63,8 @@
     "arcforge:chiseled_scoria_slab",
     "arcforge:small_travertine_brick_slab",
     "arcforge:travertine_pillar_slab",
-    "arcforge:chiseled_travertine_slab"
+    "arcforge:chiseled_travertine_slab",
+    "arcforge:plaster_slab",
+    "arcforge:magnesia_brick_slab"
   ]
 }

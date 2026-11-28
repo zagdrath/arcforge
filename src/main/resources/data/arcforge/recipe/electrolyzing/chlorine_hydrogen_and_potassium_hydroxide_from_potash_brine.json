@@ -1,0 +1,20 @@
+{
+  "type": "arcforge:electrolyzing",
+  "input": {
+    "fluid": "arcforge:potash_brine",
+    "amount": 100
+  },
+  "primary": {
+    "id": "arcforge:hydrogen",
+    "amount": 50
+  },
+  "secondary": {
+    "id": "arcforge:chlorine",
+    "amount": 50
+  },
+  "tertiary": {
+    "id": "arcforge:potassium_hydroxide_solution",
+    "amount": 100
+  },
+  "energy": 60000
+}

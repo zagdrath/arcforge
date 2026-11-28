@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:gems/olivine",
+    "#c:gems/olivine",
+    "#c:gems/olivine",
+    "#c:gems/olivine",
+    "minecraft:clay_ball"
+  ],
+  "result": {
+    "id": "arcforge:foundry_sand",
+    "count": 4
+  }
+}

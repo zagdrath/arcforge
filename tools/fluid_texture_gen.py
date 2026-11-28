@@ -58,6 +58,7 @@ LIQUIDS = {
     'heavy_water': 'thin', 'nutrient_solution': 'thin', 'ethanol': 'thin', 'naphtha': 'thin',
     'hot_coolant': 'hot', 'hot_heavy_water': 'hot',
     'latex': 'milky', 'sodium_silicate': 'milky', 'lye': 'milky',
+    'potash_brine': 'thin', 'potassium_hydroxide_solution': 'milky',
     'light_oil': 'oil', 'kerosene': 'oil', 'sour_kerosene': 'oil', 'diesel': 'oil', 'sour_diesel': 'oil',
     'gasoline': 'oil', 'lubricant': 'oil', 'seed_oil': 'oil', 'biodiesel': 'oil',
     'heavy_oil': 'thick', 'crude_oil': 'thick', 'sour_crude_oil': 'thick', 'bitumen': 'thick', 'creosote': 'thick',
@@ -89,6 +90,9 @@ PALETTES = {
     'latex': ([0xA89E88, 0xC4BCA8, 0xD8D2C2, 0xE8E4D8, 0xF4F2EA], 210),
     'sodium_silicate': ([0xA8A496, 0xC2BEB0, 0xD6D3C6, 0xE5E2D7, 0xEEECE3], 210),
     'lye': ([0x7C8078, 0x9A9E94, 0xB8BCB2, 0xD2D6CC, 0xE6E8E0], 210),
+    # Stone chemistry: Potash Brine a rosy brine (sylvinite's red, washed out); caustic potash Lye with a lilac cast.
+    'potash_brine': ([0x8A6A70, 0xA6868C, 0xC2A4A8, 0xD8C0C2, 0xEAD8D8], 210),
+    'potassium_hydroxide_solution': ([0x807C88, 0x9E9AA6, 0xBCB8C4, 0xD6D2DC, 0xEAE8EE], 210),
     'light_oil': ([0xB4861A, 0xC69A24, 0xD6AC30, 0xE2BC40, 0xF6DC80, 0xFFEEB0], 215),
     'kerosene': ([0xC8C6AA, 0xD4D2B6, 0xDEDCC2, 0xE6E4CC, 0xF2F0DC, 0xFBFAEE], 215),
     'sour_kerosene': ([0xC6C38B, 0xCECC98, 0xD6D4A5, 0xDCDAAF, 0xE5E4BF, 0xEDECD0], 215),

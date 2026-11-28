@@ -1,0 +1,15 @@
+{
+  "type": "arcforge:arcforge_smelting",
+  "metal": {
+    "ingredient": "arcforge:quicklime",
+    "count": 2
+  },
+  "coke": 2,
+  "result": {
+    "id": "arcforge:calcium_carbide",
+    "count": 1
+  },
+  "time": 800,
+  "min_temp": 1550,
+  "experience": 0.7
+}

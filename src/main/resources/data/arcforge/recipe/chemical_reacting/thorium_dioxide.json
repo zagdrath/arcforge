@@ -6,7 +6,7 @@
   },
   "fluid_inputs": [
     {
-      "fluid": "arcforge:lye",
+      "tag": "arcforge:alkalis",
       "amount": 250
     }
   ],

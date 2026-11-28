@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "arcforge:block/plaster_slab"
+    },
+    "type=double": {
+      "model": "arcforge:block/plaster"
+    },
+    "type=top": {
+      "model": "arcforge:block/plaster_slab_top"
+    }
+  }
+}

@@ -381,6 +381,8 @@ public class ArcforgeClient {
         event.register(liquidModel("latex"), ModFluids.LATEX, ModFluids.FLOWING_LATEX);
         event.register(liquidModel("liquid_experience"), ModFluids.LIQUID_EXPERIENCE, ModFluids.FLOWING_LIQUID_EXPERIENCE);
         event.register(liquidModel("lye"), ModFluids.LYE, ModFluids.FLOWING_LYE);
+        event.register(liquidModel("potash_brine"), ModFluids.POTASH_BRINE, ModFluids.FLOWING_POTASH_BRINE);
+        event.register(liquidModel("potassium_hydroxide_solution"), ModFluids.POTASSIUM_HYDROXIDE_SOLUTION, ModFluids.FLOWING_POTASSIUM_HYDROXIDE_SOLUTION);
         event.register(liquidModel("hydrochloric_acid"), ModFluids.HYDROCHLORIC_ACID, ModFluids.FLOWING_HYDROCHLORIC_ACID);
         event.register(liquidModel("sodium_silicate"), ModFluids.SODIUM_SILICATE, ModFluids.FLOWING_SODIUM_SILICATE);
         event.register(liquidModel("trichlorosilane"), ModFluids.TRICHLOROSILANE, ModFluids.FLOWING_TRICHLOROSILANE);
@@ -436,6 +438,7 @@ public class ArcforgeClient {
         event.register(gasModel(HYDROGEN_SULFIDE_TINT), ModFluids.HYDROGEN_SULFIDE, ModFluids.FLOWING_HYDROGEN_SULFIDE);
         event.register(gasModel(GasTints.NITROGEN_DIOXIDE), ModFluids.NITROGEN_DIOXIDE, ModFluids.FLOWING_NITROGEN_DIOXIDE);
         event.register(gasModel(GasTints.SULFUR_DIOXIDE), ModFluids.SULFUR_DIOXIDE, ModFluids.FLOWING_SULFUR_DIOXIDE);
+        event.register(gasModel(GasTints.ACETYLENE), ModFluids.ACETYLENE, ModFluids.FLOWING_ACETYLENE);
         event.register(gasModel(GasTints.DEUTERIUM), ModFluids.DEUTERIUM, ModFluids.FLOWING_DEUTERIUM);
         event.register(gasModel(GasTints.TRITIUM), ModFluids.TRITIUM, ModFluids.FLOWING_TRITIUM);
         event.register(gasModel(GasTints.HELIUM), ModFluids.HELIUM, ModFluids.FLOWING_HELIUM);
@@ -522,6 +525,7 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(0xC2D066, 6.0F), ModFluids.SULFURIC_ACID_TYPE.get());
         event.registerFluidType(liquidFog(0x9CA4AC, 0.75F), ModFluids.MERCURY_TYPE.get());
         event.registerFluidType(liquidFog(GasTints.SULFUR_DIOXIDE & 0xFFFFFF, 6.0F), ModFluids.SULFUR_DIOXIDE_TYPE.get());
+        event.registerFluidType(liquidFog(GasTints.ACETYLENE & 0xFFFFFF, 6.0F), ModFluids.ACETYLENE_TYPE.get());
         event.registerFluidType(liquidFog(EXHAUST_STEAM_TINT & 0xFFFFFF, 6.0F), ModFluids.EXHAUST_STEAM_TYPE.get());
         event.registerFluidType(liquidFog(HYDROGEN_TINT & 0xFFFFFF, 6.0F), ModFluids.HYDROGEN_TYPE.get());
         event.registerFluidType(liquidFog(OXYGEN_TINT & 0xFFFFFF, 6.0F), ModFluids.OXYGEN_TYPE.get());
@@ -546,6 +550,8 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(0xC8DCE4, 10.0F), ModFluids.BRINE_TYPE.get());
         event.registerFluidType(liquidFog(0xB8DCCC, 10.0F), ModFluids.LITHIUM_BRINE_TYPE.get());
         event.registerFluidType(liquidFog(0xE4E6DA, 8.0F), ModFluids.LYE_TYPE.get());
+        event.registerFluidType(liquidFog(0xE6C8C4, 8.0F), ModFluids.POTASH_BRINE_TYPE.get());
+        event.registerFluidType(liquidFog(0xE6E2EA, 8.0F), ModFluids.POTASSIUM_HYDROXIDE_SOLUTION_TYPE.get());
         event.registerFluidType(liquidFog(0xE2DC9A, 7.0F), ModFluids.HYDROCHLORIC_ACID_TYPE.get());
         event.registerFluidType(liquidFog(0xD6D2C2, 4.0F), ModFluids.SODIUM_SILICATE_TYPE.get());
         event.registerFluidType(liquidFog(0xC6CCC8, 9.0F), ModFluids.TRICHLOROSILANE_TYPE.get());

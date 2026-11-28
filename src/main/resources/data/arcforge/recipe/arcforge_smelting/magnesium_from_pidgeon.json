@@ -1,0 +1,23 @@
+{
+  "type": "arcforge:arcforge_smelting",
+  "metal": {
+    "ingredient": "arcforge:magnesia",
+    "count": 2
+  },
+  "additive": {
+    "ingredient": "arcforge:ferrosilicon",
+    "count": 1
+  },
+  "coke": 1,
+  "result": {
+    "id": "arcforge:magnesium_ingot",
+    "count": 2
+  },
+  "byproduct": {
+    "id": "arcforge:slag",
+    "count": 1
+  },
+  "time": 600,
+  "min_temp": 1500,
+  "experience": 0.7
+}

@@ -272,6 +272,20 @@ public final class ModFluids {
             () -> new BaseFlowingFluid.Source(lyeProperties()));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_LYE = FLUIDS.register("flowing_lye",
             () -> new BaseFlowingFluid.Flowing(lyeProperties()));
+    // Stone chemistry (ModMinerals): Potash Brine (Potash dissolved in water, runs like Brine) electrolyses into Chlorine,
+    // Hydrogen and Potassium Hydroxide Solution (caustic potash, burns like Lye), which the Thermal Evaporator Array dries
+    // to Potassium Hydroxide and which serves wherever Lye does (#arcforge:alkalis).
+    public static final DeferredHolder<FluidType, FluidType> POTASH_BRINE_TYPE = liquidType("potash_brine", 1_200, 1_100, 0.02F, 0.8, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> POTASH_BRINE = FLUIDS.register("potash_brine",
+            () -> new BaseFlowingFluid.Source(potashBrineProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_POTASH_BRINE = FLUIDS.register("flowing_potash_brine",
+            () -> new BaseFlowingFluid.Flowing(potashBrineProperties()));
+    public static final DeferredHolder<FluidType, FluidType> POTASSIUM_HYDROXIDE_SOLUTION_TYPE = liquidType("potassium_hydroxide_solution", 1_300, 1_500,
+            0.02F, 0.75, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> POTASSIUM_HYDROXIDE_SOLUTION = FLUIDS.register("potassium_hydroxide_solution",
+            () -> new BaseFlowingFluid.Source(potassiumHydroxideSolutionProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_POTASSIUM_HYDROXIDE_SOLUTION = FLUIDS.register(
+            "flowing_potassium_hydroxide_solution", () -> new BaseFlowingFluid.Flowing(potassiumHydroxideSolutionProperties()));
     public static final DeferredHolder<FluidType, FluidType> HYDROCHLORIC_ACID_TYPE = liquidType("hydrochloric_acid", 1_180, 1_200, 0.02F, 0.8, 0.8);
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HYDROCHLORIC_ACID = FLUIDS.register("hydrochloric_acid",
             () -> new BaseFlowingFluid.Source(hydrochloricAcidProperties()));
@@ -464,6 +478,13 @@ public final class ModFluids {
             () -> new BaseFlowingFluid.Source(mercuryProperties()));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_MERCURY = FLUIDS.register("flowing_mercury",
             () -> new BaseFlowingFluid.Flowing(mercuryProperties()));
+    // Acetylene: from Calcium Carbide and water (ModMinerals). The hottest gas fuel in the Fuel Burner and Firebox Array
+    // (refineryFuels acetyleneHeatPerMb and acetyleneBurnTemperature).
+    public static final DeferredHolder<FluidType, FluidType> ACETYLENE_TYPE = gasType("acetylene", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> ACETYLENE = FLUIDS.register("acetylene",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.ACETYLENE_TYPE, ModFluids.ACETYLENE, ModFluids.FLOWING_ACETYLENE)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_ACETYLENE = FLUIDS.register("flowing_acetylene",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.ACETYLENE_TYPE, ModFluids.ACETYLENE, ModFluids.FLOWING_ACETYLENE)));
     public static final DeferredHolder<FluidType, FluidType> SULFUR_DIOXIDE_TYPE = gasType("sulfur_dioxide", 293);
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> SULFUR_DIOXIDE = FLUIDS.register("sulfur_dioxide",
             () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.SULFUR_DIOXIDE_TYPE, ModFluids.SULFUR_DIOXIDE, ModFluids.FLOWING_SULFUR_DIOXIDE)));
@@ -1003,6 +1024,28 @@ public final class ModFluids {
                 .slopeFindDistance(4)
                 .levelDecreasePerBlock(1)
                 .tickRate(5)
+                .explosionResistance(100.0F);
+    }
+
+    // Runs like Brine.
+    private static BaseFlowingFluid.Properties potashBrineProperties() {
+        return new BaseFlowingFluid.Properties(POTASH_BRINE_TYPE, POTASH_BRINE, FLOWING_POTASH_BRINE)
+                .bucket(ModItems.POTASH_BRINE_BUCKET)
+                .block(ModBlocks.POTASH_BRINE)
+                .slopeFindDistance(4)
+                .levelDecreasePerBlock(1)
+                .tickRate(5)
+                .explosionResistance(100.0F);
+    }
+
+    // Runs like Lye.
+    private static BaseFlowingFluid.Properties potassiumHydroxideSolutionProperties() {
+        return new BaseFlowingFluid.Properties(POTASSIUM_HYDROXIDE_SOLUTION_TYPE, POTASSIUM_HYDROXIDE_SOLUTION, FLOWING_POTASSIUM_HYDROXIDE_SOLUTION)
+                .bucket(ModItems.POTASSIUM_HYDROXIDE_SOLUTION_BUCKET)
+                .block(ModBlocks.POTASSIUM_HYDROXIDE_SOLUTION)
+                .slopeFindDistance(3)
+                .levelDecreasePerBlock(1)
+                .tickRate(10)
                 .explosionResistance(100.0F);
     }
 

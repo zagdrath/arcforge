@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:plaster",
+  "result": {
+    "count": 2,
+    "id": "arcforge:plaster_slab"
+  }
+}

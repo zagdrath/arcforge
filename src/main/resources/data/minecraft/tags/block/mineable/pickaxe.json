@@ -541,6 +541,15 @@
     "arcforge:travertine_pillar_wall",
     "arcforge:chiseled_travertine_stairs",
     "arcforge:chiseled_travertine_slab",
-    "arcforge:chiseled_travertine_wall"
+    "arcforge:chiseled_travertine_wall",
+    "arcforge:magnesium_block",
+    "arcforge:plaster",
+    "arcforge:plaster_stairs",
+    "arcforge:plaster_slab",
+    "arcforge:plaster_wall",
+    "arcforge:magnesia_bricks",
+    "arcforge:magnesia_brick_stairs",
+    "arcforge:magnesia_brick_slab",
+    "arcforge:magnesia_brick_wall"
   ]
 }

@@ -1,0 +1,25 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "#arcforge:serpentine_stones",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:carbon_dioxide",
+      "amount": 500
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:magnesite",
+    "count": 2
+  },
+  "byproduct": {
+    "id": "arcforge:silica_dust",
+    "count": 1
+  },
+  "time": 160,
+  "energy_per_tick": 40,
+  "heat_per_tick": 10,
+  "min_temperature": 150
+}

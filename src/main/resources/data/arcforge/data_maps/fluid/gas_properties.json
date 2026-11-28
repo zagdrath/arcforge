@@ -92,6 +92,9 @@
     },
     "arcforge:fusion_exhaust": {
       "color": "#B6AEC4"
+    },
+    "arcforge:acetylene": {
+      "color": "#F2EEE4"
     }
   }
 }

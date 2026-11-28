@@ -64,6 +64,8 @@
     "arcforge:chiseled_scoria_stairs",
     "arcforge:small_travertine_brick_stairs",
     "arcforge:travertine_pillar_stairs",
-    "arcforge:chiseled_travertine_stairs"
+    "arcforge:chiseled_travertine_stairs",
+    "arcforge:plaster_stairs",
+    "arcforge:magnesia_brick_stairs"
   ]
 }

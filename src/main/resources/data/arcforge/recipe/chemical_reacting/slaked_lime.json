@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "arcforge:quicklime",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "tag": "minecraft:water",
+      "amount": 250
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:slaked_lime",
+    "count": 1
+  },
+  "time": 60,
+  "energy_per_tick": 20
+}

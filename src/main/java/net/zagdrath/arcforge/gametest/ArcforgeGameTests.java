@@ -392,6 +392,12 @@ public final class ArcforgeGameTests {
         TESTS.put("sifter_sifts", MineralsGameTests::sifterSifts);
         TESTS.put("diamond_press_presses", MineralsGameTests::diamondPress);
         TESTS.put("biogas_sulfur", MineralsGameTests::biogasSulfur);
+        TESTS.put("stone_chemistry_solvay", StoneChemistryGameTests::solvay);
+        TESTS.put("stone_chemistry_carbide_acetylene", StoneChemistryGameTests::carbideAcetylene);
+        TESTS.put("stone_chemistry_scrubbing", StoneChemistryGameTests::scrubbing);
+        TESTS.put("stone_chemistry_pidgeon", StoneChemistryGameTests::pidgeon);
+        TESTS.put("stone_chemistry_carbonation", StoneChemistryGameTests::carbonation);
+        TESTS.put("stone_chemistry_kimberlite_sifting", StoneChemistryGameTests::kimberliteSifting);
         TESTS.put("steam_turbine_model_layout", TurbineModelGameTests::layoutSizes);
         TESTS.put("steam_turbine_rotor_turns", TurbineModelGameTests::rotorTurns);
         TESTS.put("moving_parts_pumpjack", MovingPartsGameTests::pumpjackParts);

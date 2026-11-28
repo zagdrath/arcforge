@@ -792,6 +792,12 @@ public final class ModBlocks {
     public static final DeferredBlock<LiquidBlock> LITHIUM_BRINE = BLOCKS.registerBlock("lithium_brine",
             p -> new LiquidBlock(ModFluids.LITHIUM_BRINE.get(), p) {},
             p -> liquidProperties(p, MapColor.COLOR_LIGHT_GREEN));
+    public static final DeferredBlock<LiquidBlock> POTASH_BRINE = BLOCKS.registerBlock("potash_brine",
+            p -> new LiquidBlock(ModFluids.POTASH_BRINE.get(), p) {},
+            p -> liquidProperties(p, MapColor.COLOR_PINK));
+    public static final DeferredBlock<LiquidBlock> POTASSIUM_HYDROXIDE_SOLUTION = BLOCKS.registerBlock("potassium_hydroxide_solution",
+            p -> new SulfuricAcidBlock(ModFluids.POTASSIUM_HYDROXIDE_SOLUTION.get(), ModDamageTypes.LYE, p),
+            p -> liquidProperties(p, MapColor.SNOW));
     public static final DeferredBlock<LiquidBlock> LYE = BLOCKS.registerBlock("lye",
             p -> new SulfuricAcidBlock(ModFluids.LYE.get(), ModDamageTypes.LYE, p),
             p -> liquidProperties(p, MapColor.SNOW));

@@ -1,7 +1,7 @@
 {
   "type": "arcforge:chemical_reacting",
   "item_input": {
-    "ingredient": "#arcforge:calcium_carbonate_stones",
+    "ingredient": "#arcforge:lime_stones",
     "count": 1
   },
   "item_output": {

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "arcforge:travertine",
+    "arcforge:sandpaper"
+  ],
+  "result": {
+    "id": "arcforge:polished_travertine",
+    "count": 1
+  }
+}

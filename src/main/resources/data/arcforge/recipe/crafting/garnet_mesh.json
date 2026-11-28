@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GRG",
+    "R R",
+    "GRG"
+  ],
+  "key": {
+    "G": "#c:gems/garnet",
+    "R": "#c:rods/invar"
+  },
+  "result": {
+    "id": "arcforge:garnet_mesh",
+    "count": 1
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "MBM",
+    "B B",
+    "MBM"
+  ],
+  "key": {
+    "M": "arcforge:magnesia",
+    "B": "minecraft:brick"
+  },
+  "result": {
+    "id": "arcforge:magnesia_bricks",
+    "count": 8
+  }
+}

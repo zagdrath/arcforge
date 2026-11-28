@@ -40,6 +40,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.SIFTER.get());
                 output.accept(ModItems.STEEL_MESH.get());
                 output.accept(ModItems.INVAR_MESH.get());
+                output.accept(ModItems.GARNET_MESH.get());
                 output.accept(ModItems.TUNGSTEN_MESH.get());
                 output.accept(ModItems.SILICON_CARBIDE_MESH.get());
                 output.accept(ModItems.ARC_CRUSHING_ARRAY_CASING.get());
@@ -168,6 +169,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.RAW_ROCK_SALT_BLOCK.get());
                 output.accept(ModItems.SALT.get());
                 output.accept(ModItems.QUICKLIME.get());
+                ModMinerals.items().forEach(item -> output.accept(item.get()));
                 output.accept(ModItems.SALT_BLOCK.get());
                 output.accept(ModItems.SPODUMENE_ORE.get());
                 output.accept(ModItems.DEEPSLATE_SPODUMENE_ORE.get());
@@ -229,6 +231,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.ASPHALT_STAIRS.get());
                 output.accept(ModItems.ASPHALT_SLAB.get());
                 ModStones.items().forEach(item -> output.accept(item.get()));
+                ModMinerals.blocks().forEach(item -> output.accept(item.get()));
             }).build());
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> FLUIDS = CREATIVE_MODE_TABS.register("fluids", () -> CreativeModeTab.builder()

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "arcforge:block/stone/plaster",
+    "side": "arcforge:block/stone/plaster",
+    "top": "arcforge:block/stone/plaster"
+  }
+}

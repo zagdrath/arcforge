@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "#c:nuggets/magnesium"
+  },
+  "result": {
+    "id": "arcforge:magnesium_ingot",
+    "count": 1
+  }
+}

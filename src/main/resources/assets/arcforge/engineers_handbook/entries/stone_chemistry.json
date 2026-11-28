@@ -1,0 +1,68 @@
+{
+  "title": "Stone Chemistry",
+  "icon": "arcforge:soda_ash",
+  "items": [
+    "arcforge:soda_ash",
+    "arcforge:calcium_chloride",
+    "arcforge:calcium_carbide",
+    "arcforge:slaked_lime",
+    "arcforge:gypsum",
+    "arcforge:magnesia",
+    "arcforge:magnesium_dust",
+    "arcforge:magnesium_ingot",
+    "arcforge:magnesium_nugget",
+    "arcforge:potassium_hydroxide",
+    "arcforge:magnesite",
+    "arcforge:garnet",
+    "arcforge:sandpaper",
+    "arcforge:olivine",
+    "arcforge:foundry_sand",
+    "arcforge:mica",
+    "arcforge:chromite",
+    "arcforge:volcanic_ash",
+    "arcforge:agricultural_lime",
+    "arcforge:magnesium_block",
+    "arcforge:plaster",
+    "arcforge:magnesia_bricks",
+    "arcforge:potash_brine_bucket",
+    "arcforge:potassium_hydroxide_solution_bucket"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The natural stones are a chemistry set: lime, soda, magnesium and the minerals sifted out of the cobbles, all with machines you already have. Every page here is one chain. Where a recipe needs heat, it's the Chemical Reactor with a heat source on its Heat Input, as for calcining."
+    },
+    {
+      "type": "text",
+      "text": "# Soda Ash (Solvay)\n- 1 Limestone, Travertine or Dolomite + 1,000 mB Brine + 100 mB Ammonia, at 200 \u00b0C and 10 HU/t: 2 Soda Ash and 1 Calcium Chloride.\n- Arcforge Furnace: 4 sand + 1 Soda Ash, no coke: 6 Glass.\n- 1 Soda Ash + 500 mB Water: 500 mB Lye, without the Electrolyzer.\n- Calcium Chloride is a desiccant, kept for drying."
+    },
+    {
+      "type": "text",
+      "text": "# Carbide and Acetylene\n- Arcforge Furnace at 1,550 \u00b0C (its hottest): 2 Quicklime + 2 Coal Coke make 1 Calcium Carbide over 40 s. It eats power.\n- 1 Calcium Carbide + 500 mB Water: 500 mB Acetylene and 1 Slaked Lime.\n- Acetylene is a gas and the hottest fuel: 70 HU/mB at 1,450 \u00b0C, 1 mB/t, in the Fuel Burner and Firebox Array, and with Oxygen in oxy-fuel."
+    },
+    {
+      "type": "text",
+      "text": "# Lime and Gypsum\n- 1 Quicklime + 250 mB Water: 1 Slaked Lime.\n- 1 Slaked Lime + 250 mB Sulfur Dioxide: 1 Gypsum, scrubbing the gas.\n- Gypsum is a fertilizer (3 nutrients).\n- 4 Gypsum + a Water Bucket: 4 Plaster, with stairs, slabs and walls."
+    },
+    {
+      "type": "text",
+      "text": "# Magnesium\n- Dolomite now calcines on its own: 2 Magnesia + 1 Quicklime + 250 mB Carbon Dioxide (900 \u00b0C).\n- Pidgeon process, Arcforge Furnace at 1,500 \u00b0C: 2 Magnesia + 1 Ferrosilicon + 1 Coal Coke: 2 Magnesium Ingots and Slag.\n- Magnesium stands in for the steel plate in a Tempered Jetpack and the steel gear in Tempered Arc Tools.\n- 4 Magnesia + 4 Bricks: 8 Magnesia Bricks."
+    },
+    {
+      "type": "text",
+      "text": "# Caustic Potash\n- 1 Potash + 250 mB Water: 250 mB Potash Brine.\n- The Electrolyzer splits 100 mB of it into 50 mB Hydrogen, 50 mB Chlorine and 100 mB Potassium Hydroxide Solution (60,000 FE).\n- The Thermal Evaporator Array dries 250 mB into 1 Potassium Hydroxide.\n- The solution serves wherever Lye does."
+    },
+    {
+      "type": "text",
+      "text": "# Carbonation\n- Serpentine (natural or cobbled) + 500 mB Carbon Dioxide at 150 \u00b0C: 2 Magnesite and 1 Silica Dust.\n- 1 Olivine + 500 mB Carbon Dioxide: 2 Magnesite.\n- The CO2 stays locked in the Magnesite. Calcined at 700 \u00b0C it comes back out, with 1 Magnesia."
+    },
+    {
+      "type": "text",
+      "text": "# Sifted minerals\n- Cobbled Kimberlite: Diamond 3%, Flint 15%, Iron Dust 8%, Nickel Dust 6%, Garnet 20%, Olivine 25%.\n- Cobbled Slate: Mica 30%, Silica Dust 20%.\n- Cobbled Serpentine: Chromite 12%, Nickel Dust 5%.\n- Paper + 2 Garnet: 4 Sandpaper. 4 Garnet and 4 Invar Rods: a Garnet Mesh. A stone + Sandpaper: its Polished form.\n- 4 Olivine + 1 Clay: 4 Foundry Sand, for dies with less steel.\n- Mica can replace the bottom plate of a Tungsten Heating Coil."
+    },
+    {
+      "type": "text",
+      "text": "# Ash and lime for the fields\n- Scoria now crushes into 2 Volcanic Ash (still 12% Iron Dust): a fertilizer (1).\n- Volcanic Ash + Slaked Lime + 3 sand + 3 gravel: 8 Light Gray Concrete Powder (Pozzolan).\n- Limestone or Travertine crushed: 2 Agricultural Lime, which sweetens the soil (3)."
+    }
+  ]
+}

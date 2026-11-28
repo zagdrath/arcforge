@@ -15,6 +15,7 @@
     "#c:ingots/zirconium",
     "#c:ingots/zircaloy",
     "#c:ingots/lead_bismuth",
-    "#c:ingots/ferrosilicon"
+    "#c:ingots/ferrosilicon",
+    "#c:ingots/magnesium"
   ]
 }

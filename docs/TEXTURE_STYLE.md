@@ -1205,7 +1205,9 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 - **Sifter Meshes** (items, `#0C0D0F` outline): a 2 px square frame (lit top/left, dark bottom/right, lit corner rivets)
   round a wire grid every 3 px (x/y 5, 8, 11) with lit crossings and open (transparent) gaps, in the metal's ramp:
   Steel the Steel Rod's `#212427 → #A8AFB6`, Invar the Invar Ingot's `#343731 → #BCC2B4`, Tungsten metal
-  `#1C1F24 → #B4BBC2`.
+  `#1C1F24 → #B4BBC2`. Garnet is the same drawing on a muted pyrope, `#120A0C` outline and `#241016 #5A1E2A #7A2838
+  #9C3A4A #C86A78` (the Garnet item's full ramp is too loud beside the other meshes; this keeps it in their family and
+  still reads red).
 - **Deepslate Gravel** (natural, vanilla texture language): wrap-around pebbles (a seeded Voronoi of 18 stones), each a
   flat tone of the deepslate ramp `#1C1C22 #29292F #35353C #42424A #505058 #5E5E67 #6E6E78` with a lit top/left rim two
   steps up and a bottom/right rim a step down, and dark `#1C1C22` gaps between stones. It tiles seamlessly.
@@ -2217,3 +2219,43 @@ Slate, Serpentine, Sylvinite, Kimberlite, Pumice, Scoria, Travertine), the same 
   Travertine muted tan `#594A35 #746348 #8F7B5C #A79472 #BCAA8A #CEBEA2 #DFD3BB`.
 - **Quicklime** (item): Cody's dust (as Salt) on a warm chalky white `#7A7466 #AEA796 #CFC9B8 #E6E1D2 #F4F1E6 #FCFAF2`,
   warmer and duller than Salt.
+
+## Stone chemistry
+
+The minerals and products made from the natural stones (`tools/stone_minerals_texture_gen.py`, plus
+`tools/stone_texture_gen.py` for the two blocks and `tools/fluid_texture_gen.py` for the two liquids), all in the natural
+materials' vanilla language.
+
+- **Dusts:** the Iron Dust heap (Cody's dust, its shadow side already softened) with each tone placed by its brightness
+  along the dust's own 6-anchor ramp, so every heap keeps the softened shadow; the generator lists them in
+  `tools/dust_shading_done.txt` so they're never lifted twice. Each is chosen to read apart from Salt (cool white), Quicklime
+  (warm chalk), Silica Dust (warm grey-white) and Wood Ash (warm dark grey):
+  - Soda Ash `#C4C7CA → #FFFFFF`: pure white, faintly cool, flatter and brighter than Salt.
+  - Calcium Chloride `#8696A8 → #F2F6FB`: off-white with a clear blue cast.
+  - Slaked Lime `#B3AEA3 → #F6F5F1`: white, lower in contrast than Quicklime.
+  - Gypsum `#A08E86 → #F8F3EF`: warm pearl, faintly pink.
+  - Magnesia `#A6A7A7 → #F7F7F4`: chalk white with a hint of grey.
+  - Magnesium Dust `#646A73 → #E0E3E7`: light silver-grey, a touch blue.
+  - Potassium Hydroxide `#9A8EB2 → #F9F7FD`: white with a lilac tint, more saturated than Potash.
+  - Magnesite `#A69A72 → #FAF6E6`: pale cream, yellower than Quicklime.
+  - Chromite `#17110F → #A2948A`: near-black brown, its top tone a metallic sheen.
+  - Volcanic Ash `#4A4D52 → #AAADB1`: mid grey, cooler than Wood Ash.
+  - Agricultural Lime `#5E605A → #D9DBD4`: grey-white with five coarse grains (a darkest grain over a lit pixel).
+  - Foundry Sand `#4C482C → #B8B48A`: olive-tan.
+- **Magnesium:** the Silver Ingot and banded Silver Block, by rank onto `#4A4F55 #62686F #6E747B #7C828A #9CA2A9 #BEC3C9
+  #E2E6EA #FFFFFF` (lighter than silver, none of its blue); the block's face sits in the top five.
+- **Cody's picks** (`tools/stone_minerals_refs/`, sampled from his screenshots back onto their 16 px grid and cut from the
+  background): each is put back on flat brightness levels (1-D k-means) and recoloured by rank.
+  - Magnesium Nugget: his purple nugget, 6 levels onto the magnesium tones above.
+  - Calcium Carbide: his grey wedge lump, 7 levels onto a dark grey-blue `#15181E → #737F8D`.
+  - Mica: his green sheet, 6 levels onto pale bronze `#5A4426 → #F0DDB2`.
+  - Olivine: his red twin gem (two rounded lumps on a diagonal), its 6 tones onto the darker six of bottle green
+    `#0F2A12 #163B1A #1E4D22 #2A6430 #3B7D3E #5E9C55` (the palest, `#B8D9A0`, washed the broad faces out).
+  - Garnet: his white twin crystal, 7 levels onto pyrope `#2A0610 #47091C #6A0F27 #8E1A33 #B32A43 #D2566A #F6C4CC`.
+- **Sandpaper:** drawn: a sheet with a garnet-red grit face (an ordered grain of three reds), its top-right corner turned
+  over to show the paper back, outlined.
+- **Plaster** and **Magnesia Bricks** (`block/stone/`): Cody's picks, sampled from his screenshots onto their 16 px grid
+  (`tools/stone_refs/pick_plaster.png`, `pick_bricks.png`) and recoloured as the stones are: Plaster his soft pink tile on
+  warm pearl `#8E877C → #F8F6F1`; Magnesia Bricks his blue-green bricks on chalky grey-white `#6A6660 → #EAE8E2`.
+- **Fluids:** Potash Brine *thin*, rosy `#8A6A70 → #EAD8D8`; Potassium Hydroxide Solution *milky*, Lye with a lilac
+  cast `#807C88 → #EAE8EE`. Acetylene is a gas on the shared texture, tinted `#F2EEE4`.

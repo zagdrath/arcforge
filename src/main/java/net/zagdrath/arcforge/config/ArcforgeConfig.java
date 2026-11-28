@@ -421,6 +421,15 @@ public class ArcforgeConfig {
             .comment("Natural Gas: burn temperature in °C.")
             .defineInRange("naturalGasBurnTemperature", 1_250, 100, 10_000);
 
+    public static final ModConfigSpec.IntValue ACETYLENE_HU_PER_MB = BUILDER
+            .comment("Acetylene (Calcium Carbide and water in the Chemical Reactor): HU per mB. It burns 1 mB/t in the Fuel Burner",
+                    "and Firebox Array, as a gas: the hottest fuel there is, just above Hydrogen.")
+            .defineInRange("acetyleneHeatPerMb", 70, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue ACETYLENE_BURN_TEMPERATURE = BUILDER
+            .comment("Acetylene: burn temperature in °C.")
+            .defineInRange("acetyleneBurnTemperature", 1_450, 100, 10_000);
+
     public static final ModConfigSpec.DoubleValue SOUR_FUEL_HEAT_SHARE = BUILDER
             .comment("Sour Kerosene and Sour Diesel give this share of their clean fuel's heat per mB in burners (the Gas Turbine",
                     "Array, the Diesel Generator and the Jetpack refuse them).")
@@ -1206,6 +1215,10 @@ public class ArcforgeConfig {
             .comment("Chance multiplier of an Invar Mesh.")
             .defineInRange("invarMeshChance", 1.25, 0.0, 10.0);
 
+    public static final ModConfigSpec.DoubleValue SIFTER_GARNET_CHANCE = BUILDER
+            .comment("Chance multiplier of a Garnet Mesh (Garnet set in Invar Rods).")
+            .defineInRange("garnetMeshChance", 1.5, 0.0, 10.0);
+
     public static final ModConfigSpec.DoubleValue SIFTER_TUNGSTEN_CHANCE = BUILDER
             .comment("Chance multiplier of a Tungsten Mesh.")
             .defineInRange("tungstenMeshChance", 1.5, 0.0, 10.0);
@@ -1222,6 +1235,10 @@ public class ArcforgeConfig {
             .comment("Speed multiplier of an Invar Mesh.")
             .defineInRange("invarMeshSpeed", 1.5, 0.1, 10.0);
 
+    public static final ModConfigSpec.DoubleValue SIFTER_GARNET_SPEED = BUILDER
+            .comment("Speed multiplier of a Garnet Mesh.")
+            .defineInRange("garnetMeshSpeed", 1.75, 0.1, 10.0);
+
     public static final ModConfigSpec.DoubleValue SIFTER_TUNGSTEN_SPEED = BUILDER
             .comment("Speed multiplier of a Tungsten Mesh.")
             .defineInRange("tungstenMeshSpeed", 2.0, 0.1, 10.0);
@@ -1231,8 +1248,8 @@ public class ArcforgeConfig {
             .defineInRange("siliconCarbideMeshSpeed", 2.5, 0.1, 10.0);
 
     public static final ModConfigSpec.DoubleValue SIFTER_MESH_WEAR_CHANCE = BUILDER
-            .comment("Chance each block sifted wears the mesh by one point (Steel lasts 256 points, Invar 512, Tungsten 1,024, Silicon",
-                    "Carbide 2,048).")
+            .comment("Chance each block sifted wears the mesh by one point (Steel lasts 256 points, Invar 512, Garnet 768, Tungsten 1,024,",
+                    "Silicon Carbide 2,048).")
             .defineInRange("meshWearChance", 1.0, 0.0, 1.0);
 
     static {
@@ -2843,6 +2860,18 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue POTASH_NUTRIENTS = BUILDER
             .comment("Nutrients from one Potash.")
             .defineInRange("potash", 3, 0, 15);
+
+    public static final ModConfigSpec.IntValue GYPSUM_NUTRIENTS = BUILDER
+            .comment("Nutrients from one Gypsum (Slaked Lime scrubbed with Sulfur Dioxide).")
+            .defineInRange("gypsum", 3, 0, 15);
+
+    public static final ModConfigSpec.IntValue VOLCANIC_ASH_NUTRIENTS = BUILDER
+            .comment("Nutrients from one Volcanic Ash (crushed Scoria).")
+            .defineInRange("volcanicAsh", 1, 0, 15);
+
+    public static final ModConfigSpec.IntValue AGRICULTURAL_LIME_NUTRIENTS = BUILDER
+            .comment("Nutrients from one Agricultural Lime (crushed Limestone or Travertine).")
+            .defineInRange("agriculturalLime", 3, 0, 15);
 
     public static final ModConfigSpec.IntValue BASIC_SLAG_NUTRIENTS = BUILDER
             .comment("Nutrients from one Basic Slag.")

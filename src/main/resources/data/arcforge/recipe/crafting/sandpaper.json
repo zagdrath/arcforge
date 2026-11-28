@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:paper",
+    "#c:gems/garnet",
+    "#c:gems/garnet"
+  ],
+  "result": {
+    "id": "arcforge:sandpaper",
+    "count": 4
+  }
+}

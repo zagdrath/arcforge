@@ -23,15 +23,21 @@ TITLE = {s: s.capitalize() for s in STONES}
 
 # What each stone is for, shown on the natural and cobbled blocks' info tooltips.
 USES = {
-    "limestone": "A steel flux in the Arcforge Furnace. Calcined in the Chemical Reactor it gives Quicklime and Carbon Dioxide.",
-    "dolomite": "A steel flux, and calcined into Quicklime and Carbon Dioxide like Limestone. Its bricks make Arcforge Furnace Bricks.",
-    "slate": "A dark building stone that splits in thin sheets. Crushed, it gives gravel and sometimes Silica Dust.",
-    "serpentine": "Crushed, it gives gravel and sometimes Nickel Dust. Polished Serpentine casts Concrete Shielding without concrete.",
+    "limestone": "A steel flux in the Arcforge Furnace. Calcined in the Chemical Reactor it gives Quicklime and Carbon Dioxide; "
+                 "with Brine and Ammonia, Soda Ash. Crushed, it gives Agricultural Lime.",
+    "dolomite": "A steel flux. Calcined in the Chemical Reactor it gives Magnesia, Quicklime and Carbon Dioxide. Its bricks make "
+                "Arcforge Furnace Bricks.",
+    "slate": "A dark building stone that splits in thin sheets. Crushed, it gives gravel and sometimes Silica Dust; the Sifter "
+             "finds Mica in Cobbled Slate.",
+    "serpentine": "Crushed, it gives gravel and sometimes Nickel Dust; sifted, Chromite. It locks Carbon Dioxide into Magnesite. "
+                  "Polished Serpentine casts Concrete Shielding without concrete.",
     "sylvinite": "Potash salt rock: crushed, it gives two Potash and often Salt.",
-    "kimberlite": "The rock diamonds come up in. The Sifter finds the odd Diamond in Cobbled Kimberlite; crushed, it gives gravel and now and then one.",
+    "kimberlite": "The rock diamonds come up in. The Sifter finds the odd Diamond, and Garnet and Olivine, in Cobbled Kimberlite; "
+                  "crushed, it gives gravel and now and then a Diamond.",
     "pumice": "A light volcanic glass full of holes. The Fiberizer spins it into Rock Wool; crushed, it gives sand and Silica Dust.",
-    "scoria": "The Nether's cinder rock. The Fiberizer spins it into Rock Wool; crushed, it gives gravel and sometimes Iron Dust.",
-    "travertine": "A spring limestone: a steel flux, and calcined into Quicklime and Carbon Dioxide like Limestone.",
+    "scoria": "The Nether's cinder rock. The Fiberizer spins it into Rock Wool; crushed, it gives Volcanic Ash and sometimes Iron Dust.",
+    "travertine": "A spring limestone: a steel flux, calcined into Quicklime and Carbon Dioxide, and crushed into Agricultural "
+                  "Lime, like Limestone.",
 }
 
 # Worldgen per stone: kind (blob/layer/pipe), biome tag, step dimensions, the JSON fallbacks, rarity and targets.
@@ -55,6 +61,8 @@ WORLD = {
 }
 
 CALCIUM_CARBONATE = ["limestone", "travertine", "dolomite"]
+# The ones that calcine to Quicklime alone: Dolomite gives Magnesia too (tools/stone_minerals_data_gen.py).
+LIME_STONES = ["limestone", "travertine"]
 
 
 def write(path, obj):
@@ -263,6 +271,10 @@ def tags():
     for s in CALCIUM_CARBONATE:
         carbonates += [f"#c:stones/{s}", f"#c:cobblestones/{s}"]
     write(f"{DATA}/{NS}/tags/item/calcium_carbonate_stones.json", {"values": carbonates})
+    lime = []
+    for s in LIME_STONES:
+        lime += [f"#c:stones/{s}", f"#c:cobblestones/{s}"]
+    write(f"{DATA}/{NS}/tags/item/lime_stones.json", {"values": lime})
     merge_tag(f"{DATA}/{NS}/tags/item/steel_fluxes.json", ["#arcforge:calcium_carbonate_stones", ident("quicklime")])
 
 
@@ -280,8 +292,9 @@ def lang():
         new_tips[f"tooltip.{NS}.info.{s}"] = USES[s]
         new_tips[f"tooltip.{NS}.info.cobbled_{s}"] = USES[s]
     item = OrderedDict([(f"item.{NS}.quicklime", "Quicklime")])
-    new_tips[f"tooltip.{NS}.info.quicklime"] = ("Burnt lime: Limestone, Travertine or Dolomite calcined in the Chemical Reactor. "
-                                               "A steel flux, and with sand and gravel it makes Concrete Powder.")
+    new_tips[f"tooltip.{NS}.info.quicklime"] = ("Burnt lime: Limestone or Travertine calcined in the Chemical Reactor (Dolomite "
+                                               "gives one, with its Magnesia). A steel flux; with sand and gravel it makes "
+                                               "Concrete Powder, with water Slaked Lime, and with Coal Coke Calcium Carbide.")
 
     def insert_after(anchor, entries):
         out = OrderedDict()
@@ -372,10 +385,10 @@ def crushing(name, stone, result, count, bonus=None, chance=None):
 
 def uses():
     R = f"{DATA}/{NS}/recipe"
-    # Calcining: CaCO3 -> CaO + CO2, heated in the Chemical Reactor.
+    # Calcining: CaCO3 -> CaO + CO2, heated in the Chemical Reactor. Limestone and Travertine; Dolomite has its own.
     write(f"{R}/chemical_reacting/quicklime_from_calcining.json", OrderedDict([
         ("type", f"{NS}:chemical_reacting"),
-        ("item_input", {"ingredient": "#arcforge:calcium_carbonate_stones", "count": 1}),
+        ("item_input", {"ingredient": "#arcforge:lime_stones", "count": 1}),
         ("item_output", {"id": ident("quicklime"), "count": 2}),
         ("fluid_output", {"id": ident("carbon_dioxide"), "amount": 250}),
         ("time", 120), ("energy_per_tick", 40), ("heat_per_tick", 20), ("min_temperature", 900)]))
@@ -399,13 +412,19 @@ def uses():
     crushing("potash_from_sylvinite", "sylvinite", ident("potash"), 2, ident("salt"), 0.5)
     crushing("gravel_from_kimberlite", "kimberlite", "minecraft:gravel", 1, "minecraft:diamond", 0.02)
     crushing("sand_from_pumice", "pumice", "minecraft:sand", 1, ident("silica_dust"), 0.3)
-    crushing("gravel_from_scoria", "scoria", "minecraft:gravel", 1, ident("iron_dust"), 0.12)
+    # Scoria crushes to Volcanic Ash (was gravel), keeping its Iron Dust.
+    old = f"{DATA}/{NS}/recipe/crushing/gravel_from_scoria.json"
+    if os.path.exists(old):
+        os.remove(old)
+    crushing("volcanic_ash_from_scoria", "scoria", ident("volcanic_ash"), 2, ident("iron_dust"), 0.12)
     # Sifting Cobbled Kimberlite.
     write(f"{R}/sifting/cobbled_kimberlite.json", {"type": f"{NS}:sifting", "ingredient": ident("cobbled_kimberlite"), "outputs": [
         {"item": {"id": "minecraft:diamond"}, "chance": 0.03},
         {"item": {"id": "minecraft:flint"}, "chance": 0.15},
         {"item": {"id": ident("iron_dust")}, "chance": 0.08},
-        {"item": {"id": ident("nickel_dust")}, "chance": 0.06}]})
+        {"item": {"id": ident("nickel_dust")}, "chance": 0.06},
+        {"item": {"id": ident("garnet")}, "chance": 0.20},
+        {"item": {"id": ident("olivine")}, "chance": 0.25}]})
     # Rock Wool from the volcanic stones.
     write(f"{R}/fiberizing/rock_wool_from_volcanic_stone.json", OrderedDict([
         ("type", f"{NS}:fiberizing"),
@@ -465,11 +484,13 @@ def handbook():
                                  "world. Pumice: high in mountains. Scoria: through the Nether. Travertine: layers near the "
                                  "surface in hot, dry biomes."},
         {"type": "text", "text": "# Lime\nLimestone, Travertine and Dolomite flux steel in the Arcforge Furnace. Calcined in a "
-                                 "heated Chemical Reactor (900 °C) each gives two Quicklime and 250 mB of Carbon Dioxide for "
-                                 "your Greenhouse or Hydroponic Cells. Quicklime fluxes steel too, and with four sand and four "
+                                 "heated Chemical Reactor (900 °C) Limestone and Travertine give two Quicklime and 250 mB of "
+                                 "Carbon Dioxide for your Greenhouse or Hydroponic Cells; Dolomite gives two Magnesia and one "
+                                 "Quicklime (see Stone Chemistry). Quicklime fluxes steel too, and with four sand and four "
                                  "gravel makes eight Light Gray Concrete Powder."},
         {"type": "text", "text": "# The others\nSylvinite crushes into Potash (and Salt). Kimberlite hides diamonds: sift "
-                                 "Cobbled Kimberlite. Pumice and Scoria spin into Rock Wool. Slate, Serpentine, Pumice and "
+                                 "Cobbled Kimberlite, with Garnet and Olivine. Pumice and Scoria spin into Rock Wool; Scoria crushes to "
+                                 "Volcanic Ash. Slate, Serpentine, Pumice and "
                                  "Scoria crush with a chance of Silica, Nickel or Iron Dust. Polished Serpentine casts "
                                  "Concrete Shielding, and Dolomite Bricks make Arcforge Furnace Bricks."},
     ])

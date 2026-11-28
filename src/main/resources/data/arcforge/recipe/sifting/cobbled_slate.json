@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:sifting",
+  "ingredient": "arcforge:cobbled_slate",
+  "outputs": [
+    {
+      "item": {
+        "id": "arcforge:mica"
+      },
+      "chance": 0.3
+    },
+    {
+      "item": {
+        "id": "arcforge:silica_dust"
+      },
+      "chance": 0.2
+    }
+  ]
+}

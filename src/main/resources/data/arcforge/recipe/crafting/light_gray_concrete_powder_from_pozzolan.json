@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "#c:dusts/volcanic_ash",
+    "#c:dusts/slaked_lime",
+    "#minecraft:sand",
+    "#minecraft:sand",
+    "#minecraft:sand",
+    "#c:gravels",
+    "#c:gravels",
+    "#c:gravels"
+  ],
+  "result": {
+    "id": "minecraft:light_gray_concrete_powder",
+    "count": 8
+  }
+}

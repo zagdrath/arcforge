@@ -100,6 +100,7 @@ public final class GasApiGameTests {
         gases.put(ModFluids.CONTAMINATED_STEAM.get(), GasTints.CONTAMINATED_STEAM);
         gases.put(ModFluids.NITROGEN_DIOXIDE.get(), GasTints.NITROGEN_DIOXIDE);
         gases.put(ModFluids.SULFUR_DIOXIDE.get(), GasTints.SULFUR_DIOXIDE);
+        gases.put(ModFluids.ACETYLENE.get(), GasTints.ACETYLENE);
         gases.put(ModFluids.DEUTERIUM.get(), GasTints.DEUTERIUM);
         gases.put(ModFluids.TRITIUM.get(), GasTints.TRITIUM);
         gases.put(ModFluids.HELIUM.get(), GasTints.HELIUM);

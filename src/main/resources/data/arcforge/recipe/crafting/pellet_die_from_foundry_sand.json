@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "FSF",
+    "FXF",
+    "BBB"
+  ],
+  "key": {
+    "S": "#c:ingots/steel",
+    "X": "#c:gears/steel",
+    "B": "#c:storage_blocks/steel",
+    "F": "arcforge:foundry_sand"
+  },
+  "result": {
+    "id": "arcforge:pellet_die",
+    "count": 1
+  }
+}

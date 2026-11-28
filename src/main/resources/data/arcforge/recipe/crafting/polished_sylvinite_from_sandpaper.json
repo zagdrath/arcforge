@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "arcforge:sylvinite",
+    "arcforge:sandpaper"
+  ],
+  "result": {
+    "id": "arcforge:polished_sylvinite",
+    "count": 1
+  }
+}

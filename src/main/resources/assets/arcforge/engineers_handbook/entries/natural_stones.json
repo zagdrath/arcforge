@@ -24,11 +24,11 @@
     },
     {
       "type": "text",
-      "text": "# Lime\nLimestone, Travertine and Dolomite flux steel in the Arcforge Furnace. Calcined in a heated Chemical Reactor (900 \u00b0C) each gives two Quicklime and 250 mB of Carbon Dioxide for your Greenhouse or Hydroponic Cells. Quicklime fluxes steel too, and with four sand and four gravel makes eight Light Gray Concrete Powder."
+      "text": "# Lime\nLimestone, Travertine and Dolomite flux steel in the Arcforge Furnace. Calcined in a heated Chemical Reactor (900 \u00b0C) Limestone and Travertine give two Quicklime and 250 mB of Carbon Dioxide for your Greenhouse or Hydroponic Cells; Dolomite gives two Magnesia and one Quicklime (see Stone Chemistry). Quicklime fluxes steel too, and with four sand and four gravel makes eight Light Gray Concrete Powder."
     },
     {
       "type": "text",
-      "text": "# The others\nSylvinite crushes into Potash (and Salt). Kimberlite hides diamonds: sift Cobbled Kimberlite. Pumice and Scoria spin into Rock Wool. Slate, Serpentine, Pumice and Scoria crush with a chance of Silica, Nickel or Iron Dust. Polished Serpentine casts Concrete Shielding, and Dolomite Bricks make Arcforge Furnace Bricks."
+      "text": "# The others\nSylvinite crushes into Potash (and Salt). Kimberlite hides diamonds: sift Cobbled Kimberlite, with Garnet and Olivine. Pumice and Scoria spin into Rock Wool; Scoria crushes to Volcanic Ash. Slate, Serpentine, Pumice and Scoria crush with a chance of Silica, Nickel or Iron Dust. Polished Serpentine casts Concrete Shielding, and Dolomite Bricks make Arcforge Furnace Bricks."
     }
   ]
 }

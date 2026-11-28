@@ -61,6 +61,9 @@ public record BurnerFuel(int huPerMb, float mbPerTick, Optional<Integer> burnTem
         } else if (fluid == ModFluids.REFINERY_GAS.get()) {
             heat = ArcforgeConfig.REFINERY_GAS_HU_PER_MB;
             temperature = ArcforgeConfig.REFINERY_GAS_BURN_TEMPERATURE;
+        } else if (fluid == ModFluids.ACETYLENE.get()) {
+            heat = ArcforgeConfig.ACETYLENE_HU_PER_MB;
+            temperature = ArcforgeConfig.ACETYLENE_BURN_TEMPERATURE;
         } else if (fluid == ModFluids.NATURAL_GAS.get() || fluid == ModFluids.HELIUM_RICH_NATURAL_GAS.get()) {
             heat = ArcforgeConfig.NATURAL_GAS_HU_PER_MB;
             temperature = ArcforgeConfig.NATURAL_GAS_BURN_TEMPERATURE;

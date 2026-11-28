@@ -63,6 +63,8 @@
     "arcforge:polished_travertine_wall",
     "arcforge:small_travertine_brick_wall",
     "arcforge:travertine_pillar_wall",
-    "arcforge:chiseled_travertine_wall"
+    "arcforge:chiseled_travertine_wall",
+    "arcforge:plaster_wall",
+    "arcforge:magnesia_brick_wall"
   ]
 }

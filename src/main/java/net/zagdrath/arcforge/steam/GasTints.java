@@ -44,6 +44,8 @@ public final class GasTints {
     public static final int NITROGEN_DIOXIDE = 0xFFC8743C;
     // Sulfur Dioxide: colourless in fact, so a clear pale yellow, paler and warmer than Fluorine.
     public static final int SULFUR_DIOXIDE = 0xFFF2ECB8;
+    // Acetylene: colourless in fact, so a faint warm white.
+    public static final int ACETYLENE = 0xFFF2EEE4;
     // The fusion gases, all colourless in fact: Deuterium a pale blue, Tritium a pale green, Helium-3 a pale gold,
     // Helium near-white, Argon a faint lavender (paler and greyer than Nitrogen's lilac), Helium-Rich Natural Gas Natural
     // Gas's pale blue gone grey, Fusion Exhaust a dull grey-violet.

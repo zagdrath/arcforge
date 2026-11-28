@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "#arcforge:travertine_stones",
+  "result": {
+    "count": 2,
+    "id": "arcforge:agricultural_lime"
+  },
+  "time": 200,
+  "ore": false
+}

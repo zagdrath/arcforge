@@ -33,6 +33,7 @@ import net.zagdrath.arcforge.registry.ModChunkLoading;
 import net.zagdrath.arcforge.registry.ModDataMaps;
 import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModItems;
+import net.zagdrath.arcforge.registry.ModMinerals;
 import net.zagdrath.arcforge.registry.ModStones;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.registry.ModRecipes;
@@ -48,6 +49,7 @@ public class Arcforge {
     public Arcforge(IEventBus modEventBus, ModContainer modContainer) {
         ModFluids.register(modEventBus);
         ModStones.bootstrap();
+        ModMinerals.bootstrap();
         ModBlocks.register(modEventBus);
         ModItems.register(modEventBus);
         ModRecipes.register(modEventBus);

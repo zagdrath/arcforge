@@ -8,6 +8,7 @@
     "arcforge:chlorine",
     "arcforge:ethylene",
     "arcforge:syngas",
-    "arcforge:refinery_gas"
+    "arcforge:refinery_gas",
+    "arcforge:acetylene"
   ]
 }

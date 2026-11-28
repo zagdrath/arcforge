@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:evaporating",
+  "input": {
+    "tag": "c:potassium_hydroxide_solution",
+    "amount": 250
+  },
+  "item_result": {
+    "id": "arcforge:potassium_hydroxide"
+  },
+  "water": 200,
+  "heat": 1800
+}
