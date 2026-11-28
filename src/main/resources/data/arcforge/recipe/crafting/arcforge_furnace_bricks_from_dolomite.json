@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "B": "minecraft:bricks",
+    "D": "arcforge:dolomite_bricks"
+  },
+  "pattern": [
+    "BD",
+    "DB"
+  ],
+  "result": {
+    "count": 4,
+    "id": "arcforge:arcforge_furnace_bricks"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:dolomite",
+  "result": {
+    "count": 1,
+    "id": "arcforge:dolomite_pillar_stairs"
+  }
+}

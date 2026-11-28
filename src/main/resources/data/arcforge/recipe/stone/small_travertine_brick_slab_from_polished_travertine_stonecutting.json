@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:polished_travertine",
+  "result": {
+    "count": 2,
+    "id": "arcforge:small_travertine_brick_slab"
+  }
+}

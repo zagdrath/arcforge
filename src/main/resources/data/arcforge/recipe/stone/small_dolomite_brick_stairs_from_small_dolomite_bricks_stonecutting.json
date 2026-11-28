@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:small_dolomite_bricks",
+  "result": {
+    "count": 1,
+    "id": "arcforge:small_dolomite_brick_stairs"
+  }
+}

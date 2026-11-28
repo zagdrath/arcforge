@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "arcforge:block/chiseled_sylvinite_slab"
+    },
+    "type=double": {
+      "model": "arcforge:block/chiseled_sylvinite"
+    },
+    "type=top": {
+      "model": "arcforge:block/chiseled_sylvinite_slab_top"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "arcforge:block/kimberlite_slab"
+    },
+    "type=double": {
+      "model": "arcforge:block/kimberlite"
+    },
+    "type=top": {
+      "model": "arcforge:block/kimberlite_slab_top"
+    }
+  }
+}

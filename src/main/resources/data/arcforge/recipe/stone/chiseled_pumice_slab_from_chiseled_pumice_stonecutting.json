@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:chiseled_pumice",
+  "result": {
+    "count": 2,
+    "id": "arcforge:chiseled_pumice_slab"
+  }
+}

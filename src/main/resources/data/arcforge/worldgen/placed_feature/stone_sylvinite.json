@@ -1,0 +1,27 @@
+{
+  "feature": "arcforge:stone_sylvinite",
+  "placement": [
+    {
+      "type": "minecraft:rarity_filter",
+      "chance": 10
+    },
+    {
+      "type": "arcforge:config_count",
+      "ore": "sylvinite",
+      "default": 1
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "sylvinite",
+      "shape": "uniform",
+      "default_min": -48,
+      "default_max": 0
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

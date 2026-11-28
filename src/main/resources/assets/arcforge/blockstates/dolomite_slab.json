@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "arcforge:block/dolomite_slab"
+    },
+    "type=double": {
+      "model": "arcforge:block/dolomite"
+    },
+    "type=top": {
+      "model": "arcforge:block/dolomite_slab_top"
+    }
+  }
+}

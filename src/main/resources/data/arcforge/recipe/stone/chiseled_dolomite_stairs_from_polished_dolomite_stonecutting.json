@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:polished_dolomite",
+  "result": {
+    "count": 1,
+    "id": "arcforge:chiseled_dolomite_stairs"
+  }
+}

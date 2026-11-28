@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:sylvinite_pillar",
+  "result": {
+    "count": 2,
+    "id": "arcforge:sylvinite_pillar_slab"
+  }
+}

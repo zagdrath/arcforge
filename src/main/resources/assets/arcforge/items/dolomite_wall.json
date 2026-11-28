@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "arcforge:block/dolomite_wall_inventory"
+  }
+}

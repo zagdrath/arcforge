@@ -22,8 +22,27 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+Suggested version: **2.11.0** (minor: nine natural stones and Quicklime, and the Battery Curios slot).
+
 ### Added
 
+- **Natural stones**: Limestone, Dolomite, Slate, Serpentine, Sylvinite, Kimberlite, Pumice, Scoria and Travertine
+  generate in the world like granite and diorite. Limestone and Dolomite form blobs, Slate, Sylvinite and Travertine
+  (in hot, dry biomes) form tilted layers, Serpentine sits deep, Kimberlite rises in rare pipes from the bottom of the
+  world, Pumice lies high in mountains and Scoria runs through the Nether. Each can be set in the new `world.stones`
+  config section, like an ore.
+- Every stone comes natural, cobbled, polished, as bricks, small bricks, a pillar and a chiseled block, and each of
+  those as stairs, a slab and a wall (252 blocks, in the Building Blocks tab). Mined rock drops its cobble (Silk Touch
+  keeps the rock), and the cobble smelts back. The rest is crafted or cut in the Stonecutter. Pillars join along
+  their axis, standing or lying, so a stack shows one capital and one base.
+- **Quicklime**: calcine Limestone, Travertine or Dolomite in a heated Chemical Reactor (900 °C) for 2 Quicklime and
+  250 mB of Carbon Dioxide. Quicklime with 4 sand and 4 gravel makes 8 Light Gray Concrete Powder.
+- Uses for the stones: Limestone, Travertine, Dolomite and Quicklime flux steel in the Arcforge Furnace. Dolomite
+  Bricks make Arcforge Furnace Bricks, and Polished Serpentine makes Concrete Shielding. Sylvinite crushes into Potash
+  (and Salt), and sifting Cobbled Kimberlite can give diamonds. Pumice and Scoria fiberize into Rock Wool, and Slate,
+  Serpentine, Pumice and Scoria crush with a chance of Silica, Nickel or Iron Dust. The cobbles make stone tools and
+  furnaces.
+- An Engineer's Handbook entry, Natural Stones, in the Materials chapter.
 - A **Battery** Curios slot: a Battery worn there charges your other FE items like a carried one, and a Chargepad
   charges it.
 
@@ -35,6 +54,12 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 - Arcforge's creative tabs (and its addons') stay side by side: another mod's tab no longer lands between them.
 - Heat Pipes can no longer be seen through their core slots at a shallow angle: the slots now have walls.
+- Glass conduits and other see-through blocks behind a Fluid or Gas Reservoir now show tinted through its contents.
+  Before, they were drawn crisp on top of the contents.
+
+### Upgrading
+
+- The natural stones only generate in chunks generated after the update.
 
 ## [2.10.0] - 2026-11-27
 

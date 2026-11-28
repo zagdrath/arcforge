@@ -1,0 +1,30 @@
+{
+  "type": "arcforge:sifting",
+  "ingredient": "arcforge:cobbled_kimberlite",
+  "outputs": [
+    {
+      "item": {
+        "id": "minecraft:diamond"
+      },
+      "chance": 0.03
+    },
+    {
+      "item": {
+        "id": "minecraft:flint"
+      },
+      "chance": 0.15
+    },
+    {
+      "item": {
+        "id": "arcforge:iron_dust"
+      },
+      "chance": 0.08
+    },
+    {
+      "item": {
+        "id": "arcforge:nickel_dust"
+      },
+      "chance": 0.06
+    }
+  ]
+}

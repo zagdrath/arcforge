@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:polished_sylvinite",
+  "result": {
+    "count": 1,
+    "id": "arcforge:small_sylvinite_brick_stairs"
+  }
+}

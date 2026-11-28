@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "axis=x,down=false,up=false": {
+      "model": "arcforge:block/sylvinite_pillar",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,down=true,up=false": {
+      "model": "arcforge:block/sylvinite_pillar_upper",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,down=false,up=true": {
+      "model": "arcforge:block/sylvinite_pillar_lower",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,down=true,up=true": {
+      "model": "arcforge:block/sylvinite_pillar_middle",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y,down=false,up=false": {
+      "model": "arcforge:block/sylvinite_pillar"
+    },
+    "axis=y,down=true,up=false": {
+      "model": "arcforge:block/sylvinite_pillar_upper"
+    },
+    "axis=y,down=false,up=true": {
+      "model": "arcforge:block/sylvinite_pillar_lower"
+    },
+    "axis=y,down=true,up=true": {
+      "model": "arcforge:block/sylvinite_pillar_middle"
+    },
+    "axis=z,down=false,up=false": {
+      "model": "arcforge:block/sylvinite_pillar",
+      "x": 90
+    },
+    "axis=z,down=true,up=false": {
+      "model": "arcforge:block/sylvinite_pillar_lower",
+      "x": 90
+    },
+    "axis=z,down=false,up=true": {
+      "model": "arcforge:block/sylvinite_pillar_upper",
+      "x": 90
+    },
+    "axis=z,down=true,up=true": {
+      "model": "arcforge:block/sylvinite_pillar_middle",
+      "x": 90
+    }
+  }
+}

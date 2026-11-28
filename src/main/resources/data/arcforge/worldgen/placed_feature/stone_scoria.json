@@ -1,0 +1,23 @@
+{
+  "feature": "arcforge:stone_scoria",
+  "placement": [
+    {
+      "type": "arcforge:config_count",
+      "ore": "scoria",
+      "default": 2
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "scoria",
+      "shape": "uniform",
+      "default_min": 10,
+      "default_max": 117
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

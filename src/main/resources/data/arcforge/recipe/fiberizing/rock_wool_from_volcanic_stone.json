@@ -1,0 +1,17 @@
+{
+  "type": "arcforge:fiberizing",
+  "ingredient": [
+    "arcforge:pumice",
+    "arcforge:cobbled_pumice",
+    "arcforge:scoria",
+    "arcforge:cobbled_scoria"
+  ],
+  "result": {
+    "count": 2,
+    "id": "arcforge:rock_wool"
+  },
+  "time": 160,
+  "fe_per_tick": 30,
+  "hu_per_tick": 20,
+  "min_temp": 800
+}

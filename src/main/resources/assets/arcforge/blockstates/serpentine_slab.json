@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "arcforge:block/serpentine_slab"
+    },
+    "type=double": {
+      "model": "arcforge:block/serpentine"
+    },
+    "type=top": {
+      "model": "arcforge:block/serpentine_slab_top"
+    }
+  }
+}

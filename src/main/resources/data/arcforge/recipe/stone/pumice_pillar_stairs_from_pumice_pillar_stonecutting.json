@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:pumice_pillar",
+  "result": {
+    "count": 1,
+    "id": "arcforge:pumice_pillar_stairs"
+  }
+}

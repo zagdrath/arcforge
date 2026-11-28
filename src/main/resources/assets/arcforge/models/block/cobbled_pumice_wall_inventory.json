@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/wall_inventory",
+  "textures": {
+    "wall": "arcforge:block/stone/cobbled_pumice"
+  }
+}

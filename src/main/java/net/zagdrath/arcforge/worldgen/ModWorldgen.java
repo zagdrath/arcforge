@@ -44,6 +44,12 @@ import net.zagdrath.arcforge.machine.ClimateHelper;
 //   placement arcforge:config_height        "ore", "shape" (uniform or trapezoid), "default_min", "default_max":
 //                                           a height between the config's minY and maxY
 //   condition arcforge:ore_enabled          "ore": whether the config lets that ore generate
+//   feature arcforge:config_layer           a stone layer (Slate, Sylvinite, Travertine), the same fields plus "radius",
+//                                           "layers" and "tilt": veins of the config's veinSize laid over an oval like a
+//                                           bed, but tilted and wavy, so it reads as a sheet of rock rather than a blob
+//   feature arcforge:config_pipe            a vertical pipe of stone (Kimberlite), the same fields plus "height": veins
+//                                           stacked up from the origin, narrow at the root and widening upward, drifting
+//                                           a little sideways as they climb
 //   feature arcforge:oil_cavern             no fields: the oil deposits' caverns and surface seeps in a chunk (see
 //                                           OilCaverns), placed once per chunk, last
 // Each falls back to its JSON values for an ore the config doesn't know (or before the config loads).
@@ -57,6 +63,8 @@ public final class ModWorldgen {
     static {
         FEATURE_TYPES.register("config_ore", () -> ConfigOre.CODEC);
         FEATURE_TYPES.register("config_bed", () -> ConfigBed.CODEC);
+        FEATURE_TYPES.register("config_layer", () -> ConfigLayer.CODEC);
+        FEATURE_TYPES.register("config_pipe", () -> ConfigPipe.CODEC);
         FEATURE_TYPES.register("oil_cavern", () -> OilCavernFeature.CODEC);
         PLACEMENT_TYPES.register("config_count", () -> ConfigCount.CODEC);
         PLACEMENT_TYPES.register("config_height", () -> ConfigHeight.CODEC);
@@ -145,6 +153,95 @@ public final class ModWorldgen {
                         placed |= vein.place(level, generator, random, at);
                     }
                 }
+            }
+            return placed;
+        }
+    }
+
+    // --- A layer of stone ---
+
+    public record ConfigLayer(String ore, List<BlockReplacement> targets, int size, int radius, int layers, float tilt) implements Feature {
+        public static final MapCodec<ConfigLayer> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+                Codec.STRING.fieldOf("ore").forGetter(ConfigLayer::ore),
+                Codec.list(BlockReplacement.CODEC).fieldOf("targets").forGetter(ConfigLayer::targets),
+                Codec.intRange(0, 64).fieldOf("size").forGetter(ConfigLayer::size),
+                // At most 12, so a layer (with its veins' own spread) stays inside the chunks a feature may write to.
+                Codec.intRange(4, 12).optionalFieldOf("radius", 10).forGetter(ConfigLayer::radius),
+                Codec.intRange(1, 6).optionalFieldOf("layers", 2).forGetter(ConfigLayer::layers),
+                Codec.floatRange(0.0F, 0.4F).optionalFieldOf("tilt", 0.15F).forGetter(ConfigLayer::tilt))
+                .apply(i, ConfigLayer::new));
+        private static final int SPACING = 3, LAYER_STEP = 2;
+
+        @Override
+        public MapCodec<ConfigLayer> codec() {
+            return CODEC;
+        }
+
+        // An oval of small veins on a grid (as ConfigBed), its plane tilted up to "tilt" blocks a block each way and
+        // rolling a block or two over its width, and thinning toward its rim (one layer fewer past 70% of the radius).
+        @Override
+        public boolean place(WorldGenLevel level, ChunkGenerator generator, RandomSource random, BlockPos origin) {
+            ArcforgeConfig.OreSettings settings = settings(ore);
+            int veinSize = settings != null ? settings.veinSize().getAsInt() : size;
+            float airDiscard = settings != null ? (float) settings.airExposureDiscard().getAsDouble() : 0.0F;
+            double rx = radius * (0.7 + 0.3 * random.nextDouble());
+            double rz = radius * (0.7 + 0.3 * random.nextDouble());
+            double sx = (random.nextDouble() * 2 - 1) * tilt;
+            double sz = (random.nextDouble() * 2 - 1) * tilt;
+            double phase = random.nextDouble() * Math.PI * 2;
+            OreFeature vein = new OreFeature(targets, veinSize, airDiscard);
+            boolean placed = false;
+            for (int dx = -radius; dx <= radius; dx += SPACING) {
+                for (int dz = -radius; dz <= radius; dz += SPACING) {
+                    double edge = (dx * dx) / (rx * rx) + (dz * dz) / (rz * rz);
+                    if (edge > 1.0) {
+                        continue;
+                    }
+                    int here = edge > 0.49 ? Math.max(1, layers - 1) : layers;
+                    int dy = (int) Math.round(dx * sx + dz * sz + 1.5 * Math.sin(dx * 0.3 + dz * 0.2 + phase));
+                    for (int layer = 0; layer < here; layer++) {
+                        BlockPos at = origin.offset(dx + random.nextInt(3) - 1, dy + layer * LAYER_STEP, dz + random.nextInt(3) - 1);
+                        placed |= vein.place(level, generator, random, at);
+                    }
+                }
+            }
+            return placed;
+        }
+    }
+
+    // --- A pipe of stone ---
+
+    public record ConfigPipe(String ore, List<BlockReplacement> targets, int size, int height) implements Feature {
+        public static final MapCodec<ConfigPipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+                Codec.STRING.fieldOf("ore").forGetter(ConfigPipe::ore),
+                Codec.list(BlockReplacement.CODEC).fieldOf("targets").forGetter(ConfigPipe::targets),
+                Codec.intRange(0, 64).fieldOf("size").forGetter(ConfigPipe::size),
+                Codec.intRange(8, 96).optionalFieldOf("height", 48).forGetter(ConfigPipe::height))
+                .apply(i, ConfigPipe::new));
+        // How far the pipe may wander from its root, each way.
+        private static final double MAX_DRIFT = 4.0;
+
+        @Override
+        public MapCodec<ConfigPipe> codec() {
+            return CODEC;
+        }
+
+        // A vein every two blocks up, from 45% of veinSize at the root to all of it at the top (a carrot-shaped
+        // diatreme, as kimberlite pipes are), its centre drifting a fraction of a block a step.
+        @Override
+        public boolean place(WorldGenLevel level, ChunkGenerator generator, RandomSource random, BlockPos origin) {
+            ArcforgeConfig.OreSettings settings = settings(ore);
+            int veinSize = settings != null ? settings.veinSize().getAsInt() : size;
+            float airDiscard = settings != null ? (float) settings.airExposureDiscard().getAsDouble() : 0.0F;
+            double x = 0, z = 0;
+            boolean placed = false;
+            for (int dy = 0; dy < height; dy += 2) {
+                double up = dy / (double) height;
+                int here = Math.max(4, (int) Math.round(veinSize * (0.45 + 0.55 * up)));
+                x = Mth.clamp(x + (random.nextDouble() - 0.5) * 0.9, -MAX_DRIFT, MAX_DRIFT);
+                z = Mth.clamp(z + (random.nextDouble() - 0.5) * 0.9, -MAX_DRIFT, MAX_DRIFT);
+                placed |= new OreFeature(targets, here, airDiscard).place(level, generator, random,
+                        origin.offset((int) Math.round(x), dy, (int) Math.round(z)));
             }
             return placed;
         }

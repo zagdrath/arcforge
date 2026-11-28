@@ -1,0 +1,27 @@
+{
+  "feature": "arcforge:stone_dolomite",
+  "placement": [
+    {
+      "type": "minecraft:rarity_filter",
+      "chance": 4
+    },
+    {
+      "type": "arcforge:config_count",
+      "ore": "dolomite",
+      "default": 1
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "dolomite",
+      "shape": "uniform",
+      "default_min": -16,
+      "default_max": 80
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "arcforge:block/cobbled_sylvinite_slab"
+    },
+    "type=double": {
+      "model": "arcforge:block/cobbled_sylvinite"
+    },
+    "type=top": {
+      "model": "arcforge:block/cobbled_sylvinite_slab_top"
+    }
+  }
+}

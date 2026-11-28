@@ -1,0 +1,12 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": "arcforge:stone_dolomite",
+  "step": "underground_ores",
+  "neoforge:conditions": [
+    {
+      "type": "arcforge:ore_enabled",
+      "ore": "dolomite"
+    }
+  ]
+}

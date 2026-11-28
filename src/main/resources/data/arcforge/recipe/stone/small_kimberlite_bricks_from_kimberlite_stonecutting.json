@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:kimberlite",
+  "result": {
+    "count": 1,
+    "id": "arcforge:small_kimberlite_bricks"
+  }
+}

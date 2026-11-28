@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:slate_bricks",
+  "result": {
+    "count": 1,
+    "id": "arcforge:slate_brick_stairs"
+  }
+}

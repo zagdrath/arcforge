@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "arcforge:block/travertine_slab"
+    },
+    "type=double": {
+      "model": "arcforge:block/travertine"
+    },
+    "type=top": {
+      "model": "arcforge:block/travertine_slab_top"
+    }
+  }
+}

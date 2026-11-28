@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "arcforge:block/stone/pumice_pillar_top",
+    "side": "arcforge:block/stone/pumice_pillar",
+    "top": "arcforge:block/stone/pumice_pillar_top"
+  }
+}

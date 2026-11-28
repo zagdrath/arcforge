@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:kimberlite_pillar",
+  "result": {
+    "count": 1,
+    "id": "arcforge:kimberlite_pillar_stairs"
+  }
+}

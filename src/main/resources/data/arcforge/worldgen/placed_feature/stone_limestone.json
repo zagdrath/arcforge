@@ -1,0 +1,27 @@
+{
+  "feature": "arcforge:stone_limestone",
+  "placement": [
+    {
+      "type": "minecraft:rarity_filter",
+      "chance": 2
+    },
+    {
+      "type": "arcforge:config_count",
+      "ore": "limestone",
+      "default": 1
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "limestone",
+      "shape": "uniform",
+      "default_min": 0,
+      "default_max": 112
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

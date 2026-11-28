@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "arcforge:block/stone/serpentine_pillar_top",
+    "side": "arcforge:block/stone/serpentine_pillar",
+    "top": "arcforge:block/stone/serpentine_pillar_top"
+  }
+}

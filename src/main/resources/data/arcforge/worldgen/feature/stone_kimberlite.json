@@ -1,0 +1,15 @@
+{
+  "type": "arcforge:config_pipe",
+  "ore": "kimberlite",
+  "size": 24,
+  "height": 56,
+  "targets": [
+    {
+      "target": {
+        "predicate_type": "minecraft:tag_match",
+        "tag": "minecraft:base_stone_overworld"
+      },
+      "state": "arcforge:kimberlite"
+    }
+  ]
+}

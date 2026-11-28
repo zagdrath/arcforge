@@ -299,6 +299,9 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> COAL_COKE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.COAL_COKE_BLOCK,
             p -> p.cookingFuel(COAL_COKE_BLOCK_BURN_TIME));
     public static final DeferredItem<Item> SLAG = ITEMS.registerSimpleItem("slag");
+    // Quicklime: Limestone, Travertine or Dolomite calcined in the Chemical Reactor (giving off Carbon Dioxide). A steel
+    // flux, and the lime in Concrete Powder.
+    public static final DeferredItem<Item> QUICKLIME = ITEMS.registerSimpleItem("quicklime");
     // Renewable coal: biomass cooked in water under heat (the Hydrothermal Carbonizer). It works as coal everywhere.
     public static final DeferredItem<Item> BIO_COAL = ITEMS.registerSimpleItem("bio_coal", p -> p.cookingFuel(BIO_COAL_BURN_TIME));
     public static final DeferredItem<BlockItem> BIO_COAL_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.BIO_COAL_BLOCK,

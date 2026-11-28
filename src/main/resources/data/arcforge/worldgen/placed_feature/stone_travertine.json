@@ -1,0 +1,27 @@
+{
+  "feature": "arcforge:stone_travertine",
+  "placement": [
+    {
+      "type": "minecraft:rarity_filter",
+      "chance": 6
+    },
+    {
+      "type": "arcforge:config_count",
+      "ore": "travertine",
+      "default": 1
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "travertine",
+      "shape": "uniform",
+      "default_min": 50,
+      "default_max": 100
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "type": "arcforge:config_layer",
+  "ore": "travertine",
+  "size": 14,
+  "radius": 10,
+  "layers": 2,
+  "tilt": 0.1,
+  "targets": [
+    {
+      "target": {
+        "predicate_type": "minecraft:tag_match",
+        "tag": "minecraft:base_stone_overworld"
+      },
+      "state": "arcforge:travertine"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:polished_scoria",
+  "result": {
+    "count": 1,
+    "id": "arcforge:scoria_pillar_wall"
+  }
+}

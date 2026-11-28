@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:pumice",
+  "result": {
+    "count": 1,
+    "id": "arcforge:polished_pumice_wall"
+  }
+}

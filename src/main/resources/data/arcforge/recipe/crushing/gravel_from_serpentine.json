@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": [
+    "arcforge:serpentine",
+    "arcforge:cobbled_serpentine"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:gravel"
+  },
+  "bonus": {
+    "count": 1,
+    "id": "arcforge:nickel_dust"
+  },
+  "bonus_chance": 0.15,
+  "time": 200,
+  "ore": false
+}

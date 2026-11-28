@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "#arcforge:calcium_carbonate_stones",
+    "count": 1
+  },
+  "item_output": {
+    "id": "arcforge:quicklime",
+    "count": 2
+  },
+  "fluid_output": {
+    "id": "arcforge:carbon_dioxide",
+    "amount": 250
+  },
+  "time": 120,
+  "energy_per_tick": 40,
+  "heat_per_tick": 20,
+  "min_temperature": 900
+}

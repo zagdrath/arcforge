@@ -14,7 +14,13 @@ import com.mojang.renderpearl.api.pipeline.DepthStencilState;
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 
 import net.minecraft.client.renderer.BindGroupLayouts;
+import com.mojang.blaze3d.vertex.PoseStack;
+
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.SubmitNodeCollection;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.feature.CustomFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -66,6 +72,24 @@ public final class ArcforgeRenderTypes {
     public static RenderType fluid(TextureAtlasSprite sprite, int color) {
         return color >>> 24 == 0xFF && sprite.contents().transparency().isOpaque() ? RenderTypes.entityCutout(sprite.atlasLocation())
                 : volumeTranslucent(sprite.atlasLocation());
+    }
+
+    // Submits translucent contents to be drawn after the translucent terrain (vanilla's afterTerrain phase, where its
+    // particles go) instead of before it, for contents whose casing is solid or cutout (a Reservoir's glass). Drawn
+    // before, a volume that doesn't write depth is painted over by every translucent block behind it (glass conduits
+    // showed crisp and untinted through a full Reservoir). Drawn after, the terrain behind is already there to blend over,
+    // and the terrain's depth keeps what stands in front. Not for contents behind translucent terrain of their own (tank
+    // or conduit glass): that glass would hide them. Opaque contents, and the Improved Transparency (OIT) path, where
+    // afterTerrain is the same phase as the rest, behave as a plain submitCustomGeometry.
+    public static void submitAfterTerrain(SubmitNodeCollector collector, PoseStack poseStack, RenderType renderType,
+            SubmitNodeCollector.CustomGeometryRenderer renderer) {
+        SubmitNodeCollection collection = collector instanceof SubmitNodeStorage storage ? storage.order(0)
+                : collector instanceof SubmitNodeCollection ordered ? ordered : null;
+        if (collection == null || !renderType.hasBlending() || renderType.isOutline()) {
+            collector.submitCustomGeometry(poseStack, renderType, renderer);
+            return;
+        }
+        collection.afterTerrain.submit(new CustomFeatureRenderer.Submit(poseStack.last().copy(), renderType, renderer));
     }
 
     @SubscribeEvent

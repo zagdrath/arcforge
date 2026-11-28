@@ -1,0 +1,27 @@
+{
+  "feature": "arcforge:stone_serpentine",
+  "placement": [
+    {
+      "type": "minecraft:rarity_filter",
+      "chance": 4
+    },
+    {
+      "type": "arcforge:config_count",
+      "ore": "serpentine",
+      "default": 1
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "serpentine",
+      "shape": "trapezoid",
+      "default_min": -64,
+      "default_max": 16
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

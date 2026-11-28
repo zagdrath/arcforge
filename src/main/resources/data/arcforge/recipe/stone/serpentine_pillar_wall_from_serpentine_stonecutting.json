@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:serpentine",
+  "result": {
+    "count": 1,
+    "id": "arcforge:serpentine_pillar_wall"
+  }
+}

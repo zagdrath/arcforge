@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/inner_stairs",
+  "textures": {
+    "bottom": "arcforge:block/stone/scoria",
+    "side": "arcforge:block/stone/scoria",
+    "top": "arcforge:block/stone/scoria"
+  }
+}

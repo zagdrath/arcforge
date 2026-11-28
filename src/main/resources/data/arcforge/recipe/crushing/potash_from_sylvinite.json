@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": [
+    "arcforge:sylvinite",
+    "arcforge:cobbled_sylvinite"
+  ],
+  "result": {
+    "count": 2,
+    "id": "arcforge:potash"
+  },
+  "bonus": {
+    "count": 1,
+    "id": "arcforge:salt"
+  },
+  "bonus_chance": 0.5,
+  "time": 200,
+  "ore": false
+}

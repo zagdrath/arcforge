@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "arcforge:block/stone/cobbled_dolomite",
+    "side": "arcforge:block/stone/cobbled_dolomite",
+    "top": "arcforge:block/stone/cobbled_dolomite"
+  }
+}

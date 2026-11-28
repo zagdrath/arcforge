@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:sylvinite_bricks",
+  "result": {
+    "count": 2,
+    "id": "arcforge:small_sylvinite_brick_slab"
+  }
+}

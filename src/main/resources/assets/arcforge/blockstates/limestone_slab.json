@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "arcforge:block/limestone_slab"
+    },
+    "type=double": {
+      "model": "arcforge:block/limestone"
+    },
+    "type=top": {
+      "model": "arcforge:block/limestone_slab_top"
+    }
+  }
+}

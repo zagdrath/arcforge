@@ -1,0 +1,34 @@
+{
+  "title": "Natural Stones",
+  "icon": "arcforge:limestone_bricks",
+  "items": [
+    "arcforge:limestone",
+    "arcforge:dolomite",
+    "arcforge:slate",
+    "arcforge:serpentine",
+    "arcforge:sylvinite",
+    "arcforge:kimberlite",
+    "arcforge:pumice",
+    "arcforge:scoria",
+    "arcforge:travertine",
+    "arcforge:quicklime"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Nine rocks lie in the world beside granite and diorite. Mined, each drops its cobbled form (Silk Touch keeps the rock), which smelts back. Every one comes polished, as bricks, small bricks, a pillar and a chiseled block, and every form in stairs, slabs and walls, by crafting or the Stonecutter. Their cobbles also make stone tools and furnaces."
+    },
+    {
+      "type": "text",
+      "text": "# Where they lie\nLimestone: big blobs, common, from Y 0 to 112. Dolomite: blobs from below sea level into the hills. Slate: wide tilted layers. Serpentine: deep, in and above the deepslate. Sylvinite: deep salt layers. Kimberlite: rare pipes rising from the bottom of the world. Pumice: high in mountains. Scoria: through the Nether. Travertine: layers near the surface in hot, dry biomes."
+    },
+    {
+      "type": "text",
+      "text": "# Lime\nLimestone, Travertine and Dolomite flux steel in the Arcforge Furnace. Calcined in a heated Chemical Reactor (900 \u00b0C) each gives two Quicklime and 250 mB of Carbon Dioxide for your Greenhouse or Hydroponic Cells. Quicklime fluxes steel too, and with four sand and four gravel makes eight Light Gray Concrete Powder."
+    },
+    {
+      "type": "text",
+      "text": "# The others\nSylvinite crushes into Potash (and Salt). Kimberlite hides diamonds: sift Cobbled Kimberlite. Pumice and Scoria spin into Rock Wool. Slate, Serpentine, Pumice and Scoria crush with a chance of Silica, Nickel or Iron Dust. Polished Serpentine casts Concrete Shielding, and Dolomite Bricks make Arcforge Furnace Bricks."
+    }
+  ]
+}

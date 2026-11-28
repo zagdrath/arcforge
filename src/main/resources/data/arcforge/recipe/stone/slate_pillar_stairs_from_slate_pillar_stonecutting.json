@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:slate_pillar",
+  "result": {
+    "count": 1,
+    "id": "arcforge:slate_pillar_stairs"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "arcforge:block/stone/cobbled_sylvinite",
+    "side": "arcforge:block/stone/cobbled_sylvinite",
+    "top": "arcforge:block/stone/cobbled_sylvinite"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:travertine_pillar",
+  "result": {
+    "count": 1,
+    "id": "arcforge:travertine_pillar_stairs"
+  }
+}

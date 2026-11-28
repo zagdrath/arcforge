@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": [
+    "arcforge:pumice",
+    "arcforge:cobbled_pumice"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:sand"
+  },
+  "bonus": {
+    "count": 1,
+    "id": "arcforge:silica_dust"
+  },
+  "bonus_chance": 0.3,
+  "time": 200,
+  "ore": false
+}

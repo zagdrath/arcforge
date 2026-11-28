@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "arcforge:block/stone/small_slate_bricks",
+    "side": "arcforge:block/stone/small_slate_bricks",
+    "top": "arcforge:block/stone/small_slate_bricks"
+  }
+}

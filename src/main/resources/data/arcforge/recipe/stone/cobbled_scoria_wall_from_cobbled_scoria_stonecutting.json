@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:cobbled_scoria",
+  "result": {
+    "count": 1,
+    "id": "arcforge:cobbled_scoria_wall"
+  }
+}

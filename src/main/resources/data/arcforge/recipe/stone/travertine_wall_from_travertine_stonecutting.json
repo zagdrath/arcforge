@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:travertine",
+  "result": {
+    "count": 1,
+    "id": "arcforge:travertine_wall"
+  }
+}

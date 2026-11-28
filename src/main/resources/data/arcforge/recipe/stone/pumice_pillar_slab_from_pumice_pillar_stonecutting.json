@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:pumice_pillar",
+  "result": {
+    "count": 2,
+    "id": "arcforge:pumice_pillar_slab"
+  }
+}

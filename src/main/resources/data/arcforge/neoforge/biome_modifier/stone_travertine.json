@@ -1,0 +1,12 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#c:is_dry/overworld",
+  "features": "arcforge:stone_travertine",
+  "step": "underground_ores",
+  "neoforge:conditions": [
+    {
+      "type": "arcforge:ore_enabled",
+      "ore": "travertine"
+    }
+  ]
+}

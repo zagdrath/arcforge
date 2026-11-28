@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:polished_slate",
+  "result": {
+    "count": 1,
+    "id": "arcforge:slate_brick_wall"
+  }
+}

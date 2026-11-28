@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "arcforge:block/small_sylvinite_brick_slab"
+    },
+    "type=double": {
+      "model": "arcforge:block/small_sylvinite_bricks"
+    },
+    "type=top": {
+      "model": "arcforge:block/small_sylvinite_brick_slab_top"
+    }
+  }
+}

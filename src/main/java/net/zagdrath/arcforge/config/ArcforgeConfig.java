@@ -3884,6 +3884,26 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Natural stone generation, per stone, like vanilla's granite and diorite: whether, how many, how big",
+                "and how deep. Blobs (veinSize: blocks per blob), layers (veinSize: each small vein of the layer) and",
+                "Kimberlite's pipes (veinSize: the pipe's width at the top). Read when a world loads.").push("stones");
+        ore("limestone", "Limestone: big blobs, common at mid heights (veinsPerChunk: blobs tried in 1 chunk in 2).", true, 1, 64, 0, 112, 0.0);
+        ore("dolomite", "Dolomite: blobs from below sea level up to the hills (veinsPerChunk: blobs tried in 1 chunk in 4).",
+                true, 1, 56, -16, 80, 0.0);
+        ore("slate", "Slate: wide tilted layers (veinsPerChunk: layers tried in 1 chunk in 8).", true, 1, 16, -24, 72, 0.0);
+        ore("serpentine", "Serpentine: deep blobs, in the deepslate and just above it (veinsPerChunk: blobs tried in 1 chunk in 4).",
+                true, 1, 48, -64, 16, 0.0);
+        ore("sylvinite", "Sylvinite: deep layers of potash salt (veinsPerChunk: layers tried in 1 chunk in 10).", true, 1, 14, -48, 0, 0.0);
+        ore("kimberlite", "Kimberlite: rare vertical pipes rising from the bottom of the world (veinsPerChunk: pipes tried in 1 chunk in 48;"
+                + " minY/maxY: where a pipe's root is).", true, 1, 24, -60, -44, 0.0);
+        ore("pumice", "Pumice: blobs high in mountains (veinsPerChunk: blobs tried in 1 chunk in 3).", true, 1, 48, 60, 200, 0.0);
+        ore("scoria", "Scoria: blobs through the Nether's netherrack and basalt (veinsPerChunk: blobs per chunk).", true, 2, 48, 10, 117, 0.0);
+        ore("travertine", "Travertine: layers near the surface in hot, dry biomes (veinsPerChunk: layers tried in 1 chunk in 6).",
+                true, 1, 14, 50, 100, 0.0);
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Halite beds: how the ore's flat beds are laid (see ores.halite for whether, how often and how deep).")
                 .push("haliteBeds");
     }

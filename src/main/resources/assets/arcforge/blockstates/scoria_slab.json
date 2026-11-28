@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "arcforge:block/scoria_slab"
+    },
+    "type=double": {
+      "model": "arcforge:block/scoria"
+    },
+    "type=top": {
+      "model": "arcforge:block/scoria_slab_top"
+    }
+  }
+}

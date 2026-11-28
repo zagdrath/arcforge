@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "arcforge:block/stone/chiseled_pumice",
+    "side": "arcforge:block/stone/chiseled_pumice",
+    "top": "arcforge:block/stone/chiseled_pumice"
+  }
+}

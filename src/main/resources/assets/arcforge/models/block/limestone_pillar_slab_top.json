@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "arcforge:block/stone/limestone_pillar_top",
+    "side": "arcforge:block/stone/limestone_pillar",
+    "top": "arcforge:block/stone/limestone_pillar_top"
+  }
+}

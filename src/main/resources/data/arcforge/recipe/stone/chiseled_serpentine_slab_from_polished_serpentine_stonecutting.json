@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:polished_serpentine",
+  "result": {
+    "count": 2,
+    "id": "arcforge:chiseled_serpentine_slab"
+  }
+}

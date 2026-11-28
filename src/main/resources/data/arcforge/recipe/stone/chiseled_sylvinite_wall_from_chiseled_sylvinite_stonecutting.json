@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:chiseled_sylvinite",
+  "result": {
+    "count": 1,
+    "id": "arcforge:chiseled_sylvinite_wall"
+  }
+}

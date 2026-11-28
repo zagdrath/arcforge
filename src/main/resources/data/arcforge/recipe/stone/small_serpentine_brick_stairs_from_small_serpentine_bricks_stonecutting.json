@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:small_serpentine_bricks",
+  "result": {
+    "count": 1,
+    "id": "arcforge:small_serpentine_brick_stairs"
+  }
+}

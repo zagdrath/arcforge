@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:chiseled_slate",
+  "result": {
+    "count": 1,
+    "id": "arcforge:chiseled_slate_wall"
+  }
+}

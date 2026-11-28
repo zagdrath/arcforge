@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:chiseled_serpentine",
+  "result": {
+    "count": 1,
+    "id": "arcforge:chiseled_serpentine_stairs"
+  }
+}

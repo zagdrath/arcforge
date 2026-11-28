@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "arcforge:block/cobbled_pumice_slab"
+    },
+    "type=double": {
+      "model": "arcforge:block/cobbled_pumice"
+    },
+    "type=top": {
+      "model": "arcforge:block/cobbled_pumice_slab_top"
+    }
+  }
+}

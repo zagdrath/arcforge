@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:cobbled_kimberlite",
+  "result": {
+    "count": 1,
+    "id": "arcforge:cobbled_kimberlite_wall"
+  }
+}

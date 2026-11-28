@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "arcforge:block/stone/dolomite",
+    "side": "arcforge:block/stone/dolomite",
+    "top": "arcforge:block/stone/dolomite"
+  }
+}

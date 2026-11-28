@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "arcforge:block/polished_serpentine_slab"
+    },
+    "type=double": {
+      "model": "arcforge:block/polished_serpentine"
+    },
+    "type=top": {
+      "model": "arcforge:block/polished_serpentine_slab_top"
+    }
+  }
+}

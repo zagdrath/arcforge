@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:scoria",
+  "result": {
+    "count": 1,
+    "id": "arcforge:chiseled_scoria_stairs"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "arcforge:block/stone/cobbled_kimberlite",
+    "side": "arcforge:block/stone/cobbled_kimberlite",
+    "top": "arcforge:block/stone/cobbled_kimberlite"
+  }
+}

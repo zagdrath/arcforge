@@ -1,0 +1,17 @@
+{
+  "type": "arcforge:config_layer",
+  "ore": "slate",
+  "size": 16,
+  "radius": 11,
+  "layers": 3,
+  "tilt": 0.25,
+  "targets": [
+    {
+      "target": {
+        "predicate_type": "minecraft:tag_match",
+        "tag": "minecraft:base_stone_overworld"
+      },
+      "state": "arcforge:slate"
+    }
+  ]
+}

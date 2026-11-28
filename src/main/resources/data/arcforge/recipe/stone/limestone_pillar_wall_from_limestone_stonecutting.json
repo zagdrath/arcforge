@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "arcforge:limestone",
+  "result": {
+    "count": 1,
+    "id": "arcforge:limestone_pillar_wall"
+  }
+}

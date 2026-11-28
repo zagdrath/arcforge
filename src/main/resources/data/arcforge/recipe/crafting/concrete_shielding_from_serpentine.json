@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CRC",
+    "RCR",
+    "CRC"
+  ],
+  "key": {
+    "C": "arcforge:polished_serpentine",
+    "R": "#c:rods/steel"
+  },
+  "result": {
+    "id": "arcforge:concrete_shielding",
+    "count": 5
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": [
+    "arcforge:kimberlite",
+    "arcforge:cobbled_kimberlite"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:gravel"
+  },
+  "bonus": {
+    "count": 1,
+    "id": "minecraft:diamond"
+  },
+  "bonus_chance": 0.02,
+  "time": 200,
+  "ore": false
+}

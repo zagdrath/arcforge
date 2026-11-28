@@ -1,6 +1,8 @@
 {
   "values": [
     "#c:gems/fluorite",
-    "#c:ingots/ferrosilicon"
+    "#c:ingots/ferrosilicon",
+    "#arcforge:calcium_carbonate_stones",
+    "arcforge:quicklime"
   ]
 }

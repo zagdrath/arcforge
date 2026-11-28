@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/inner_stairs",
+  "textures": {
+    "bottom": "arcforge:block/stone/chiseled_dolomite",
+    "side": "arcforge:block/stone/chiseled_dolomite",
+    "top": "arcforge:block/stone/chiseled_dolomite"
+  }
+}

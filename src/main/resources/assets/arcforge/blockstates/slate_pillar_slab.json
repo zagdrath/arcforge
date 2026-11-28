@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "arcforge:block/slate_pillar_slab"
+    },
+    "type=double": {
+      "model": "arcforge:block/slate_pillar"
+    },
+    "type=top": {
+      "model": "arcforge:block/slate_pillar_slab_top"
+    }
+  }
+}
