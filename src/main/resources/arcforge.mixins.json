@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.zagdrath.arcforge.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "CreativeModeTabRegistryMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

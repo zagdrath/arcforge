@@ -1,0 +1,8 @@
+{
+  "size": 1,
+  "order": 83,
+  "icon": "arcforge:slot/battery",
+  "validators": [
+    "curios:tag"
+  ]
+}

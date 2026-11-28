@@ -357,6 +357,8 @@ public final class ArcforgeGameTests {
         TESTS.put("quarry_nether_height", EquipmentLogisticsFixGameTests::quarryNether);
         TESTS.put("curios_jetpack_flight", EquipmentLogisticsFixGameTests::curioJetpack);
         TESTS.put("curios_long_fall_boots", EquipmentLogisticsFixGameTests::curioLongFallBoots);
+        TESTS.put("curios_battery", EquipmentLogisticsFixGameTests::curioBattery);
+        TESTS.put("creative_tabs_together", EquipmentLogisticsFixGameTests::creativeTabsTogether);
         TESTS.put("quantum_tunnel_item_counts", ExtendedLogisticsGameTests::quantumTunnelItemCounts);
         TESTS.put("chunk_loader", ExtendedLogisticsGameTests::chunkLoader);
         TESTS.put("quantum_tunnel_chunk_loading", ExtendedLogisticsGameTests::quantumTunnelChunkLoading);

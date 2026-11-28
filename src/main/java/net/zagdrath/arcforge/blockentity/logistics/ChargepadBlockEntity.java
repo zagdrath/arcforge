@@ -39,14 +39,14 @@ import net.zagdrath.arcforge.transfer.energy.SidedEnergyHandler;
 import net.zagdrath.arcforge.transfer.energy.TrackingEnergyHandler;
 
 // The Chargepad: FE goes in through the port on its back (and only there), and every tick it charges the FE items of
-// players standing on it, the held item first, then the offhand, the hotbar, the armour and the Jetpack and Long Fall
-// Boots Curios slots, each up to
+// players standing on it, the held item first, then the offhand, the hotbar, the armour and the Jetpack, Long Fall
+// Boots and Battery Curios slots, each up to
 // chargeRatePerItem and all together up to maxTransferPerTick. Its FE stays with the item when it's broken.
 public class ChargepadBlockEntity extends BlockEntity implements ConduitConnectable, Dismantleable {
     // How long after its last charge it still shows as charging.
     private static final int CHARGING_TICKS = 10;
     private static final int[] ARMOUR_SLOTS = { 36, 37, 38, 39 };
-    private static final String[] CURIO_SLOTS = { "jetpack", "long_fall_boots" };
+    private static final String[] CURIO_SLOTS = { "jetpack", "long_fall_boots", "battery" };
 
     private final TrackingEnergyHandler energy;
     private final EnergyHandler input;
@@ -151,7 +151,7 @@ public class ChargepadBlockEntity extends BlockEntity implements ConduitConnecta
         return slots;
     }
 
-    // After the armour: a Jetpack or Long Fall Boots worn in their Curios slots.
+    // After the armour: a Jetpack, Long Fall Boots or Battery worn in their Curios slots.
     private static void curioSlots(Player player, List<ItemAccess> items) {
         top.theillusivec4.curios.api.CuriosApi.getCuriosInventory(player).ifPresent(inventory -> {
             for (String id : CURIO_SLOTS) {

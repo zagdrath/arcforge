@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:wrought_battery",
+    "arcforge:hardened_battery",
+    "arcforge:tempered_battery",
+    "arcforge:arcforged_battery"
+  ]
+}

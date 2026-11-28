@@ -4,6 +4,7 @@
   ],
   "slots": [
     "jetpack",
-    "long_fall_boots"
+    "long_fall_boots",
+    "battery"
   ]
 }

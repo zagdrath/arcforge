@@ -3801,6 +3801,7 @@
   "tooltip.arcforge.info.armored_long_fall_boots": "Long Fall Boots reinforced with Steel Boots: 2 armor and 1 toughness. Negates all fall damage for 1,000 FE per damaging landing. Holds 256,000 FE; recharge in a charging slot or on a Chargepad. Below 1,000 FE, fall protection stops; armor still works.",
   "curios.identifier.jetpack": "Jetpack",
   "curios.identifier.long_fall_boots": "Long Fall Boots",
+  "curios.identifier.battery": "Battery",
   "arcforge.configuration.energyOutputPerFace": "Quantum Tunnel FE output per face",
   "arcforge.configuration.radiationParticles": "Radiation warning particles",
   "gui.arcforge.vent.output": "Output %s",

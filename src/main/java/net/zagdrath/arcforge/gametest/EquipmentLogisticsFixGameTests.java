@@ -136,4 +136,40 @@ public final class EquipmentLogisticsFixGameTests {
                 .getStacks().getStackInSlot(0)) == LongFallBootsItem.LANDING_COST, "The landing didn't take its FE from the Curios boots");
         helper.succeed();
     }
+
+    // A Battery in its Curios slot charges a held FE item, as a carried one does.
+    static void curioBattery(GameTestHelper helper) {
+        var player = TestFixtures.player(helper);
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        var inventory = top.theillusivec4.curios.api.CuriosApi.getCuriosInventory(player).orElseThrow();
+        helper.assertTrue(inventory.getCurios().containsKey("battery"), "Dedicated Battery slot is missing");
+        ItemStack battery = new ItemStack(ModItems.portable(net.zagdrath.arcforge.item.storage.PortableStorageItem.Kind.BATTERY,
+                net.zagdrath.arcforge.conduit.ConduitTier.TEMPERED));
+        helper.assertTrue(battery.is(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM,
+                net.minecraft.resources.Identifier.fromNamespaceAndPath("curios", "battery"))), "Batteries aren't allowed in the Battery slot");
+        battery.set(net.zagdrath.arcforge.registry.ModDataComponents.ENERGY.get(), 5_000);
+        inventory.setEquippedCurio("battery", 0, battery);
+        player.getInventory().setSelectedSlot(0);
+        player.getInventory().setItem(0, new ItemStack(ModItems.TEMPERED_ARC_DRILL.get()));
+        net.zagdrath.arcforge.event.BatteryCharging.charge(player);
+        helper.assertTrue(net.zagdrath.arcforge.item.tool.ArcToolItem.energy(player.getInventory().getItem(0)) > 0,
+                "The Battery in its Curios slot didn't charge the held Arc Drill");
+        helper.succeed();
+    }
+
+    // Arcforge's creative tabs sit side by side, and the grouping pulls a stray one back to the first.
+    static void creativeTabsTogether(GameTestHelper helper) {
+        List<String> order = net.neoforged.neoforge.common.CreativeModeTabRegistry.getSortedCreativeModeTabs().stream()
+                .map(tab -> net.neoforged.neoforge.common.CreativeModeTabRegistry.getName(tab).getNamespace()).toList();
+        int first = order.indexOf("arcforge");
+        int last = order.lastIndexOf("arcforge");
+        helper.assertTrue(first >= 0 && order.subList(first, last + 1).stream().allMatch("arcforge"::equals),
+                "Arcforge's creative tabs are split: " + order);
+        List<String> grouped = net.zagdrath.arcforge.registry.ModCreativeTabs.grouped(
+                List.of("minecraft:a", "arcforge:a", "other:a", "arcforgetransmission:a", "arcforge:b", "other:b"),
+                id -> id.substring(0, id.indexOf(':')));
+        helper.assertTrue(grouped.equals(List.of("minecraft:a", "arcforge:a", "arcforge:b", "arcforgetransmission:a", "other:a", "other:b")),
+                "Grouped as " + grouped);
+        helper.succeed();
+    }
 }

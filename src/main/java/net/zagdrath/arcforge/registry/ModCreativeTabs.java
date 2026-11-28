@@ -20,7 +20,7 @@ import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.item.tool.ModuleType;
 
 // Arcforge tabs, in order: Machines, Materials, Components, Building Blocks, Fluids, Logistics, Tools & Upgrades,
-// Farming.
+// Farming, Nuclear, Fusion. grouped() keeps them side by side whatever other mods add.
 public final class ModCreativeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Arcforge.MODID);
 
@@ -399,6 +399,34 @@ public final class ModCreativeTabs {
             .build());
 
     private ModCreativeTabs() {}
+
+    // NeoForge breaks ties between modded tabs by path, so another mod's "main" or "items" tab would land between
+    // Machines and Materials. CreativeModeTabRegistryMixin runs the sorted list through this: Arcforge's tabs, then
+    // its addons' (namespaces starting with "arcforge"), move together to where the first of them sits, each keeping
+    // its sorted order.
+    public static <T> List<T> grouped(List<T> sorted, java.util.function.Function<T, String> namespace) {
+        List<T> own = new java.util.ArrayList<>();
+        List<T> addons = new java.util.ArrayList<>();
+        int first = -1;
+        List<T> rest = new java.util.ArrayList<>();
+        for (T tab : sorted) {
+            String ns = namespace.apply(tab);
+            if (ns != null && ns.startsWith(Arcforge.MODID)) {
+                if (first < 0) {
+                    first = rest.size();
+                }
+                (ns.equals(Arcforge.MODID) ? own : addons).add(tab);
+            } else {
+                rest.add(tab);
+            }
+        }
+        if (first < 0) {
+            return sorted;
+        }
+        rest.addAll(first, addons);
+        rest.addAll(first, own);
+        return rest;
+    }
 
     public static void register(IEventBus modEventBus) {
         CREATIVE_MODE_TABS.register(modEventBus);

@@ -22,6 +22,20 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+### Added
+
+- A **Battery** Curios slot: a Battery worn there charges your other FE items like a carried one, and a Chargepad
+  charges it.
+
+### Changed
+
+- The Long Fall Boots Curios slot's outline is a pair of boots.
+
+### Fixed
+
+- Arcforge's creative tabs (and its addons') stay side by side: another mod's tab no longer lands between them.
+- Heat Pipes can no longer be seen through their core slots at a shallow angle: the slots now have walls.
+
 ## [2.10.0] - 2026-11-27
 
 ### Added
