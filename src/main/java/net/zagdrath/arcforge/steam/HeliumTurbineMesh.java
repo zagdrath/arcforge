@@ -170,9 +170,10 @@ public final class HeliumTurbineMesh extends ModelMesh {
         int steps = 6;
         float run = (u1 - u0) / steps, rise = top / steps;
         for (int k = 1; k <= steps; k++) {
-            cbox(70.25F, rise * k - 1.0F, u0 + run * (k - 1), 78.75F, rise * k, u0 + run * k, Paint.DARK, Paint.GRATE, Paint.DARK, 0);
+            cbox(HeliumTurbineLayout.WALKWAY_X + 1.25F, rise * k - 1.0F, u0 + run * (k - 1), 78.75F, rise * k, u0 + run * k, Paint.DARK, Paint.GRATE,
+                    Paint.DARK, 0);
         }
-        for (float sx : new float[] { 69.5F, 79.25F }) {
+        for (float sx : new float[] { HeliumTurbineLayout.WALKWAY_X + 0.5F, 79.25F }) {
             tube(p(sx, 0.0F, u0 - 1.0F), p(sx, top, u1), 0.6F, 4, Paint.PLAIN);
         }
         cbox(78.5F, 0.0F, u0 - 0.25F, 79.5F, 14.0F, u0 + 0.75F, Paint.LIT, Paint.LIT, Paint.LIT, 0);
@@ -182,7 +183,7 @@ public final class HeliumTurbineMesh extends ModelMesh {
     // The walkway grating along the front edge of the deck, and its handrail: posts every block, a top and a knee rail.
     private void walkway() {
         float t = layout.lengthPx(), floor = HeliumTurbineLayout.DECK_TOP, u0 = HeliumTurbineLayout.STAIR_U1;
-        cbox(69.0F, floor, u0, 79.5F, floor + 1.0F, t - 1.0F, Paint.DARK, Paint.GRATE, Paint.DARK, SKIP_DOWN);
+        cbox(HeliumTurbineLayout.WALKWAY_X, floor, u0, 79.5F, floor + 1.0F, t - 1.0F, Paint.DARK, Paint.GRATE, Paint.DARK, SKIP_DOWN);
         float top = floor + 14.0F;
         for (float u = u0 + 1.0F; u <= t - 3.0F; u += 16.0F) {
             cbox(78.5F, floor + 1.0F, u, 79.5F, top - 1.0F, u + 1.0F, Paint.LIT, Paint.LIT, Paint.LIT, SKIP_DOWN);
@@ -259,7 +260,7 @@ public final class HeliumTurbineMesh extends ModelMesh {
         cbox(x0 - 0.5F, deck, s.u0() - 0.5F, x1 + 1.0F, deck + 2.0F, s.u1() + 0.5F, Paint.PLAIN, Paint.MID, null, SKIP_DOWN);
         solidBox(x0, deck, s.u0() - 0.5F, x1 + 1.0F, top, s.u1() + 0.5F);
         // The water headers on top, and their risers at the far end.
-        for (float hx : new float[] { 57.5F, 63.5F }) {
+        for (float hx : new float[] { 56.5F, 60.5F }) {
             prismU(x(hx), top + 2.0F, new float[][] { { s.u0() + 2.0F, 1.6F }, { s.u1() - 2.0F, 1.6F } }, PIPE, Math.PI / PIPE, Paint.BANDED, Paint.PLAIN,
                     Paint.PLAIN, null);
             prismY(x(hx), s.u1() - 4.0F, top, top + 2.0F, 1.0F, Paint.BANDED, Paint.BANDED);
@@ -493,10 +494,19 @@ public final class HeliumTurbineMesh extends ModelMesh {
         }
         solidBox(26.0F, sy + 16.0F, c0, 46.0F, sy + 27.5F, c1);
         HeliumTurbineLayout.Span box = layout.terminalBox();
-        cbox(31.0F, 10.0F, box.u0(), 49.0F, 28.0F, box.u1(), Paint.FE_BAND, Paint.FE_BAND, Paint.FE_DARK, 0);
+        // Up from under the deck into the stator (its top hidden in it), in the darker red, with a raised panel on each face
+        // under the deck and a collar where it comes up through the deck, both in the brighter red.
+        float bx0 = 31.0F, bx1 = 49.0F, bu0 = box.u0(), bu1 = box.u1(), btop = sy - 6.0F, low = 11.0F, high = HeliumTurbineLayout.DECK_BOTTOM - 1.0F;
+        cbox(bx0, 10.0F, bu0, bx1, btop, bu1, Paint.FE_DARK, Paint.FE_DARK, Paint.FE_DARK, SKIP_UP);
+        cbox(bx0 - 0.4F, low, bu0 + 1.5F, bx0, high, bu1 - 1.5F, Paint.FE, Paint.FE_LIT, Paint.FE_DARK, SKIP_POS_X);
+        cbox(bx1, low, bu0 + 1.5F, bx1 + 0.4F, high, bu1 - 1.5F, Paint.FE, Paint.FE_LIT, Paint.FE_DARK, SKIP_NEG_X);
+        cbox(bx0 + 1.5F, low, bu0 - 0.4F, bx1 - 1.5F, high, bu0, Paint.FE, Paint.FE_LIT, Paint.FE_DARK, SKIP_POS_U);
+        cbox(bx0 + 1.5F, low, bu1, bx1 - 1.5F, high, bu1 + 0.4F, Paint.FE, Paint.FE_LIT, Paint.FE_DARK, SKIP_NEG_U);
+        float deckTop = HeliumTurbineLayout.DECK_TOP;
+        cbox(bx0 - 0.6F, deckTop, bu0 - 0.6F, bx1 + 0.6F, deckTop + 1.5F, bu1 + 0.6F, Paint.FE, Paint.FE_LIT, Paint.FE_DARK, SKIP_DOWN);
         float bus = HeliumTurbineLayout.BUS_X, half = HeliumTurbineLayout.BUS_HALF;
         cbox(bus - half, 0.0F, layout.busU() - half, bus + half, 10.0F, layout.busU() + half, Paint.PLAIN, null, Paint.PLAIN, SKIP_UP);
-        solidBox(bus - half, 0.0F, layout.busU() - half, bus + half, 28.0F, layout.busU() + half);
+        solidBox(bus - half, 0.0F, layout.busU() - half, bus + half, sy - 6.0F, layout.busU() + half);
         // The slip-ring housing and the exciter beyond it.
         HeliumTurbineLayout.Span slip = layout.slipRing(), ex = layout.exciter();
         cbox(28.0F, deck, slip.u0(), 44.0F, 58.0F, slip.u1(), Paint.EN_PLAIN, Paint.EN_PLAIN, null, SKIP_DOWN | SKIP_POS_U);

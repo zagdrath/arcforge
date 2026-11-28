@@ -202,6 +202,8 @@ Creative ramp (`tools/creative_storage_gen.py`).
 - Use vertical column bands with the highlight just left of centre.
 - Profile for columns 0–15: `0 1 1 2 3 4 5 4 3 3 2 2 1 1 0 0`.
 - Pressurized Cylinder steel: `#3E444B #4E545C #646A72 #7E848C #9AA0A8 #B4BAC0 #D6DADE`.
+  Its tier band (body rows 5 and 6) takes the body's ramp across it in the tier's colour (darker to the edges, the
+  highlight toward white, the top row a step lighter), drawn by `tools/CylinderBandGen.java`.
 - Round caps are flat concentric rings, lit on the top-left half and one step darker on the
   bottom-right half.
 

@@ -38,7 +38,7 @@ public final class HeliumTurbineLayout {
     public static final int WIDTH = 5, HEIGHT = 5, MIN_LENGTH = 15, MAX_LENGTH = 31;
     public static final float PX = 16.0F, WIDTH_PX = WIDTH * PX, HEIGHT_PX = HEIGHT * PX;
     // The deck slab, and the walkway's inner edge (canonical x) from there to the front.
-    public static final float DECK_BOTTOM = 18.0F, DECK_TOP = 22.0F, WALKWAY_X = 69.0F;
+    public static final float DECK_BOTTOM = 18.0F, DECK_TOP = 22.0F, WALKWAY_X = 64.0F;
     // The shaft (canonical x).
     public static final float SHAFT_X = 36.0F, SHAFT_Y = 46.0F, SHAFT_RADIUS = 3.5F;
     // The gap between two casings: a bearing pedestal, a coupling, a pedestal.
@@ -53,13 +53,13 @@ public final class HeliumTurbineLayout {
     // The power turbines: their inlet and exhaust radii, the inlet ring, and the exhaust neck on top.
     public static final float TURBINE_IN = 15.0F, TURBINE_OUT = 20.0F, RING_RADIUS = 18.5F;
     // The precooler (canonical x and its top) along the front of the compressor.
-    public static final float PRECOOLER_X0 = 54.0F, PRECOOLER_X1 = 67.0F, PRECOOLER_TOP = 54.0F;
+    public static final float PRECOOLER_X0 = 54.0F, PRECOOLER_X1 = 63.0F, PRECOOLER_TOP = 54.0F;
     // The recuperator (canonical x), its axis height and radius.
     public static final float RECUPERATOR_X = 7.5F, RECUPERATOR_Y = 34.0F, RECUPERATOR_RADIUS = 6.5F;
     // The crossover ducts: radius and the arches' crown.
     public static final float CROSSOVER_RADIUS = 4.5F, CROWN_Y = 75.0F;
     // The Hot Helium inlet ducts (canonical x of the riser) and their radius.
-    public static final float INLET_X = 60.0F, INLET_RADIUS = 3.5F, INLET_Y = 46.0F;
+    public static final float INLET_X = 59.5F, INLET_RADIUS = 3.5F, INLET_Y = 46.0F;
     // The generator's stator.
     public static final float STATOR_RADIUS = 20.0F, STATOR_END_RADIUS = 13.0F, SHIELD = 6.0F;
     // The cable bus under the terminal box (canonical x: the middle block's centre, so mirroring keeps it there).

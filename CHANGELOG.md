@@ -186,6 +186,12 @@ Battery charging, the Quantum Tunnel Upgrades tab and the NPK and Nutrient Solut
 - A Conduit Filter stays on when the Wrench turns its side from Output back to Input (passing through Disabled): a
   disabled side keeps its filter, out of sight, until it's a port again. It still pops off when the machine goes.
 - The Helium Gas Turbine's intake plenum no longer has a see-through strip above the precooler beside it.
+- The Pressurized Cylinders' tier bands are shaded like the rest of the cylinder (darker at the edges, a highlight down
+  the middle) instead of three flat stripes.
+- The Helium Gas Turbine's walkway and stair are wide enough to walk (16 px, the stair's treads 13 px between its
+  stringers; they were 9, narrower than a player): the precooler and the Hot Helium risers moved in to make room. Its
+  terminal box now runs up into the generator instead of stopping short of it, in a darker red with raised panels and
+  a collar at the deck.
 - Energy, Fluid and Gas Meters no longer cap what passes through them: an Energy Meter topped out at 262,144 FE/t (a Direct Energy Converter
   or a whole plant's output was throttled and misread). They pass any flow; the config value (now labelled Full Scale)
   only sets the rate a comparator reads as 15 and the screen bar's full scale, and the threshold can go above it.
