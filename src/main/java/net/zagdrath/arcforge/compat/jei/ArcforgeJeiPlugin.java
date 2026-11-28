@@ -291,7 +291,10 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.Vitrifying.TYPE, recipes(ModRecipes.VITRIFYING.get()));
         registration.addRecipes(MachineCategories.Reprocessing.TYPE, recipes(ModRecipes.REPROCESSING.get()));
         registration.addRecipes(MachineCategories.Enriching.TYPE, List.of(new MachineCategories.EnrichmentRecipe(3_000),
-                new MachineCategories.EnrichmentRecipe(5_000), new MachineCategories.EnrichmentRecipe(net.zagdrath.arcforge.nuclear.Enrichment.MAX_PCM)));
+                new MachineCategories.EnrichmentRecipe(5_000), new MachineCategories.EnrichmentRecipe(net.zagdrath.arcforge.nuclear.Enrichment.MAX_PCM),
+                // Depleted UF6 re-enriched: default tails (0.25%) fed back with the tails set to the lowest, 0.1%.
+                new MachineCategories.EnrichmentRecipe(5_000, net.zagdrath.arcforge.nuclear.Enrichment.DEFAULT_TAILS_PCM,
+                        net.zagdrath.arcforge.nuclear.Enrichment.MIN_TAILS_PCM, true)));
         List<MachineCategories.BatteryComponentRecipe> batteryParts = new ArrayList<>();
         for (net.zagdrath.arcforge.conduit.ConduitTier tier : net.zagdrath.arcforge.conduit.ConduitTier.STANDARD) {
             batteryParts.add(new MachineCategories.BatteryComponentRecipe(ModBlocks.lithiumCell(tier).get().asItem(), tier, true));

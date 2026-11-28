@@ -86,6 +86,9 @@ Suggested version: **2.11.0** (minor: nine natural stones and Quicklime, stone c
 - The Lye recipes (Sodium Silicate, Lye biodiesel, Thorium Dioxide, Lithium Hydroxide) take any alkali: Lye or
   Potassium Hydroxide Solution.
 - Gas in a Gas Reservoir is a darker shade of its colour and less see-through.
+- The Gas Centrifuge Cascade takes Depleted Uranium Hexafluoride as feed and re-enriches it, with its tails assay set
+  below the feed's (0.25% tails run at 0.1%): 5% product from it costs 32.7 mB and 26.3 SWU a mB, against 10.3 mB and
+  7.9 SWU from natural UF6. Feed no richer than the tails stops it with its own status; JEI shows the re-enrichment.
 - The Chunk Loader's + button is greyed out when the next size wouldn't fit under your chunk limit beside your other
   loaders, and its tooltip says how many chunks it needs and how many you have free. The server refuses it too.
 - Each player may now keep **128** chunks loaded (was 25; `logistics.chunkLoader.chunksPerPlayer`). An existing config

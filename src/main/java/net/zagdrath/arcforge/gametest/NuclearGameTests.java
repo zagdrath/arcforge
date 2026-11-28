@@ -317,6 +317,47 @@ public final class NuclearGameTests {
                 .thenSucceed();
     }
 
+    // Depleted UF6 is feed: at the default tails (0.25%, its own assay) it's too lean to split; with the tails at 0.1% it
+    // re-enriches into product at the target, at (target - tails) / (feed - tails) mB of feed a mB, leaving 0.1% tails.
+    static void cascadeReenrichesTails(GameTestHelper helper) {
+        BlockPos min = new BlockPos(0, 1, 1);
+        BlockPos controller = buildCascade(helper, min);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    CentrifugeCascadeBlockEntity cascade = helper.getBlockEntity(controller, CentrifugeCascadeBlockEntity.class);
+                    helper.assertTrue(cascade.isFormed(), "The 3x3 hall didn't form");
+                    cascade.setTarget(3_000);
+                    cascade.setTailsAssay(Enrichment.DEFAULT_TAILS_PCM);
+                    helper.assertTrue(fill(cascade.getFeed(), Enrichment.withAssay(ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE.get(), Enrichment.DEFAULT_TAILS_PCM),
+                            4_000) == 4_000, "It refused Depleted UF6 as feed");
+                    CrushingGameTests.charge(cascade.getEnergy(), ArcforgeConfig.CASCADE_ENERGY_CAPACITY.getAsInt());
+                })
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    CentrifugeCascadeBlockEntity cascade = helper.getBlockEntity(controller, CentrifugeCascadeBlockEntity.class);
+                    helper.assertTrue(cascade.getStatus() == MachineStatus.FEED_TOO_LEAN, "0.25% feed at 0.25% tails is " + cascade.getStatus());
+                    helper.assertTrue(cascade.getProduct().getAmount() == 0, "It made product from feed as lean as its tails");
+                    cascade.setTailsAssay(Enrichment.MIN_TAILS_PCM);
+                })
+                .thenWaitUntil(() -> helper.assertTrue(helper.getBlockEntity(controller, CentrifugeCascadeBlockEntity.class).getProduct().getAmount() > 0,
+                        "No product from re-enriched tails yet"))
+                .thenExecute(() -> {
+                    CentrifugeCascadeBlockEntity cascade = helper.getBlockEntity(controller, CentrifugeCascadeBlockEntity.class);
+                    helper.assertTrue(cascade.getStatus() == MachineStatus.ENRICHING, "Status " + cascade.getStatus());
+                    helper.assertTrue(cascade.getProduct().getResource(0).is(ModFluids.URANIUM_HEXAFLUORIDE.get())
+                            && Enrichment.assay(cascade.getProduct().getResource(0)) == 3_000, "The product isn't 3% UF6");
+                    helper.assertTrue(cascade.getTails().getResource(0).is(ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE.get())
+                            && Enrichment.assay(cascade.getTails().getResource(0)) == Enrichment.MIN_TAILS_PCM, "The tails aren't at 0.1%");
+                    int product = cascade.getProduct().getAmount();
+                    int used = 4_000 - cascade.getFeed().getAmount();
+                    double perProduct = (3_000.0 - Enrichment.MIN_TAILS_PCM) / (Enrichment.DEFAULT_TAILS_PCM - Enrichment.MIN_TAILS_PCM);
+                    helper.assertTrue(Math.abs(used - product * perProduct) <= perProduct + 1.0,
+                            used + " mB feed for " + product + " mB product (expected " + perProduct + " a mB)");
+                })
+                .thenSucceed();
+    }
+
     // A 5x4 floor forms as one 5x4 hall, not a 3x3 inside it: the centrifuges on its outer column and back row form too.
     static void cascadeFormsWholeFloor(GameTestHelper helper) {
         BlockPos min = new BlockPos(0, 1, 1);

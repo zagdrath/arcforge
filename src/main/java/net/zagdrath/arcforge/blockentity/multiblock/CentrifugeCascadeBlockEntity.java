@@ -72,7 +72,10 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 //  - Its capacity is its centrifuges times swuPerCentrifuge, in SWU a tick; each running centrifuge uses
 //    energyPerCentrifuge FE/t. With less FE than that it does as much of the work as its FE pays for.
 //  - Each mB of product costs Enrichment.swuPerProduct SWU and takes Enrichment.feedPerProduct mB of feed (any UF6
-//    poorer than the target and richer than the tails), leaving the rest as tails (Depleted Uranium Hexafluoride). The
+//    poorer than the target and richer than the tails), leaving the rest as tails (Depleted Uranium Hexafluoride).
+//    Depleted UF6 is feed too, re-enriched as real tails are: with the tails assay set below its own (0.25% tails run
+//    at 0.1%) it gives product like any lean feed, only at a lot more feed and work a mB; at or under the tails assay
+//    it's FEED_TOO_LEAN. The
 //    feed and tails a mB of product takes are seldom whole, so it carries the fractions to the next mB.
 //  - Feed goes in through Input ports; product comes out of Output ports and tails out of Tails ports, pushed into what
 //    touches them. Energy goes in through Energy ports. Product or tails of another assay left in the tanks (after the
@@ -128,7 +131,8 @@ public class CentrifugeCascadeBlockEntity extends MachineBlockEntity implements 
         int capacity = ArcforgeConfig.CASCADE_ENERGY_CAPACITY.getAsInt();
         this.energy = new ConsumerEnergyHandler(capacity, capacity, this::setChanged);
         this.feed = new FilteredFluidTank(ArcforgeConfig.CASCADE_FEED_CAPACITY.getAsInt(),
-                resource -> resource.getFluid().isSame(ModFluids.URANIUM_HEXAFLUORIDE.get()), this::setChanged);
+                resource -> resource.getFluid().isSame(ModFluids.URANIUM_HEXAFLUORIDE.get())
+                        || resource.getFluid().isSame(ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE.get()), this::setChanged);
         this.product = new FilteredFluidTank(ArcforgeConfig.CASCADE_PRODUCT_CAPACITY.getAsInt(),
                 resource -> resource.getFluid().isSame(ModFluids.URANIUM_HEXAFLUORIDE.get()), this::setChanged);
         this.tails = new FilteredFluidTank(ArcforgeConfig.CASCADE_TAILS_CAPACITY.getAsInt(),
@@ -149,6 +153,8 @@ public class CentrifugeCascadeBlockEntity extends MachineBlockEntity implements 
                     case CentrifugeCascadeMenu.DATA_TAILS_ASSAY -> tailsPcm;
                     case CentrifugeCascadeMenu.DATA_FEED_ASSAY -> feed.getAmount() > 0 ? Enrichment.assay(feed.getResource(0)) : 0;
                     case CentrifugeCascadeMenu.DATA_FEED -> feed.getAmount();
+                    case CentrifugeCascadeMenu.DATA_FEED_DEPLETED -> feed.getAmount() > 0
+                            && feed.getResource(0).getFluid().isSame(ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE.get()) ? 1 : 0;
                     case CentrifugeCascadeMenu.DATA_FEED_CAPACITY -> feed.getCapacity();
                     case CentrifugeCascadeMenu.DATA_PRODUCT -> product.getAmount();
                     case CentrifugeCascadeMenu.DATA_PRODUCT_ASSAY -> product.getAmount() > 0 ? Enrichment.assay(product.getResource(0)) : 0;
@@ -391,7 +397,8 @@ public class CentrifugeCascadeBlockEntity extends MachineBlockEntity implements 
         double feedPerProduct = Enrichment.feedPerProduct(targetPcm, feedPcm, tailsPcm);
         double swuPerProduct = Enrichment.swuPerProduct(targetPcm, feedPcm, tailsPcm);
         if (Double.isInfinite(feedPerProduct) || !(swuPerProduct > 0.0)) {
-            return MachineStatus.FEED_TOO_RICH;
+            // Feed no richer than the tails can't be split; feed as rich as the target needn't be.
+            return feedPcm <= tailsPcm ? MachineStatus.FEED_TOO_LEAN : MachineStatus.FEED_TOO_RICH;
         }
         FluidResource productResource = Enrichment.withAssay(ModFluids.URANIUM_HEXAFLUORIDE.get(), targetPcm);
         FluidResource tailsResource = Enrichment.withAssay(ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE.get(), tailsPcm);

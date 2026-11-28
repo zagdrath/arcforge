@@ -650,6 +650,7 @@ public final class ArcforgeGameTests {
         TESTS.put("nuclear_chemistry", NuclearGameTests::chemistry);
         TESTS.put("nuclear_enrichment_math", NuclearGameTests::enrichmentMath);
         TESTS.put("nuclear_cascade_enriches", NuclearGameTests::cascadeEnriches);
+        TESTS.put("nuclear_cascade_reenriches_tails", NuclearGameTests::cascadeReenrichesTails);
         TESTS.put("nuclear_cascade_forms_whole_floor", NuclearGameTests::cascadeFormsWholeFloor);
         TESTS.put("nuclear_corrosive_storage", NuclearGameTests::corrosiveStorage);
         TESTS.put("fission_reactor_physics", FissionGameTests::reactorPhysics);

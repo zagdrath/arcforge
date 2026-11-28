@@ -3478,6 +3478,7 @@
   "subtitles.arcforge.geiger_click": "Geiger Counter clicks",
   "gui.arcforge.status.enriching": "Enriching",
   "gui.arcforge.status.feed_too_rich": "Feed can't reach the target",
+  "gui.arcforge.status.feed_too_lean": "Feed no richer than the tails",
   "gui.arcforge.status.assay_mismatch": "Drain the old product or tails",
   "gui.arcforge.side_mode.tails": "Tails",
   "gui.arcforge.side_mode.product_output": "Product output",

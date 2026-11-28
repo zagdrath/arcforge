@@ -21,7 +21,7 @@
     },
     {
       "type": "text",
-      "text": "# Running it\n- Feed may be any UF₆ poorer than the target and richer than the tails, so 5% can be fed back to reach 20%.\n- After changing the target or tails, drain the old product or tails first: it won't mix assays.\n- Redstone control can stop it. While it runs its centrifuges' bands spin and the hall hums."
+      "text": "# Running it\n- Feed may be any UF₆ poorer than the target and richer than the tails, so 5% can be fed back to reach 20%.\n- Depleted UF₆ is feed too: set the tails below its assay (0.25% tails run at 0.1%) and it re-enriches. It takes far more: 5% from 0.25% tails at 0.1% costs 32.7 mB and 26.3 SWU a mB, against 10.3 mB and 7.9 SWU from natural feed. At or under the tails assay it says Feed no richer than the tails.\n- After changing the target or tails, drain the old product or tails first: it won't mix assays.\n- Redstone control can stop it. While it runs its centrifuges' bands spin and the hall hums."
     }
   ]
 }

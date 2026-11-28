@@ -166,6 +166,8 @@ public enum MachineStatus {
     // its tails), and with product or tails of another assay still in its tanks.
     ENRICHING("enriching", "led_running"),
     FEED_TOO_RICH("feed_too_rich", "led_blocked"),
+    // The cascade's feed is no richer than its tails assay (Depleted UF6 with the tails left at 0.25%).
+    FEED_TOO_LEAN("feed_too_lean", "led_blocked"),
     ASSAY_MISMATCH("assay_mismatch", "led_blocked"),
     // The Fission Reactor: critical (making power), subcritical (shut down or starting up), tripped (its rods dropped
     // in by the protection system), and with its core damaged (the fuel melted). The Heavy Water Tower: exchanging.

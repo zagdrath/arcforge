@@ -42,7 +42,9 @@ public class CentrifugeCascadeMenu extends MachineMenu {
     public static final int DATA_STATUS = 17;
     public static final int DATA_REDSTONE_MODE = 18;
     public static final int DATA_SIDE_CONFIG = 19;
-    public static final int DATA_VALUES = 20;
+    // 1 when the feed is Depleted UF6 (being re-enriched), for the feed tank's colour.
+    public static final int DATA_FEED_DEPLETED = 20;
+    public static final int DATA_VALUES = 21;
 
     // The player inventory's corner: the screen is taller than the standard one, and 40 px wider (the inventory centred).
     public static final int INVENTORY_X = 28, INVENTORY_Y = 104;
@@ -127,6 +129,10 @@ public class CentrifugeCascadeMenu extends MachineMenu {
 
     public int getFeed() {
         return value(DATA_FEED);
+    }
+
+    public boolean isFeedDepleted() {
+        return value(DATA_FEED_DEPLETED) != 0;
     }
 
     public int getFeedCapacity() {

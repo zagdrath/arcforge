@@ -74,7 +74,8 @@ public class CentrifugeCascadeScreen extends MachineScreen<CentrifugeCascadeMenu
     @Override
     protected void drawContents(GuiGraphicsExtractor graphics, int x, int y) {
         drawEnergy(graphics, x, y);
-        drawFluidTank(graphics, ModFluids.URANIUM_HEXAFLUORIDE.get(), menu.getFeed(), menu.getFeedCapacity(), gasFill, tankGauge,
+        drawFluidTank(graphics, menu.isFeedDepleted() ? ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE.get() : ModFluids.URANIUM_HEXAFLUORIDE.get(),
+                menu.getFeed(), menu.getFeedCapacity(), gasFill, tankGauge,
                 x, y, TANK_X[0], TANK_Y, TANK_W, TANK_H);
         drawFluidTank(graphics, ModFluids.URANIUM_HEXAFLUORIDE.get(), menu.getProduct(), menu.getProductCapacity(), gasFill, tankGauge,
                 x, y, TANK_X[1], TANK_Y, TANK_W, TANK_H);
