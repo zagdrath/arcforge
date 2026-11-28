@@ -16,6 +16,7 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.block.multiblock.VesselControllerBlock;
 import net.zagdrath.arcforge.blockentity.fusion.FusionPlantBlockEntity;
+import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.fusion.FusionExhaustPool;
 import net.zagdrath.arcforge.fusion.Lithium6;
 import net.zagdrath.arcforge.fusion.PlasmaSim;
@@ -63,6 +64,39 @@ public final class FusionGameTests {
         PlasmaSim.Event end = run(r3, 8.0, 50.0, 0.8, 900, peak);
         helper.assertTrue(peak[0] > 100.0 && peak[0] < 1_000.0, "An R3 tokamak peaked at " + peak[0] + " MW");
         helper.assertTrue(end == PlasmaSim.Event.PULSE_END, "An R3 pulse ended with " + end);
+        // A finished pulse is out (so the controller recharges the solenoid and, repeating, starts the next one).
+        helper.assertFalse(r3.alive, "The plasma was still alive after its pulse ended");
+        // With impurities (the config's clean plasma, and a dirtier one), the fuelling holds the density where radiation
+        // can't take over: the burn holds through the pulse instead of collapsing into a cold, radiating plasma.
+        for (double impurity : new double[] { ArcforgeConfig.FUSION_BASE_IMPURITY.getAsDouble(), 0.002 }) {
+            PlasmaSim dirty = new PlasmaSim(new TokamakLayout(3).majorRadiusMetres(), false, new PlasmaSim.Params());
+            dirty.pumping = 0.25;
+            dirty.impurity = impurity;
+            dirty.bField = 8.0;
+            dirty.ready = true;
+            dirty.ipTarget = dirty.maxCurrent();
+            double best = 0.0, coldest = Double.MAX_VALUE, settled = Double.MAX_VALUE;
+            PlasmaSim.Event last = PlasmaSim.Event.NONE;
+            for (int sec = 0; sec < 900 && last != PlasmaSim.Event.PULSE_END && !last.name().contains("DISRUPTION"); sec++) {
+                dirty.pEch = sec < 30 ? 10.0 : 0.0;
+                dirty.pNbi = 50.0;
+                double fuel = dirty.alive ? dirty.fuelDemand(0.85, 1.0) : 2.0;
+                dirty.srcD = fuel / 2.0;
+                dirty.srcT = fuel / 2.0;
+                last = dirty.step();
+                if (dirty.alive && !dirty.rampDown && sec > 40) {
+                    best = Math.max(best, dirty.pFusion);
+                    settled = Math.min(settled, dirty.pFusion);
+                    coldest = Math.min(coldest, dirty.t);
+                }
+            }
+            helper.assertTrue(last == PlasmaSim.Event.PULSE_END, "An R3 at impurity " + impurity + " ended with " + last);
+            helper.assertTrue(coldest > 2.0, "An R3 at impurity " + impurity + " cooled to " + coldest + " keV before its ramp-down");
+            // A clean one holds its burn steady; a dirty one may run rough, but stays hot.
+            if (impurity < 0.002) {
+                helper.assertTrue(settled > 0.5 * best, "An R3 at impurity " + impurity + " fell from " + best + " to " + settled + " MW mid-pulse");
+            }
+        }
         helper.assertTrue(peak[0] / 50.0 > 2.0, "An R3 tokamak didn't reach Q 2");
         double[] stellarator = { 0.0 };
         PlasmaSim steady = new PlasmaSim(new TokamakLayout(5).majorRadiusMetres(), true, new PlasmaSim.Params());

@@ -181,7 +181,10 @@ public class ArcforgeClient {
         net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity.clientHook = net.zagdrath.arcforge.client.sound.DieselGeneratorSound::clientTick;
         net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity.clientHook = net.zagdrath.arcforge.client.sound.CentrifugeCascadeSound::clientTick;
         net.zagdrath.arcforge.blockentity.multiblock.FissionReactorBlockEntity.clientHook = net.zagdrath.arcforge.client.sound.FissionReactorSound::clientTick;
-        net.zagdrath.arcforge.blockentity.fusion.FusionReactorBlockEntity.clientHook = net.zagdrath.arcforge.client.sound.FusionReactorSound::clientTick;
+        net.zagdrath.arcforge.blockentity.fusion.FusionReactorBlockEntity.clientHook = reactor -> {
+            net.zagdrath.arcforge.client.sound.FusionReactorSound.clientTick(reactor);
+            FusionPlasmaParticles.clientTick(reactor);
+        };
         MachineSounds.clientHook = MachineLoopSound::keepPlaying;
         JetpackStatePayload.clientHandler = JetpackClient::onState;
         net.zagdrath.arcforge.network.ArcQuarryFinishedPayload.clientHandler = ArcQuarryToast::show;

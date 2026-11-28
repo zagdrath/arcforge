@@ -67,13 +67,18 @@ import net.zagdrath.arcforge.transfer.energy.TrackingEnergyHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 
 // An Energy, Heat, Fluid or Gas Meter. It passes what its kind carries from its left side (as you face its screen)
-// to its right, up to the kind's cap a tick, through a buffer of one tick's flow: it takes what's pushed into its
-// left and pulls from the block there, and pushes into the block on its right (conduits there pull too). What leaves
+// to its right (flipped: right to left), any amount a tick (THROUGHPUT; a Heat Meter up to its cap), through a buffer
+// of one tick's flow: it takes what's pushed into its input side and pulls from the block there, and pushes into the
+// block on its output side (conduits there pull too). What leaves
 // the buffer each tick is its flow; the rate is the average over smoothingTicks. It gives a signal of 15 on every
-// side while the rate is above (or below) its threshold, and comparators read the rate against the cap.
+// side while the rate is above (or below) its threshold, and comparators read the rate against the kind's full scale
+// (its config cap, also the screen bar's full scale): a faster flow still passes, and reads 15.
 public class MeterBlockEntity extends BlockEntity implements MenuProvider, Owned, ConduitConnectable, SettingsCopyable, Dismantleable {
     // The most samples the rate is averaged over (config smoothingTicks is capped by this).
     private static final int MAX_SAMPLES = 1_200;
+    // What it passes a tick, of any kind: no limit worth meeting (every source and conduit is far below it), with room
+    // so a tick's flow in and out can't overflow.
+    public static final int THROUGHPUT = Integer.MAX_VALUE / 4;
     // The rate shown on the front and in Jade is resent at most this often while it changes.
     private static final int DISPLAY_SYNC_TICKS = 10;
 
@@ -111,7 +116,7 @@ public class MeterBlockEntity extends BlockEntity implements MenuProvider, Owned
     public MeterBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.METER.get(), pos, state);
         this.kind = state.getBlock() instanceof MeterBlock meter ? meter.kind() : MeterKind.ENERGY;
-        int cap = kind.cap();
+        int cap = THROUGHPUT;
         this.energy = new TrackingEnergyHandler(kind == MeterKind.ENERGY ? cap : 1, kind == MeterKind.ENERGY ? cap : 0, this::setChanged);
         this.energyIn = new SidedEnergyHandler(energy, true, false);
         this.energyOut = new SidedEnergyHandler(energy, false, true);
@@ -127,6 +132,7 @@ public class MeterBlockEntity extends BlockEntity implements MenuProvider, Owned
                     case MeterMenu.DATA_THRESHOLD -> settings.threshold();
                     case MeterMenu.DATA_MODE -> settings.mode().ordinal();
                     case MeterMenu.DATA_POWERED -> isPowered() ? 1 : 0;
+                    case MeterMenu.DATA_FLIPPED -> isFlipped() ? 1 : 0;
                     default -> 0;
                 };
             }
@@ -142,7 +148,7 @@ public class MeterBlockEntity extends BlockEntity implements MenuProvider, Owned
     }
 
     public void setSettings(MeterSettings settings) {
-        MeterSettings clamped = new MeterSettings(Mth.clamp(settings.threshold(), 0, kind.cap()), settings.mode());
+        MeterSettings clamped = new MeterSettings(Mth.clamp(settings.threshold(), 0, THROUGHPUT), settings.mode());
         if (!clamped.equals(this.settings)) {
             this.settings = clamped;
             setChanged();
@@ -167,12 +173,33 @@ public class MeterBlockEntity extends BlockEntity implements MenuProvider, Owned
         return rate <= 0 ? 0 : Mth.clamp(Mth.ceil(15.0 * rate / Math.max(1, cap)), 1, 15);
     }
 
+    // The side it takes from (its left as you face its screen, its right when flipped), and the side it gives out of.
     private Direction left() {
-        return RelativeSide.LEFT.toDirection(getBlockState().getValue(MeterBlock.FACING));
+        BlockState state = getBlockState();
+        return (state.getValue(MeterBlock.FLIPPED) ? RelativeSide.RIGHT : RelativeSide.LEFT).toDirection(state.getValue(MeterBlock.FACING));
     }
 
     private Direction right() {
-        return RelativeSide.RIGHT.toDirection(getBlockState().getValue(MeterBlock.FACING));
+        BlockState state = getBlockState();
+        return (state.getValue(MeterBlock.FLIPPED) ? RelativeSide.LEFT : RelativeSide.RIGHT).toDirection(state.getValue(MeterBlock.FACING));
+    }
+
+    // Turns its flow round: what it takes from and gives out of swap sides. What's in its buffer carries on out of the
+    // new output.
+    public void flip() {
+        if (level == null) {
+            return;
+        }
+        BlockState state = getBlockState();
+        level.setBlock(worldPosition, state.setValue(MeterBlock.FLIPPED, !state.getValue(MeterBlock.FLIPPED)), Block.UPDATE_ALL);
+        // Conduits beside it see its new input and output sides.
+        level.updateNeighborsAt(worldPosition, state.getBlock());
+        invalidateCapabilities();
+        setChanged();
+    }
+
+    public boolean isFlipped() {
+        return getBlockState().getValue(MeterBlock.FLIPPED);
     }
 
     // --- Ticking ---
@@ -182,7 +209,7 @@ public class MeterBlockEntity extends BlockEntity implements MenuProvider, Owned
     }
 
     private void tick(ServerLevel level, BlockPos pos, BlockState state) {
-        int cap = kind.cap();
+        int cap = THROUGHPUT;
         Direction left = left();
         Direction right = right();
         BlockPos leftPos = pos.relative(left);
@@ -201,6 +228,9 @@ public class MeterBlockEntity extends BlockEntity implements MenuProvider, Owned
                 energy.resetTotals();
             }
             case HEAT -> {
+                // A Heat Meter keeps its config cap as a limit: heat networks didn't pass heat through one with a bigger
+                // buffer (the gas_turbine_exhaust_through_heat_meter GameTest).
+                cap = kind.cap();
                 HeatHandler source = level.getCapability(ModCapabilities.HEAT, leftPos, left.getOpposite());
                 heatCelsius = sourceCelsius(level, leftPos, source);
                 HeatHandler target = level.getCapability(ModCapabilities.HEAT, rightPos, right.getOpposite());

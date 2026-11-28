@@ -48,8 +48,9 @@ import net.zagdrath.arcforge.steam.TokamakMesh;
 // cryostat with its viewports onto the plasma chamber, port flanges, the control desk and the nozzles of its ports and
 // modules; its blocks draw nothing while formed. The model is built when the reactor forms and again when its glass,
 // ports or modules change (checked every second). While the plasma burns it's drawn full-bright inside, a core in a
-// halo, tinted for its temperature (the controller's synced glow, 1 to 15: a deep pink-violet when it's cool, paler and
-// whiter as it heats; a D-He3 plasma a bluer lilac) and brighter with it, its light on the viewports' ducts too.
+// halo, tinted for its temperature (the controller's synced glow, 1 to 15: a deep violet when it's cool, a brighter purple
+// as it heats; a D-He3 plasma a bluer lilac) and brighter with it, its light on the viewports' ducts too. Its particles
+// (motes and sparks) are FusionPlasmaParticles'.
 //
 // The see-through parts go in order: the glow and the plasma first, then the glass tint over them (see VesselRenderer).
 public class FusionReactorRenderer implements StructureRenderer<FusionReactorBlockEntity, FusionReactorRenderer.State> {
@@ -58,10 +59,10 @@ public class FusionReactorRenderer implements StructureRenderer<FusionReactorBlo
     private static final float[] EMPTY = new float[0];
     private static final int TINT_ALPHA = 0x5A, PLASMA_ORDER = 1, TINT_ORDER = 2;
     // The halo's share of the core's strength.
-    private static final float HALO = 0.4F;
+    private static final float HALO = 0.55F;
     // The plasma's tint, cool and hot, for D-T and D-He3 {r, g, b} 0..1.
-    private static final float[][] DT = { { 0.78F, 0.27F, 0.86F }, { 1.0F, 0.82F, 0.96F } };
-    private static final float[][] DHE3 = { { 0.62F, 0.50F, 1.0F }, { 0.90F, 0.88F, 1.0F } };
+    private static final float[][] DT = { { 0.62F, 0.16F, 0.96F }, { 0.84F, 0.48F, 1.0F } };
+    private static final float[][] DHE3 = { { 0.46F, 0.38F, 1.0F }, { 0.70F, 0.66F, 1.0F } };
 
     private final Map<FusionReactorBlockEntity, Built> built = new WeakHashMap<>();
 
@@ -205,7 +206,7 @@ public class FusionReactorRenderer implements StructureRenderer<FusionReactorBlo
             rgb = rgb << 8 | Math.round(255.0F * (ramp[0][k] + (ramp[1][k] - ramp[0][k]) * heat));
         }
         state.plasmaColor = rgb;
-        state.plasmaLevel = 0.45F + 0.55F * heat;
+        state.plasmaLevel = 0.65F + 0.35F * heat;
         state.sheet = SteamBoilerArrayRenderer.sprite(SHEET);
         state.light = LightCoordsUtil.getLightCoords(level, shape.axis().above(shape.layout().top() + 1));
     }

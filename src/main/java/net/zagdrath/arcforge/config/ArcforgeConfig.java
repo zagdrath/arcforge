@@ -3594,24 +3594,24 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Energy, Heat, Fluid and Gas Meters: pass flow from their left side to their right, up to a cap per tick, and",
-                "report the rate. The caps default to the Arcforged conduit rates.").push("meters");
+        BUILDER.comment("Energy, Heat, Fluid and Gas Meters: pass flow from their left side to their right (any amount; a Heat Meter up to its cap), and",
+                "report the rate. Their full scales default to the Arcforged conduit rates.").push("meters");
     }
 
     public static final ModConfigSpec.IntValue METER_ENERGY_CAP = BUILDER
-            .comment("Most FE an Energy Meter passes per tick.")
+            .comment("The FE/t an Energy Meter reads as full: a comparator's 15 and the full bar on its screen. It passes any flow.")
             .defineInRange("energyRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.defaultEnergyPerTick(), 1, Integer.MAX_VALUE);
 
     public static final ModConfigSpec.IntValue METER_HEAT_CAP = BUILDER
-            .comment("Most HU a Heat Meter passes per tick.")
+            .comment("Most HU a Heat Meter passes per tick, and the rate it reads as full (a comparator's 15, the full bar on its screen).")
             .defineInRange("heatRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.defaultHeatPerTick(), 1, Integer.MAX_VALUE);
 
     public static final ModConfigSpec.IntValue METER_FLUID_CAP = BUILDER
-            .comment("Most mB of liquid a Fluid Meter passes per tick.")
+            .comment("The mB/t of liquid a Fluid Meter reads as full: a comparator's 15 and the full bar on its screen. It passes any flow.")
             .defineInRange("fluidRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.fluidPerTick(), 1, Integer.MAX_VALUE);
 
     public static final ModConfigSpec.IntValue METER_GAS_CAP = BUILDER
-            .comment("Most mB of gas a Gas Meter passes per tick.")
+            .comment("The mB/t of gas a Gas Meter reads as full: a comparator's 15 and the full bar on its screen. It passes any flow.")
             .defineInRange("gasRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.gasPerTick(), 1, Integer.MAX_VALUE);
 
     public static final ModConfigSpec.IntValue METER_SMOOTHING_TICKS = BUILDER
@@ -4881,8 +4881,8 @@ public class ArcforgeConfig {
             .defineInRange("blanketGain", 1.15, 1.0, 2.0);
 
     public static final ModConfigSpec.DoubleValue FUSION_BASE_IMPURITY = BUILDER
-            .comment("Impurity fraction of a clean plasma (eroded walls and poor vacuum add to it).")
-            .defineInRange("baseImpurity", 0.002, 0.0, 0.1);
+            .comment("Impurity fraction of a clean plasma (eroded walls and poor vacuum add to it). Renamed from baseImpurity (was 0.002) so existing configs take the new default.")
+            .defineInRange("cleanImpurity", 0.0005, 0.0, 0.1);
 
     public static final ModConfigSpec.IntValue FUSION_PUMPDOWN = BUILDER
             .comment("Seconds one Cryopump takes to pump a 4-radius vessel down to vacuum (bigger vessels and fewer pumps take longer).")

@@ -155,6 +155,9 @@ public class FusionReactorBlockEntity extends MachineBlockEntity implements Mult
     private double vacuum = 1.0, leak;
     private double coilTemp = AMBIENT_K, field;
     private boolean energised;
+    // Whether the coils warmed last second (their coolant ran out or they're being let warm): the magnet alarm only
+    // warns of energised coils warming toward a quench, not of their cool-down passing through the same band.
+    private boolean coilsWarming;
     private double magnetPaid, csCharge, csNeeded;
     // Heat not yet carried off (HU), as the wall's and blanket's temperatures; this second's heat to carry (HU/t).
     private double wallHeat, blanketHeat, wallPerTick, blanketPerTick;
@@ -249,6 +252,12 @@ public class FusionReactorBlockEntity extends MachineBlockEntity implements Mult
         return shape != null ? shape.radius() : 0;
     }
 
+    // The temperature the coils quench above at the field they hold: Liquid Nitrogen's critical temperature up to the
+    // nitrogen-level field, Liquid Helium's above it.
+    double criticalTemp() {
+        return shape != null && field <= maxField(shape.radius()) * ArcforgeConfig.FUSION_LN2_FIELD.getAsDouble() + 0.01 ? TC_NITROGEN : TC_FULL;
+    }
+
     // Cold enough to start on: below Liquid Helium's critical temperature while there's Liquid Helium to cool with (so a
     // pulse doesn't light on the nitrogen-level field partway through the cool-down, then lose its flux to the field's
     // ramp to full), else below Liquid Nitrogen's.
@@ -317,7 +326,7 @@ public class FusionReactorBlockEntity extends MachineBlockEntity implements Mult
     }
 
     private void updateFormed(ServerLevel level) {
-        if (shape != null && !(level.isLoaded(shape.min()) && level.isLoaded(shape.max()))) {
+        if (shape != null && !TokamakStructure.loaded(level, shape.min(), shape.max())) {
             return;
         }
         TokamakStructure.Shape found = TokamakStructure.find(level, worldPosition, shape);
@@ -713,8 +722,10 @@ public class FusionReactorBlockEntity extends MachineBlockEntity implements Mult
                 target = 77.0;
             }
         }
+        double before = coilTemp;
         coilTemp += (target - coilTemp) * (target < coilTemp ? 0.02 : 0.004);
-        double critical = field <= maxField(shape.radius()) * ArcforgeConfig.FUSION_LN2_FIELD.getAsDouble() + 0.01 ? TC_NITROGEN : TC_FULL;
+        coilsWarming = coilTemp > before + 1.0E-6;
+        double critical = criticalTemp();
         if (field > 0.1 && coilTemp > critical) {
             quench(level);
             return;
@@ -1062,7 +1073,9 @@ public class FusionReactorBlockEntity extends MachineBlockEntity implements Mult
     private void alarms(ServerLevel level, PlasmaSim plasma) {
         int flags = alarms & (FusionAlarm.DISRUPTION.bit | FusionAlarm.QUENCH.bit | FusionAlarm.TRITIUM.bit);
         if (plasma.alive) {
-            if (!shape.stellarator() && plasma.greenwald > 0.9 * ArcforgeConfig.FUSION_GREENWALD_LIMIT.getAsDouble()) {
+            // Not during the ramp-down at the end of a pulse: the density limit falls with the current a step ahead of
+            // the density, but a planned ramp-down can't disrupt on it (the pulse-ending alarm covers it).
+            if (!shape.stellarator() && !plasma.rampDown && plasma.greenwald > 0.9 * ArcforgeConfig.FUSION_GREENWALD_LIMIT.getAsDouble()) {
                 flags |= FusionAlarm.DENSITY.bit;
             }
             if (!shape.stellarator() && plasma.betaN > 0.9 * ArcforgeConfig.FUSION_BETA_LIMIT.getAsDouble()) {
@@ -1081,7 +1094,7 @@ public class FusionReactorBlockEntity extends MachineBlockEntity implements Mult
         if (wallTemperature() > WALL_LIMIT * 0.8 || blanketTemperature() > BLANKET_LIMIT * 0.8) {
             flags |= FusionAlarm.COOLANT.bit;
         }
-        if (energised && coilTemp > TC_FULL * 0.8 && coilTemp <= TC_FULL || coilDamage > 0.0) {
+        if (energised && coilsWarming && coilTemp > criticalTemp() * 0.8 || coilDamage > 0.0) {
             flags |= FusionAlarm.MAGNET.bit;
         }
         if (Math.max(fwWear, divWear) > 0.8 || blanketWear > 0.8) {

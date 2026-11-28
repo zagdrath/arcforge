@@ -140,6 +140,20 @@ Battery charging, the Quantum Tunnel Upgrades tab and the NPK and Nutrient Solut
   without the cage. **The ladder can be climbed:** step into the gap in front of it on the column's left side and
   climb to a new deck on top of the column, round the condenser, where you can walk. The column's blocks now take the
   shape of the model (shell, platforms, railings) instead of full blocks.
+- The Fusion Reactor's plasma glows a brighter, more saturated purple (a bluer lilac on D-He3) instead of fading to
+  near-white as it heats, and while it burns, plenty of purple motes drift through it and sparks stream round the ring
+  (more the hotter it burns and the bigger the reactor).
+  Through a viewport the chamber is now a rounded vacuum vessel round the plasma, its walls curving into its roof and
+  floor (First Wall armour, the Divertor's targets round its bottom), instead of a square-cornered box.
+- Meters can be turned round: a Flip button in the GUI makes one take from its right and give out of its left, and the
+  bar on its front is now an arrow pointing the way it flows. Its Above / Below buttons are smaller (the Chunk Loader's
+  size), with the Flip button on the status line.
+- The Helium Gas Turbine's split flanges follow the compressor's and power turbines' taper instead of standing off the
+  narrow end; the stub on the starting motor and the cooler's two water-line stubs are gone; the cooler has heat-sink
+  fins down both sides; and the terminal box is a shaded red panel instead of flat red.
+- The Helium Gas Turbine's machinery is bigger: the compressor, power turbines and generator are about 2.5 blocks
+  across (were about 1.7), on a raised shaft, with everything round them resized to match. The walkway is unchanged,
+  and the recuperator behind is slimmer to make room. Its block shapes follow the new model.
 - Every machine and multiblock that uses FE shows the Energy tab on the left: the Cryogenic Plant, Cryogenic
   Distillation Column, Tritium Plant, Fusion Reactor (its FE use averaged over the last second), Centrifuge Cascade,
   Heavy Water Tower, PUREX Plant and Water Intake now have it too.
@@ -162,6 +176,20 @@ Battery charging, the Quantum Tunnel Upgrades tab and the NPK and Nutrient Solut
   the column or cold box (it runs back to meet it), and you can no longer see into the flange bands from below or
   through gaps round the jacketed lines' bellows, the expander's flange and the compressor's barrel.
 - The Mercury Vapour Lamp's cage no longer flickers where its rails met the corner bars.
+- A Fusion Reactor no longer loses its vacuum (and shows a Vacuum fault) on joining a world: a reactor spanning
+  several chunks could be checked before all of them had loaded, found incomplete, and its vessel let up to air. It now
+  waits for every chunk it covers.
+- A Fusion Reactor's viewports look into its rounded vacuum vessel through proper ports: the port runs in to the curved
+  liner, which you look straight through (nothing of it in the way) at its far side and the plasma, with walls in the First
+  Wall's armour and the Divertor's targets underfoot, instead of showing the square chamber's flat walls, roof and floor
+  round the liner. The plasma's glow falls on the vessel's inside rather than on the port.
+- A Conduit Filter stays on when the Wrench turns its side from Output back to Input (passing through Disabled): a
+  disabled side keeps its filter, out of sight, until it's a port again. It still pops off when the machine goes.
+- The Helium Gas Turbine's intake plenum no longer has a see-through strip above the precooler beside it.
+- Energy, Fluid and Gas Meters no longer cap what passes through them: an Energy Meter topped out at 262,144 FE/t (a Direct Energy Converter
+  or a whole plant's output was throttled and misread). They pass any flow; the config value (now labelled Full Scale)
+  only sets the rate a comparator reads as 15 and the screen bar's full scale, and the threshold can go above it.
+  The Heat Meter keeps its limit (51,200 HU/t by default).
 - The Helium Gas Turbine and Nuclear Steam Turbine no longer form with Pressure Glass in their walls (they're all
   casings), which drew the glass as a stray sheet over the formed model. In a world where one already formed round
   glass, breaking a pane now takes the turbine apart instead of leaving its model, outline and glass frames behind.
@@ -177,6 +205,19 @@ Battery charging, the Quantum Tunnel Upgrades tab and the NPK and Nutrient Solut
   starts on the full field. It used to light at 85 K on the Liquid Nitrogen field partway through the cool-down. The
   start-up checklist's "Magnets cold" step and the Handbook say so (allow a couple of minutes from warm).
 - Fusion Reactor disruptions say in chat which limit was passed and what to change, instead of a raw lang key.
+- The Fusion Reactor's Magnet fault alarm no longer sounds on every start-up: it lit whenever energised coils were
+  between 16 and 20 K, which they always pass through on their way down to 4.5 K while the field ramps. It now warns
+  only of energised coils warming toward their quench temperature (85 K on the Liquid Nitrogen field), or of coil
+  damage.
+- A Fusion Reactor pulse now goes out when its current has ramped down. The plasma stayed "alive" and empty after its
+  pulse ended (Fusing, nothing in it, "Pulse ending" every second), so the solenoid never recharged and Repeat pulses
+  never started the next one.
+- A Fusion Reactor's burn no longer collapses partway through a pulse. Fuelled up to the density setpoint, impurity
+  radiation (which grows with the density squared) outgrew the heating, and the plasma fell into a cold state at under
+  half a keV that radiated everything and burnt through the solenoid's flux. The fuelling now holds the density where
+  radiation takes at most 60% of the power in.
+- The density alarm no longer sounds as a pulse ends: the current's ramp-down lowers the density limit a moment ahead
+  of the density, but a planned ramp-down can't disrupt on it. "Pulse ending" still shows.
 - Looking into a Fusion Reactor's viewport: no sky shows through a crack round the top and foot of the centre column; a
   window across the plasma chamber's top or bottom row shows a solid ledge with a lip where the blanket meets the
   chamber, not a paper-thin sheet; and the control desk's lid no longer flickers against a window's sill right above
@@ -188,6 +229,9 @@ Battery charging, the Quantum Tunnel Upgrades tab and the NPK and Nutrient Solut
 
 ### Upgrading
 
+- The Fusion Reactor's `baseImpurity` config is now `cleanImpurity`, default 0.0005 (was 0.002, which held an R3 to about
+  60 MW of fusion once the burn no longer collapses; at 0.0005 it makes about 190 MW). Existing configs take the new
+  default; set it back if you want the harder balance.
 - A Helium Gas Turbine or Nuclear Steam Turbine built with Pressure Glass in its walls stays formed until a block of
   it is broken; after that it only forms again with casings in place of the glass.
 

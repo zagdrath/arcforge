@@ -43,7 +43,10 @@ public class MeterScreen extends AbstractContainerScreen<MeterMenu> {
     private static final int LABEL_X = 12, VALUE_RIGHT = 164;
     private static final int RATE_Y = 23, BAR_X = 12, BAR_Y = 34, BAR_W = 152, BAR_H = 4, TICK_Y = 33, THRESHOLD_Y = 42;
     private static final int LED_X = 12, LED_Y = 56, STATUS_X = 20;
-    private static final int SIGNAL_WHEN_X = 8, SIGNAL_WHEN_Y = 82, ABOVE_X = 122, BELOW_X = 146, MODE_Y = 76, BUTTON_SIZE = 20;
+    // The small buttons (the Chunk Loader's size): Above and Below on the Signal when row, Flip at the end of the status
+    // line with the way it flows beside it.
+    private static final int SIGNAL_WHEN_X = 8, SIGNAL_WHEN_Y = 82, ABOVE_X = 134, BELOW_X = 150, MODE_Y = 79, BUTTON_SIZE = 14, ICON = 10;
+    private static final int FLIP_X = 150, FLIP_Y = LED_Y - 4, FLOW_RIGHT = FLIP_X - 4;
     private static final int FIELD_LABEL_X = 8, FIELD_Y = 105, FIELD_X = 69, FIELD_W = 70, UNIT_RIGHT = 165;
 
     private final SideTabPanel tabs = new SideTabPanel();
@@ -101,7 +104,7 @@ public class MeterScreen extends AbstractContainerScreen<MeterMenu> {
         } catch (NumberFormatException e) {
             typed = 0;
         }
-        int threshold = (int) Math.min(Math.max(0, typed), kind().cap());
+        int threshold = (int) Math.min(Math.max(0, typed), net.zagdrath.arcforge.blockentity.logistics.MeterBlockEntity.THROUGHPUT);
         field.setValue(Integer.toString(threshold));
         if (threshold != menu.getThreshold()) {
             sendButton(MeterMenu.THRESHOLD_BUTTON + threshold);
@@ -157,8 +160,12 @@ public class MeterScreen extends AbstractContainerScreen<MeterMenu> {
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TICK, x + tickX, y + TICK_Y, 1, 6);
         String led = menu.isPowered() ? "led_running" : menu.getRate() > 0 ? "led_idle" : "led_off";
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite(led), x + LED_X, y + LED_Y, 6, 6);
-        modeButton(graphics, mouseX, mouseY, ABOVE_X, MeterSettings.Mode.ABOVE, "meter_above");
-        modeButton(graphics, mouseX, mouseY, BELOW_X, MeterSettings.Mode.BELOW, "meter_below");
+        modeButton(graphics, mouseX, mouseY, ABOVE_X, MeterSettings.Mode.ABOVE, "small_meter_above");
+        modeButton(graphics, mouseX, mouseY, BELOW_X, MeterSettings.Mode.BELOW, "small_meter_below");
+        int fx = x + FLIP_X, fy = y + FLIP_Y;
+        boolean flipHovered = ArcforgeGui.isInside(mouseX, mouseY, fx, fy, BUTTON_SIZE, BUTTON_SIZE);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, flipHovered ? BUTTON_HOVER : BUTTON, fx, fy, BUTTON_SIZE, BUTTON_SIZE);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ArcforgeGui.widget("small_flip"), fx + 2, fy + 2, ICON, ICON);
         // Tabs overlap the panel edge, so they are drawn after the background.
         tabs.render(graphics, font, leftPos, topPos, mouseX, mouseY);
     }
@@ -169,7 +176,7 @@ public class MeterScreen extends AbstractContainerScreen<MeterMenu> {
         boolean hovered = ArcforgeGui.isInside(mouseX, mouseY, x, y, BUTTON_SIZE, BUTTON_SIZE);
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, selected ? BUTTON_PRESSED : hovered ? BUTTON_HOVER : BUTTON, x, y, BUTTON_SIZE, BUTTON_SIZE);
         int offset = selected ? 3 : 2;
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ArcforgeGui.widget(icon), x + offset, y + offset, 16, 16);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ArcforgeGui.widget(icon), x + offset, y + offset, ICON, ICON);
         if (selected) {
             graphics.outline(x - 1, y - 1, BUTTON_SIZE + 2, BUTTON_SIZE + 2, ArcforgeGui.ACCENT);
         }
@@ -186,6 +193,8 @@ public class MeterScreen extends AbstractContainerScreen<MeterMenu> {
         Component status = Component.translatable(menu.isPowered() ? "gui.arcforge.meter.signal_on"
                 : menu.getRate() > 0 ? "gui.arcforge.meter.signal_off" : "gui.arcforge.meter.no_flow");
         graphics.text(font, status, STATUS_X, LED_Y - 1, ArcforgeGui.TEXT, false);
+        textRight(graphics, Component.translatable(menu.isFlipped() ? "gui.arcforge.meter.flow.right_to_left" : "gui.arcforge.meter.flow.left_to_right"),
+                FLOW_RIGHT, LED_Y - 1, ArcforgeGui.LABEL);
         graphics.text(font, Component.translatable("gui.arcforge.meter.signal_when"), SIGNAL_WHEN_X, SIGNAL_WHEN_Y, ArcforgeGui.LABEL, false);
         graphics.text(font, Component.translatable("gui.arcforge.meter.threshold"), FIELD_LABEL_X, FIELD_Y, ArcforgeGui.LABEL, false);
         textRight(graphics, kind().unit(), UNIT_RIGHT, FIELD_Y, ArcforgeGui.LABEL);
@@ -199,6 +208,8 @@ public class MeterScreen extends AbstractContainerScreen<MeterMenu> {
             lines.add(Component.translatable("gui.arcforge.meter.mode.above.tooltip"));
         } else if (ArcforgeGui.isInside(mouseX, mouseY, leftPos + BELOW_X, topPos + MODE_Y, BUTTON_SIZE, BUTTON_SIZE)) {
             lines.add(Component.translatable("gui.arcforge.meter.mode.below.tooltip"));
+        } else if (ArcforgeGui.isInside(mouseX, mouseY, leftPos + FLIP_X, topPos + FLIP_Y, BUTTON_SIZE, BUTTON_SIZE)) {
+            lines.add(Component.translatable("gui.arcforge.meter.flip.tooltip"));
         } else {
             tabs.addTooltip(lines, mouseX, mouseY);
         }
@@ -215,6 +226,11 @@ public class MeterScreen extends AbstractContainerScreen<MeterMenu> {
             return true;
         }
         if (ArcforgeGui.isPress(event)) {
+            if (ArcforgeGui.isInside(event.x(), event.y(), leftPos + FLIP_X, topPos + FLIP_Y, BUTTON_SIZE, BUTTON_SIZE)) {
+                sendButton(MeterMenu.BUTTON_FLIP);
+                ArcforgeGui.playClickSound();
+                return true;
+            }
             if (ArcforgeGui.isInside(event.x(), event.y(), leftPos + ABOVE_X, topPos + MODE_Y, BUTTON_SIZE, BUTTON_SIZE)) {
                 if (menu.getMode() != MeterSettings.Mode.ABOVE) {
                     sendButton(MeterMenu.BUTTON_ABOVE);

@@ -38,17 +38,20 @@ import net.zagdrath.arcforge.machine.meter.MeterKind;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // An Energy, Heat, Fluid or Gas Meter (see MeterBlockEntity). It faces whoever places it; the Wrench turns it. While
-// its rate meets its threshold it's POWERED: a signal of 15 on every side, and a lit LED on its front.
+// its rate meets its threshold it's POWERED: a signal of 15 on every side, and a lit LED on its front. FLIPPED (set
+// from its screen) turns its flow round, from its right side to its left; the arrow on its front points the way it
+// flows.
 public class MeterBlock extends BaseEntityBlock implements WrenchableMachine {
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+    public static final BooleanProperty FLIPPED = BooleanProperty.create("flipped");
 
     private final MeterKind kind;
 
     public MeterBlock(MeterKind kind, BlockBehaviour.Properties properties) {
         super(properties);
         this.kind = kind;
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(POWERED, false));
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(POWERED, false).setValue(FLIPPED, false));
     }
 
     public MeterKind kind() {
@@ -57,7 +60,7 @@ public class MeterBlock extends BaseEntityBlock implements WrenchableMachine {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, POWERED);
+        builder.add(FACING, POWERED, FLIPPED);
     }
 
     @Override
@@ -72,7 +75,9 @@ public class MeterBlock extends BaseEntityBlock implements WrenchableMachine {
 
     @Override
     protected BlockState mirror(BlockState state, Mirror mirror) {
-        return state.rotate(mirror.getRotation(state.getValue(FACING)));
+        // Mirrored, its left and right swap places: flip it so it still takes from the same block and feeds the other.
+        BlockState turned = state.rotate(mirror.getRotation(state.getValue(FACING)));
+        return mirror == Mirror.NONE ? turned : turned.setValue(FLIPPED, !turned.getValue(FLIPPED));
     }
 
     @Override

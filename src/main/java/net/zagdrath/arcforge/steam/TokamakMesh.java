@@ -46,6 +46,10 @@ public final class TokamakMesh extends VesselMesh {
     // it, and its facets round and along.
     static final float PLASMA_FILL = 0.78F, KAPPA = 1.7F, DELTA = 0.33F, CORE = 0.55F;
     static final int POLOIDAL = 16;
+    // The rounded liner round the plasma (see liner): its facets round the cross-section, and its superellipse's power
+    // (2 a circle's ellipse, higher a squarer box with round corners).
+    static final int LINER_ROUND = 24;
+    static final double LINER_POWER = 2.6;
     private static final int SOLID = 0, FRAMED = 1, OPEN = 2;
 
     // A Reactor Glass block in the wall: its block {x, y, u} in the frame.
@@ -682,11 +686,18 @@ public final class TokamakMesh extends VesselMesh {
                 float rend = chamber ? chamberOut : (radius + 0.5F) * PX;
                 float t0 = j * PX, t1 = t0 + PX;
                 float[] in = across(f);
-                if (!open[Math.floorMod(f + 1, sides)][j]) {
-                    ductWall(new float[][] { polar(a1, rin, t0), polar(a1, rend, t0), polar(a1, rend, t1), polar(a1, rin, t1), in }, chamber);
-                }
-                if (!open[Math.floorMod(f - 1, sides)][j]) {
-                    ductWall(new float[][] { polar(a0, rin, t0), polar(a0, rend, t0), polar(a0, rend, t1), polar(a0, rin, t1), neg(in) }, chamber);
+                // Into the chamber, the port runs in to the vessel's liner (see linerR): its side walls in steps that follow
+                // the liner's curve, its floor and ceiling to where the liner is at their height.
+                float steps = chamber ? Math.max(1, Math.round((t1 - t0) / 2.0F)) : 1;
+                for (int k = 0; k < steps; k++) {
+                    float ya = t0 + (t1 - t0) * k / steps, yb = t0 + (t1 - t0) * (k + 1) / steps;
+                    float ea = chamber ? linerR(ya) : rend, eb = chamber ? linerR(yb) : rend;
+                    if (!open[Math.floorMod(f + 1, sides)][j]) {
+                        ductWall(new float[][] { polar(a1, rin, ya), polar(a1, ea, ya), polar(a1, eb, yb), polar(a1, rin, yb), in }, chamber);
+                    }
+                    if (!open[Math.floorMod(f - 1, sides)][j]) {
+                        ductWall(new float[][] { polar(a0, rin, ya), polar(a0, ea, ya), polar(a0, eb, yb), polar(a0, rin, yb), neg(in) }, chamber);
+                    }
                 }
                 // Against a duct into the chamber in the next row, a blanket row's floor (or ceiling) stands LEDGE off the
                 // chamber's roof (or floor), so the two read as a ledge with a lip, not one sheet seen from both sides.
@@ -694,11 +705,13 @@ public final class TokamakMesh extends VesselMesh {
                 boolean ledgeAbove = !chamber && j + 1 < blocksHigh && open[f][j + 1] && inChamber(j + 1);
                 float floor = ledgeBelow ? t0 + LEDGE : t0, ceiling = ledgeAbove ? t1 - LEDGE : t1;
                 if (j == 0 || !open[f][j - 1] || inChamber(j - 1) != chamber) {
-                    ductWall(new float[][] { polar(a0, rin, floor), polar(a1, rin, floor), polar(a1, rend, floor), polar(a0, rend, floor), { 0, 1, 0 } },
+                    float end = chamber ? portEnd(floor) : rend;
+                    ductWall(new float[][] { polar(a0, rin, floor), polar(a1, rin, floor), polar(a1, end, floor), polar(a0, end, floor), { 0, 1, 0 } },
                             chamber);
                 }
                 if (j + 1 >= blocksHigh || !open[f][j + 1] || inChamber(j + 1) != chamber) {
-                    ductWall(new float[][] { polar(a0, rin, ceiling), polar(a1, rin, ceiling), polar(a1, rend, ceiling), polar(a0, rend, ceiling),
+                    float end = chamber ? portEnd(ceiling) : rend;
+                    ductWall(new float[][] { polar(a0, rin, ceiling), polar(a1, rin, ceiling), polar(a1, end, ceiling), polar(a0, end, ceiling),
                             { 0, -1, 0 } }, chamber);
                 }
                 double out = (a0 + a1) / 2.0;
@@ -718,12 +731,59 @@ public final class TokamakMesh extends VesselMesh {
         }
     }
 
-    // A duct's wall {p0, p1, p2, p3, facing}, kept for the plasma's light when it opens into the chamber.
+    // A duct's wall {p0, p1, p2, p3, facing}: plain steel in the blanket; into the chamber, the port's walls are the
+    // vessel's own, in the First Wall's armour laid on the block grid (so they carry on from step to step and meet the
+    // liner's tiles), the Divertor's targets on a floor.
     private void ductWall(float[][] w, boolean chamber) {
-        orient(w[0], w[1], w[2], w[3], w[4], Paint.PLAIN);
-        if (chamber) {
-            spillFaces.add(w);
+        if (!chamber) {
+            orient(w[0], w[1], w[2], w[3], w[4], Paint.PLAIN);
+            return;
         }
+        float[] n = w[4];
+        if (Math.abs(n[1]) > 0.5F) {
+            tiledFlat(List.of(w[0], w[1], w[2], w[3]), n, n[1] > 0 ? DIVERTOR_X : FW_X);
+        } else {
+            tiledUpright(List.of(w[0], w[1], w[2], w[3]), n, FW_X);
+        }
+    }
+
+    // A wall standing on a radius of the ring (its points round it), facing n, laid in a tile at 1:1: across it by
+    // distance from the axis, up it by height, so walls on the same radius carry on from one to the next.
+    private void tiledUpright(List<float[]> points, float[] n, int tileX) {
+        float[] first = points.get(0);
+        float[] right = normalize(new float[] { first[0] - cx, 0.0F, first[2] - cu });
+        float[] up = { 0, 1, 0 };
+        if (dot(cross(right, up), n) < 0) {
+            right = new float[] { -right[0], 0.0F, -right[2] };
+        }
+        float[] base = { cx, 0.0F, cu };
+        List<float[]> st = new ArrayList<>();
+        float sMin = Float.MAX_VALUE, sMax = -Float.MAX_VALUE, tMin = Float.MAX_VALUE, tMax = -Float.MAX_VALUE;
+        for (float[] p : points) {
+            float[] d = sub(p, base);
+            float sv = dot(d, right), tv = p[1];
+            st.add(new float[] { sv, tv });
+            sMin = Math.min(sMin, sv);
+            sMax = Math.max(sMax, sv);
+            tMin = Math.min(tMin, tv);
+            tMax = Math.max(tMax, tv);
+        }
+        // Counter-clockwise in its own s and t (seen from the side it faces).
+        float area = 0.0F;
+        for (int i = 0; i < st.size(); i++) {
+            float[] a = st.get(i), b = st.get((i + 1) % st.size());
+            area += a[0] * b[1] - b[0] * a[1];
+        }
+        if (area < 0) {
+            java.util.Collections.reverse(st);
+        }
+        List<float[]> rects = new ArrayList<>();
+        for (float gs = (float) Math.floor(sMin / TILE) * TILE; gs < sMax; gs += TILE) {
+            for (float gt = (float) Math.floor(tMin / TILE) * TILE; gt < tMax; gt += TILE) {
+                rects.add(new float[] { gs, gs + TILE, gt, gt + TILE, tileX, TILE_Y });
+            }
+        }
+        paintPlane(st, base, right, up, rects, false);
     }
 
     // The plasma's light on the walls of the ducts into the chamber: each a hair in front of its wall, in the plasma
@@ -745,47 +805,121 @@ public final class TokamakMesh extends VesselMesh {
         }
     }
 
-    // The plasma chamber: its outer wall (facing in) and the centre column's (facing out) in the First Wall's armour,
-    // its roof in it too, and its floor the Divertor's targets.
+    // The plasma chamber: the vacuum vessel's rounded liner (see liner), all round the ring, and over and under it the
+    // chamber's roof and floor (a port reaching the chamber's top or bottom row looks over or under the liner at them),
+    // run in past the centre column's facets.
     private void chamber() {
-        float ri = chamberIn, rw = chamberOut, y0 = chamberLow, y1 = chamberHigh;
-        float fwOut = 2.0F * (float) Math.sin(step / 2.0) * rw;
         int innerSides = Math.max(12, sides / 4);
-        double innerStep = 2.0 * Math.PI / innerSides;
-        float fwIn = 2.0F * (float) Math.sin(innerStep / 2.0) * ri;
+        float rc = chamberIn * (float) Math.cos(Math.PI / innerSides) - 0.5F;
         for (int f = 0; f < sides; f++) {
             double a0 = start + f * step, a1 = a0 + step;
-            // Facing in: seen from the axis, a0 is on the left.
-            tiledWall(polar(a0, rw, y0), polar(a1, rw, y0), polar(a1, rw, y1), polar(a0, rw, y1), f * fwOut, fwOut, y1 - y0, y0, FW_X);
-        }
-        for (int f = 0; f < innerSides; f++) {
-            double a0 = f * innerStep, a1 = a0 + innerStep;
-            tiledWall(polar(a1, ri, y0), polar(a0, ri, y0), polar(a0, ri, y1), polar(a1, ri, y1), (innerSides - 1 - f) * fwIn, fwIn, y1 - y0, y0, FW_X);
-        }
-        // The roof and floor: wedges between the two walls, each its own polygon (the inner wall has fewer facets), run
-        // in under the centre column's flat facets (whose middles sit inside ri), so no crack shows round its top or
-        // foot.
-        float rc = ri * (float) Math.cos(innerStep / 2.0) - 0.5F;
-        for (int f = 0; f < sides; f++) {
-            double a0 = start + f * step, a1 = a0 + step;
-            List<float[]> roof = List.of(polar(a0, rw, y1), polar(a1, rw, y1), polar(a1, rc, y1), polar(a0, rc, y1));
-            tiledFlat(roof, new float[] { 0, -1, 0 }, FW_X);
-            List<float[]> floor = List.of(polar(a0, rw, y0), polar(a1, rw, y0), polar(a1, rc, y0), polar(a0, rc, y0));
-            tiledFlat(floor, new float[] { 0, 1, 0 }, DIVERTOR_X);
+            tiledFlat(List.of(polar(a0, chamberOut, chamberHigh), polar(a1, chamberOut, chamberHigh), polar(a1, rc, chamberHigh), polar(a0, rc, chamberHigh)),
+                    new float[] { 0, -1, 0 }, FW_X);
+            tiledFlat(List.of(polar(a0, chamberOut, chamberLow), polar(a1, chamberOut, chamberLow), polar(a1, rc, chamberLow), polar(a0, rc, chamberLow)),
+                    new float[] { 0, 1, 0 }, DIVERTOR_X);
+            liner(f, a0, a1);
         }
     }
 
-    // A wall facet p0 p1 p2 p3 (bottom-left, bottom-right, top-right, top-left seen from the side it faces) laid in a
-    // tile at 1:1, s0 round the wall unrolled, so the tiles carry on from facet to facet and sit on the block rows.
-    private void tiledWall(float[] p0, float[] p1, float[] p2, float[] p3, float s0, float w, float h, float y0, int tileX) {
-        List<float[]> rects = new ArrayList<>();
-        for (float s = (float) Math.floor(s0 / TILE) * TILE; s < s0 + w - 1.0E-4F; s += TILE) {
-            for (float t = (float) Math.floor(y0 / TILE) * TILE; t < y0 + h - 1.0E-4F; t += TILE) {
-                rects.add(new float[] { s - s0, s - s0 + TILE, t - y0, t - y0 + TILE, tileX, TILE_Y });
+    // The liner's cross-section: its middle (radius, height) and half-width and half-height, filling the chamber.
+    private float linerCentre() {
+        return (chamberIn + chamberOut) / 2.0F;
+    }
+
+    private float linerMid() {
+        return (chamberLow + chamberHigh) / 2.0F;
+    }
+
+    private float linerHalfW() {
+        return (chamberOut - chamberIn) / 2.0F - 0.5F;
+    }
+
+    private float linerHalfH() {
+        return (chamberHigh - chamberLow) / 2.0F - 0.5F;
+    }
+
+    // How far out the liner's outer side is at height y (over or under it, its middle), a little in from its curve so a
+    // port's walls meet its facets with no gap.
+    private float linerR(float y) {
+        float k = Math.min(1.0F, Math.abs(y - linerMid()) / linerHalfH());
+        float across = (float) Math.pow(Math.max(0.0, 1.0 - Math.pow(k, LINER_POWER)), 1.0 / LINER_POWER);
+        return linerCentre() + Math.max(0.0F, linerHalfW() * across - 0.4F);
+    }
+
+    // Where a port's floor or ceiling at height y ends: at the liner, or in the chamber's roof or floor plane at the
+    // chamber's outer edge, where the roof or floor carries on.
+    private float portEnd(float y) {
+        return y >= chamberHigh - 0.01F || y <= chamberLow + 0.01F ? chamberOut : linerR(y);
+    }
+
+    // The vacuum vessel's rounded liner round the plasma, inside the chamber's box: its cross-section a rounded square
+    // (a superellipse filling the chamber, LINER_POWER) swept round the axis on the outer wall's facets, facing in (so a
+    // viewport looks through its near side, culled, at its far side and the plasma within), in the First Wall's armour
+    // with the Divertor's targets round its bottom. It faces in only: a port looks straight through its near side (culled)
+    // at its far side and the plasma, nothing of it in the way; the port's walls run in to meet it, and the chamber's
+    // roof and floor close the space over and under it.
+    //
+    // Its tiles are laid on the surface, not facet by facet: a whole number of tile columns round the ring and of tile
+    // rows round the cross-section, each tile a fixed share of each, so they run on straight across the facets both
+    // ways (stretched a little toward the outside of the ring, as the surface is wider there). Every facet is cut at the
+    // tiles' edges, and a whole tile is one tile or the other (Divertor rows are whole rows).
+    private void liner(int f, double a0, double a1) {
+        float centre = linerCentre(), mid = linerMid(), halfW = linerHalfW(), halfH = linerHalfH();
+        float[][] ring = new float[LINER_ROUND + 1][];
+        float[] arc = new float[LINER_ROUND + 1];
+        for (int j = 0; j <= LINER_ROUND; j++) {
+            double theta = -Math.PI / 2.0 + 2.0 * Math.PI * j / LINER_ROUND;
+            double c = Math.cos(theta), sn = Math.sin(theta);
+            ring[j] = new float[] { centre + halfW * (float) (Math.signum(c) * Math.pow(Math.abs(c), 2.0 / LINER_POWER)),
+                    mid + halfH * (float) (Math.signum(sn) * Math.pow(Math.abs(sn), 2.0 / LINER_POWER)) };
+            if (j > 0) {
+                arc[j] = arc[j - 1] + (float) Math.hypot(ring[j][0] - ring[j - 1][0], ring[j][1] - ring[j - 1][1]);
             }
         }
-        List<float[]> st = List.of(new float[] { 0, 0 }, new float[] { w, 0 }, new float[] { w, h }, new float[] { 0, h });
-        paintPlane(st, p0, normalize(sub(p1, p0)), normalize(sub(p3, p0)), rects, false);
+        // Tiles round the ring (at the cross-section's middle) and round the cross-section, whole numbers of each.
+        float around = Math.max(4, Math.round((float) (2.0 * Math.PI * centre) / TILE));
+        float rows = Math.max(2, Math.round(arc[LINER_ROUND] / TILE));
+        float u0 = f * around / sides, u1 = (f + 1) * around / sides;
+        for (int j = 0; j < LINER_ROUND; j++) {
+            float v0 = arc[j] / arc[LINER_ROUND] * rows, v1 = arc[j + 1] / arc[LINER_ROUND] * rows;
+            // The facet's corners: a0 / a1 round the ring, ring point j / j + 1 round the cross-section.
+            float[] c00 = polar(a0, ring[j][0], ring[j][1]), c10 = polar(a1, ring[j][0], ring[j][1]);
+            float[] c11 = polar(a1, ring[j + 1][0], ring[j + 1][1]), c01 = polar(a0, ring[j + 1][0], ring[j + 1][1]);
+            // The plasma's glow on its inside.
+            float rm = (ring[j][0] + ring[j + 1][0]) / 2.0F, ym = (ring[j][1] + ring[j + 1][1]) / 2.0F;
+            double am = a0 + (a1 - a0) / 2.0;
+            spillFaces.add(new float[][] { c00, c10, c11, c01, normalize(sub(polar(am, centre, mid), polar(am, rm, ym))) });
+            for (float ua = u0; ua < u1 - 1.0E-4F; ua = Math.min(u1, (float) Math.floor(ua + 1.0E-4F) + 1.0F)) {
+                float ub = Math.min(u1, (float) Math.floor(ua + 1.0E-4F) + 1.0F);
+                for (float va = v0; va < v1 - 1.0E-4F; va = Math.min(v1, (float) Math.floor(va + 1.0E-4F) + 1.0F)) {
+                    float vb = Math.min(v1, (float) Math.floor(va + 1.0E-4F) + 1.0F);
+                    int row = (int) Math.floor(va + 1.0E-4F);
+                    // The Divertor's targets: the rows whose middle lies round the bottom (the cross-section starts there).
+                    float rowMiddle = (row + 0.5F) / rows;
+                    int tileX = rowMiddle < 0.14F || rowMiddle > 0.86F ? DIVERTOR_X : FW_X;
+                    linerTile(c00, c10, c11, c01, (ua - u0) / (u1 - u0), (ub - u0) / (u1 - u0), (va - v0) / (v1 - v0), (vb - v0) / (v1 - v0),
+                            ua - (float) Math.floor(ua + 1.0E-4F), ub - (float) Math.floor(ua + 1.0E-4F), va - row, vb - row, tileX, polar(a0 + (a1 - a0) / 2.0, centre, mid));
+                }
+            }
+        }
+    }
+
+    // One piece of a liner facet: from fa to fb across it and fb0 to fb1 round the cross-section (0..1 of the facet
+    // c00 c10 c11 c01), showing tile tileX from s0 to s1 and t0 to t1 (0..1 of the tile), facing toward the point given
+    // (the middle of the cross-section).
+    private void linerTile(float[] c00, float[] c10, float[] c11, float[] c01, float fa, float fb, float ga, float gb, float s0, float s1, float t0,
+            float t1, int tileX, float[] toward) {
+        float[] p0 = bilinear(c00, c10, c11, c01, fa, ga), p1 = bilinear(c00, c10, c11, c01, fb, ga);
+        float[] p2 = bilinear(c00, c10, c11, c01, fb, gb), p3 = bilinear(c00, c10, c11, c01, fa, gb);
+        float uA = (tileX + s0 * TILE) / SHEET_W, uB = (tileX + s1 * TILE) / SHEET_W;
+        float vA = (TILE_Y + (1.0F - t0) * TILE) / SHEET_H, vB = (TILE_Y + (1.0F - t1) * TILE) / SHEET_H;
+        float[] n = cross(sub(p1, p0), sub(p3, p0));
+        float[] middle = { (p0[0] + p2[0]) / 2.0F, (p0[1] + p2[1]) / 2.0F, (p0[2] + p2[2]) / 2.0F };
+        if (dot(n, sub(toward, middle)) >= 0) {
+            quad(p0, p1, p2, p3, new float[] { uA, vA, uB, vA, uB, vB, uA, vB }, false);
+        } else {
+            quad(p3, p2, p1, p0, new float[] { uA, vB, uB, vB, uB, vA, uA, vA }, false);
+        }
     }
 
     // A flat polygon facing up or down laid in a tile at 1:1 on the block grid.

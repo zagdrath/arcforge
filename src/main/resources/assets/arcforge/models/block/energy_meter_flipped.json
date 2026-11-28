@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/meter/energy_front_flipped",
+    "south": "arcforge:block/meter/back",
+    "east": "arcforge:block/meter/energy_out",
+    "west": "arcforge:block/meter/energy_in",
+    "up": "arcforge:block/meter/top",
+    "down": "arcforge:block/meter/bottom",
+    "particle": "arcforge:block/meter/top"
+  }
+}

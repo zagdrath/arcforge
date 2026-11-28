@@ -1,33 +1,63 @@
 {
   "variants": {
-    "facing=north,powered=false": {
+    "facing=north,powered=false,flipped=false": {
       "model": "arcforge:block/energy_meter"
     },
-    "facing=north,powered=true": {
+    "facing=north,powered=false,flipped=true": {
+      "model": "arcforge:block/energy_meter_flipped"
+    },
+    "facing=north,powered=true,flipped=false": {
       "model": "arcforge:block/energy_meter_on"
     },
-    "facing=east,powered=false": {
+    "facing=north,powered=true,flipped=true": {
+      "model": "arcforge:block/energy_meter_on_flipped"
+    },
+    "facing=east,powered=false,flipped=false": {
       "model": "arcforge:block/energy_meter",
       "y": 90
     },
-    "facing=east,powered=true": {
+    "facing=east,powered=false,flipped=true": {
+      "model": "arcforge:block/energy_meter_flipped",
+      "y": 90
+    },
+    "facing=east,powered=true,flipped=false": {
       "model": "arcforge:block/energy_meter_on",
       "y": 90
     },
-    "facing=south,powered=false": {
+    "facing=east,powered=true,flipped=true": {
+      "model": "arcforge:block/energy_meter_on_flipped",
+      "y": 90
+    },
+    "facing=south,powered=false,flipped=false": {
       "model": "arcforge:block/energy_meter",
       "y": 180
     },
-    "facing=south,powered=true": {
+    "facing=south,powered=false,flipped=true": {
+      "model": "arcforge:block/energy_meter_flipped",
+      "y": 180
+    },
+    "facing=south,powered=true,flipped=false": {
       "model": "arcforge:block/energy_meter_on",
       "y": 180
     },
-    "facing=west,powered=false": {
+    "facing=south,powered=true,flipped=true": {
+      "model": "arcforge:block/energy_meter_on_flipped",
+      "y": 180
+    },
+    "facing=west,powered=false,flipped=false": {
       "model": "arcforge:block/energy_meter",
       "y": 270
     },
-    "facing=west,powered=true": {
+    "facing=west,powered=false,flipped=true": {
+      "model": "arcforge:block/energy_meter_flipped",
+      "y": 270
+    },
+    "facing=west,powered=true,flipped=false": {
       "model": "arcforge:block/energy_meter_on",
+      "y": 270
+    },
+    "facing=west,powered=true,flipped=true": {
+      "model": "arcforge:block/energy_meter_on_flipped",
       "y": 270
     }
   }

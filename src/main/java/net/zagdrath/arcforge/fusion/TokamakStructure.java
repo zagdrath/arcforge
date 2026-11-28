@@ -189,10 +189,23 @@ public final class TokamakStructure {
         return null;
     }
 
+    // Whether every chunk from min to max is loaded: a reactor spans several, and its corners loading first mustn't let a
+    // check of a half-loaded reactor find it broken (which unformed it and let its vacuum up, on joining a world).
+    public static boolean loaded(Level level, BlockPos min, BlockPos max) {
+        for (int cx = min.getX() >> 4; cx <= max.getX() >> 4; cx++) {
+            for (int cz = min.getZ() >> 4; cz <= max.getZ() >> 4; cz++) {
+                if (!level.hasChunk(cx, cz)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     // Whether every block of the reactor is what it should be. A block another reactor has claimed (formed, outside
     // current) doesn't count.
     public static boolean isValid(Level level, Shape shape, BlockPos controller, @Nullable Shape current) {
-        if (!level.isLoaded(shape.min()) || !level.isLoaded(shape.max())) {
+        if (!loaded(level, shape.min(), shape.max())) {
             return false;
         }
         if (shape.partAt(controller) != TokamakLayout.Part.CRYOSTAT_WALL || controller.getY() != shape.axis().getY()) {

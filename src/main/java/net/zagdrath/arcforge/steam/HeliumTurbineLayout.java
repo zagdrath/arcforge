@@ -40,28 +40,28 @@ public final class HeliumTurbineLayout {
     // The deck slab, and the walkway's inner edge (canonical x) from there to the front.
     public static final float DECK_BOTTOM = 18.0F, DECK_TOP = 22.0F, WALKWAY_X = 69.0F;
     // The shaft (canonical x).
-    public static final float SHAFT_X = 34.0F, SHAFT_Y = 40.0F, SHAFT_RADIUS = 2.5F;
+    public static final float SHAFT_X = 36.0F, SHAFT_Y = 46.0F, SHAFT_RADIUS = 3.5F;
     // The gap between two casings: a bearing pedestal, a coupling, a pedestal.
     public static final float GAP = 9.0F, PEDESTAL = 2.5F;
     // The staircase runs from the ground at STAIR_U0 up to the deck at STAIR_U1 along the front strip.
     public static final float STAIR_U0 = 2.0F, STAIR_U1 = 26.0F;
     // The front standard, and the turning-gear wheel behind it.
-    public static final float STANDARD_U0 = 3.0F, STANDARD_U1 = 16.0F, WHEEL_U0 = 17.0F, WHEEL_U1 = 19.5F, WHEEL_RADIUS = 6.5F;
+    public static final float STANDARD_U0 = 3.0F, STANDARD_U1 = 16.0F, WHEEL_U0 = 17.0F, WHEEL_U1 = 19.5F, WHEEL_RADIUS = 9.0F;
     // The compressor's intake plenum (canonical x, u, y) and the drum's radius at its intake and discharge ends.
-    public static final float PLENUM_X0 = 21.0F, PLENUM_X1 = 50.0F, PLENUM_U0 = 22.0F, PLENUM_U1 = 31.0F, PLENUM_TOP = 54.0F;
-    public static final float COMPRESSOR_IN = 10.0F, COMPRESSOR_OUT = 7.0F, STAGE = 6.0F;
+    public static final float PLENUM_X0 = 18.0F, PLENUM_X1 = 54.0F, PLENUM_U0 = 22.0F, PLENUM_U1 = 31.0F, PLENUM_TOP = 68.0F;
+    public static final float COMPRESSOR_IN = 16.0F, COMPRESSOR_OUT = 11.5F, STAGE = 6.0F;
     // The power turbines: their inlet and exhaust radii, the inlet ring, and the exhaust neck on top.
-    public static final float TURBINE_IN = 9.0F, TURBINE_OUT = 12.0F, RING_RADIUS = 12.5F;
+    public static final float TURBINE_IN = 15.0F, TURBINE_OUT = 20.0F, RING_RADIUS = 18.5F;
     // The precooler (canonical x and its top) along the front of the compressor.
-    public static final float PRECOOLER_X0 = 50.0F, PRECOOLER_X1 = 66.0F, PRECOOLER_TOP = 50.0F;
+    public static final float PRECOOLER_X0 = 54.0F, PRECOOLER_X1 = 67.0F, PRECOOLER_TOP = 54.0F;
     // The recuperator (canonical x), its axis height and radius.
-    public static final float RECUPERATOR_X = 12.0F, RECUPERATOR_Y = 34.0F, RECUPERATOR_RADIUS = 9.0F;
+    public static final float RECUPERATOR_X = 7.5F, RECUPERATOR_Y = 34.0F, RECUPERATOR_RADIUS = 6.5F;
     // The crossover ducts: radius and the arches' crown.
-    public static final float CROSSOVER_RADIUS = 3.8F, CROWN_Y = 72.0F;
+    public static final float CROSSOVER_RADIUS = 4.5F, CROWN_Y = 75.0F;
     // The Hot Helium inlet ducts (canonical x of the riser) and their radius.
-    public static final float INLET_X = 58.0F, INLET_RADIUS = 3.2F, INLET_Y = 40.0F;
+    public static final float INLET_X = 60.0F, INLET_RADIUS = 3.5F, INLET_Y = 46.0F;
     // The generator's stator.
-    public static final float STATOR_RADIUS = 13.5F, STATOR_END_RADIUS = 8.5F, SHIELD = 4.5F;
+    public static final float STATOR_RADIUS = 20.0F, STATOR_END_RADIUS = 13.0F, SHIELD = 6.0F;
     // The cable bus under the terminal box (canonical x: the middle block's centre, so mirroring keeps it there).
     public static final float BUS_X = 40.0F, BUS_HALF = 3.5F;
 

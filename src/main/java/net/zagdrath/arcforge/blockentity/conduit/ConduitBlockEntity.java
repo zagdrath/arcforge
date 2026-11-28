@@ -223,11 +223,14 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
     }
 
     // Each side's filter look (FilterSettings.Mode ordinal + 1, 0 for none) in 2 bits per side: what the model draws.
+    // A filter kept on a side that isn't a port right now (see setBlockState) isn't drawn.
     public int packFilterModes() {
         int packed = 0;
+        BlockState state = getBlockState();
+        boolean conduit = state.getBlock() instanceof ConduitBlock;
         for (Direction side : Direction.values()) {
             ItemStack filter = filters[side.ordinal()];
-            if (!filter.isEmpty()) {
+            if (!filter.isEmpty() && (!conduit || ConduitBlock.mode(state, side).isPort())) {
                 packed |= (FilterSettings.mode(filter).ordinal() + 1) << (side.ordinal() * 2);
             }
         }
@@ -242,8 +245,9 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
         }
     }
 
-    // Unhooking a side (its arm no longer faces a machine, e.g. the machine was broken or the side disabled)
-    // pops its filter out: a filter never stays on a bare pipe.
+    // Unhooking a side (its arm no longer faces a machine, e.g. the machine was broken) pops its filter out: a filter
+    // never stays on a bare pipe. A side the Wrench has set to Disabled keeps it (the Wrench passes through Disabled
+    // going from Output back to Input), out of sight and unused until the side is a port again.
     @Override
     public void setBlockState(BlockState state) {
         super.setBlockState(state);
@@ -251,7 +255,7 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
             return;
         }
         for (Direction side : Direction.values()) {
-            if (hasFilter(side) && !ConduitBlock.mode(state, side).isPort()) {
+            if (hasFilter(side) && !ConduitBlock.mode(state, side).isPort() && settings[side.ordinal()] != SideSetting.DISABLED) {
                 Block.popResource(level, worldPosition, clearFilter(side));
             }
         }

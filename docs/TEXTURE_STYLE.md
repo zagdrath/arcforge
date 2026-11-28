@@ -1061,12 +1061,14 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   textures; rerun it if those change.
 - Formed, HeliumTurbineMesh draws one closed-cycle (Brayton) turbine-generator set from HeliumTurbineLayout, in the
   Nuclear Steam Turbine's manner on a 5×5 section: a deck (top at 22 px) on stepped columns, the walkway and handrail
-  along the front, a six-step stair at the front end. Deliberately round where the Nuclear Steam Turbine is angular:
+  along the front, a six-step stair at the front end. The machine train is about 2.5 blocks across (shaft at x 36, y 46;
+  a 20 px stator and turbine exhaust), clear of the walkway (x 69 on), the recuperator slim (6.5 px) behind it.
+  Deliberately round where the Nuclear Steam Turbine is angular:
   - **Enamel**: the intake plenum (a square box with a bolted lid and two stiffeners), the compressor (a 12-sided drum
-    narrowing from 10 to 7 px with a BANDED flange every 6 px), the power turbines (16-sided, flaring 9 → 12 px, an
+    narrowing from 16 to 11.5 px with a BANDED flange every 6 px), the power turbines (16-sided, flaring 15 → 20 px, an
     enamel inlet ring, a split flange with bolts, a flange at the exhaust end and an exhaust neck on top), the
     recuperator (one long vessel along the back on machine-steel saddles, domed ends, a girth flange at its middle), its
-    crossover ducts (a cubic arch from each exhaust neck, 12 lengths swept as one tube, crown at 72 px), the precooler
+    crossover ducts (a cubic arch from each exhaust neck, 12 lengths swept as one tube, crown at 75 px), the precooler
     (a box along the front of the compressor), the generator, its single cooler, slip-ring housing and exciter.
   - **Vent tile**: the precooler's finned front, framed by enamel edges, and the exciter's grille.
   - **Machine steel**: the deck, columns, stair, walkway, front standard and pedestals, the insulated Hot Helium ducts

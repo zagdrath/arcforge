@@ -26,16 +26,17 @@ import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.security.SecuredMenu;
 
 // A Meter's screen: no slots, just its rate, threshold, mode and signal, and its Security tab. The screen sets the
-// mode and the threshold through menu buttons: 0 and 1 for Above and Below, THRESHOLD_BUTTON + n for a threshold of n
-// (clamped to the meter's cap); the security buttons are MachineMenuButtons'.
+// mode and the threshold through menu buttons: 0 and 1 for Above and Below, 2 to flip its flow round, THRESHOLD_BUTTON + n
+// for a threshold of n (up to MeterBlockEntity.THROUGHPUT); the security buttons are MachineMenuButtons'.
 public class MeterMenu extends AbstractContainerMenu implements SecuredMenu {
     public static final int DATA_RATE = 0;
     public static final int DATA_THRESHOLD = 1;
     public static final int DATA_MODE = 2;
     public static final int DATA_POWERED = 3;
-    public static final int DATA_VALUES = 4;
+    public static final int DATA_FLIPPED = 4;
+    public static final int DATA_VALUES = 5;
 
-    public static final int BUTTON_ABOVE = 0, BUTTON_BELOW = 1;
+    public static final int BUTTON_ABOVE = 0, BUTTON_BELOW = 1, BUTTON_FLIP = 2;
     public static final int THRESHOLD_BUTTON = 1_000;
 
     private final BlockPos pos;
@@ -88,8 +89,21 @@ public class MeterMenu extends AbstractContainerMenu implements SecuredMenu {
         return value(DATA_POWERED) != 0;
     }
 
+    // Whether it flows from its right side to its left (see MeterBlock.FLIPPED).
+    public boolean isFlipped() {
+        return value(DATA_FLIPPED) != 0;
+    }
+
     @Override
     public boolean clickMenuButton(Player player, int buttonId) {
+        if (buttonId == BUTTON_FLIP) {
+            access.execute((level, at) -> {
+                if (level.getBlockEntity(at) instanceof MeterBlockEntity meter) {
+                    meter.flip();
+                }
+            });
+            return true;
+        }
         if (buttonId == BUTTON_ABOVE || buttonId == BUTTON_BELOW || buttonId >= THRESHOLD_BUTTON) {
             access.execute((level, at) -> {
                 if (level.getBlockEntity(at) instanceof MeterBlockEntity meter) {

@@ -87,12 +87,12 @@ public final class HeliumTurbineMesh extends ModelMesh {
         modules = false;
         startRotor(0.0F);
         float sx = layout.shaftX(), sy = layout.shaftY();
-        prismU(sx, sy, new float[][] { { HeliumTurbineLayout.STANDARD_U0 + 2.0F, 2.5F }, { layout.lengthPx() - 3.0F, 2.5F } }, 6, 0.0, Paint.BANDED, null,
+        prismU(sx, sy, new float[][] { { HeliumTurbineLayout.STANDARD_U0 + 2.0F, 3.5F }, { layout.lengthPx() - 3.0F, 3.5F } }, 6, 0.0, Paint.BANDED, null,
                 null, null);
         prismU(sx, sy, new float[][] { { HeliumTurbineLayout.WHEEL_U0, HeliumTurbineLayout.WHEEL_RADIUS },
                 { HeliumTurbineLayout.WHEEL_U1, HeliumTurbineLayout.WHEEL_RADIUS } }, 8, 0.0, Paint.BANDED, Paint.MID, Paint.SHADE, null);
         for (HeliumTurbineLayout.Span gap : layout.gaps()) {
-            prismU(sx, sy, new float[][] { { gap.middle() - 1.5F, 5.0F }, { gap.middle() + 1.5F, 5.0F } }, 8, 0.0, Paint.BANDED, Paint.MID, Paint.SHADE, null);
+            prismU(sx, sy, new float[][] { { gap.middle() - 1.5F, 7.0F }, { gap.middle() + 1.5F, 7.0F } }, 8, 0.0, Paint.BANDED, Paint.MID, Paint.SHADE, null);
         }
         modules = was;
         return solid.toArray();
@@ -199,14 +199,14 @@ public final class HeliumTurbineMesh extends ModelMesh {
     // on its back side.
     private void frontStandard() {
         float u0 = HeliumTurbineLayout.STANDARD_U0, u1 = HeliumTurbineLayout.STANDARD_U1, deck = HeliumTurbineLayout.DECK_TOP;
-        cbox(25.0F, deck, u0, 43.0F, 45.0F, u1, Paint.PLATE, Paint.PLAIN, null, SKIP_DOWN);
-        cbox(28.0F, 45.0F, u0 + 1.5F, 40.0F, 48.0F, u1 - 1.5F, Paint.PLAIN, Paint.MID, null, SKIP_DOWN);
-        solidBox(25.0F, deck, u0, 43.0F, 48.0F, u1);
-        prismY(x(44.0F), u0 + 5.0F, deck, 43.0F, 0.55F, Paint.BANDED, Paint.BANDED);
-        pipeX(u0 + 5.0F, 43.0F, 43.0F, 44.6F, 0.6F, Paint.BANDED, Paint.BANDED);
+        float sy = HeliumTurbineLayout.SHAFT_Y;
+        cbox(26.0F, deck, u0, 46.0F, sy + 5.0F, u1, Paint.PLATE, Paint.PLAIN, null, SKIP_DOWN);
+        cbox(29.0F, sy + 5.0F, u0 + 1.5F, 43.0F, sy + 8.0F, u1 - 1.5F, Paint.PLAIN, Paint.MID, null, SKIP_DOWN);
+        solidBox(26.0F, deck, u0, 46.0F, sy + 8.0F, u1);
+        prismY(x(47.0F), u0 + 5.0F, deck, sy + 3.0F, 0.55F, Paint.BANDED, Paint.BANDED);
+        pipeX(u0 + 5.0F, sy + 3.0F, 46.0F, 47.6F, 0.6F, Paint.BANDED, Paint.BANDED);
         // The starting motor (a closed cycle has to be spun up to self-sustaining speed) on its gearbox.
-        cbox(19.0F, 28.0F, u0 + 2.0F, 25.0F, 42.0F, u1 - 2.0F, Paint.M_MOTOR, Paint.PLAIN, null, SKIP_POS_X);
-        pipeX((u0 + u1) / 2.0F, 35.0F, 11.0F, 19.0F, 4.0F, Paint.BANDED, Paint.PLAIN);
+        cbox(19.0F, 30.0F, u0 + 2.0F, 26.0F, 46.0F, u1 - 2.0F, Paint.M_MOTOR, Paint.PLAIN, null, SKIP_POS_X);
     }
 
     // The compressor's intake plenum: a square box round the shaft, with a flanged lid and its stiffeners, open on its
@@ -214,7 +214,7 @@ public final class HeliumTurbineMesh extends ModelMesh {
     private void plenum() {
         float x0 = HeliumTurbineLayout.PLENUM_X0, x1 = HeliumTurbineLayout.PLENUM_X1, u0 = HeliumTurbineLayout.PLENUM_U0, u1 = HeliumTurbineLayout.PLENUM_U1;
         float deck = HeliumTurbineLayout.DECK_TOP, top = HeliumTurbineLayout.PLENUM_TOP;
-        cbox(x0, deck, u0, x1, top, u1, Paint.EN_PLAIN, Paint.EN_PLAIN, null, SKIP_DOWN | SKIP_POS_X);
+        cbox(x0, deck, u0, x1, top, u1, Paint.EN_PLAIN, Paint.EN_PLAIN, null, SKIP_DOWN);
         cbox(x0 - 1.0F, top, u0 - 1.0F, x1, top + 1.5F, u1 + 1.0F, Paint.EN_PLAIN, Paint.EN_PLAIN, Paint.EN_PLAIN, 0);
         for (float u = u0 + 2.5F; u <= u1 - 2.0F; u += 4.0F) {
             bolt(x0, top + 1.5F, u, 1.0F);
@@ -238,9 +238,7 @@ public final class HeliumTurbineMesh extends ModelMesh {
             float r = rin + (rout - rin) * (u - c.u0()) / span;
             prismU(sx, sy, new float[][] { { u - 0.5F, r + 1.0F }, { u + 0.5F, r + 1.0F } }, 12, 0.0, Paint.BANDED, Paint.PLAIN, Paint.PLAIN, null);
         }
-        float lip = HeliumTurbineLayout.SHAFT_X - rin - 1.5F, far = HeliumTurbineLayout.SHAFT_X + rin + 1.5F;
-        cbox(lip, sy - 1.0F, c.u0(), lip + 2.0F, sy + 1.0F, c.u1() - 6.0F, Paint.EN_PLAIN, Paint.EN_PLAIN, Paint.EN_PLAIN, 0);
-        cbox(far - 2.0F, sy - 1.0F, c.u0(), far, sy + 1.0F, c.u1() - 6.0F, Paint.EN_PLAIN, Paint.EN_PLAIN, Paint.EN_PLAIN, 0);
+        splitFlange(c.u0(), c.u1() - 6.0F, c.u0(), rin, c.u1() - 3.0F, rout, sy, 2.0F, false);
     }
 
     // The precooler: a finned box along the front of the compressor (the cooler's fins on its front face), its top
@@ -261,7 +259,7 @@ public final class HeliumTurbineMesh extends ModelMesh {
         cbox(x0 - 0.5F, deck, s.u0() - 0.5F, x1 + 1.0F, deck + 2.0F, s.u1() + 0.5F, Paint.PLAIN, Paint.MID, null, SKIP_DOWN);
         solidBox(x0, deck, s.u0() - 0.5F, x1 + 1.0F, top, s.u1() + 0.5F);
         // The water headers on top, and their risers at the far end.
-        for (float hx : new float[] { 54.0F, 62.0F }) {
+        for (float hx : new float[] { 57.5F, 63.5F }) {
             prismU(x(hx), top + 2.0F, new float[][] { { s.u0() + 2.0F, 1.6F }, { s.u1() - 2.0F, 1.6F } }, PIPE, Math.PI / PIPE, Paint.BANDED, Paint.PLAIN,
                     Paint.PLAIN, null);
             prismY(x(hx), s.u1() - 4.0F, top, top + 2.0F, 1.0F, Paint.BANDED, Paint.BANDED);
@@ -272,7 +270,7 @@ public final class HeliumTurbineMesh extends ModelMesh {
     // The compressor's discharge: a pipe down from under its discharge end through the deck, where the cooled Helium
     // leaves for the reactor, with its flange on the deck.
     private void dischargePipe() {
-        float u = layout.dischargeU(), deck = HeliumTurbineLayout.DECK_TOP, r = 2.8F;
+        float u = layout.dischargeU(), deck = HeliumTurbineLayout.DECK_TOP, r = 3.5F;
         float bottom = layout.shaftY() - HeliumTurbineLayout.COMPRESSOR_OUT - 0.5F;
         prismY(x(HeliumTurbineLayout.SHAFT_X), u, 0.0F, bottom, r, Paint.BANDED, Paint.PLAIN);
         uprights.add(new float[] { x(HeliumTurbineLayout.SHAFT_X), u, r, 0.0F, bottom });
@@ -294,17 +292,11 @@ public final class HeliumTurbineMesh extends ModelMesh {
         // The exhaust-end flange.
         prismU(sx, sy, new float[][] { { t.u1() - 4.5F, rout + 1.0F }, { t.u1() - 3.5F, rout + 1.0F } }, 16, 0.0, Paint.BANDED, Paint.PLAIN, Paint.PLAIN, null);
         // The split flange and its bolts.
-        float lip = HeliumTurbineLayout.SHAFT_X - rout - 1.5F, far = HeliumTurbineLayout.SHAFT_X + rout + 1.5F;
-        cbox(lip, sy - 1.0F, t.u0() + 10.5F, lip + 3.0F, sy + 1.0F, t.u1() - 5.0F, Paint.EN_PLAIN, Paint.EN_PLAIN, Paint.EN_PLAIN, 0);
-        cbox(far - 3.0F, sy - 1.0F, t.u0() + 10.5F, far, sy + 1.0F, t.u1() - 5.0F, Paint.EN_PLAIN, Paint.EN_PLAIN, Paint.EN_PLAIN, 0);
-        for (float u = t.u0() + 12.5F; u <= t.u1() - 6.0F; u += 4.0F) {
-            bolt(lip + 0.3F, sy + 1.0F, u, 1.0F);
-            bolt(far - 1.3F, sy + 1.0F, u, 1.0F);
-        }
+        splitFlange(t.u0() + 10.5F, t.u1() - 5.0F, t.u0() + 3.0F, rin, t.u1() - 4.0F, rout, sy, 3.0F, true);
         // The exhaust neck on top, into the crossover.
         float nu = neckU(t);
-        uprightTube(sx, nu, new float[][] { { sy + rout - 2.0F, 4.6F }, { sy + rout + 3.0F, 4.6F } }, 12, 0.0, Paint.ENAMEL, null);
-        prismY(sx, nu, sy + rout + 2.0F, sy + rout + 3.5F, 5.6F, Paint.PLAIN, Paint.MID);
+        uprightTube(sx, nu, new float[][] { { sy + rout - 2.0F, 5.4F }, { sy + rout + 3.0F, 5.4F } }, 12, 0.0, Paint.ENAMEL, null);
+        prismY(sx, nu, sy + rout + 2.0F, sy + rout + 3.5F, 6.4F, Paint.PLAIN, Paint.MID);
     }
 
     // Where a power turbine's exhaust neck stands along u.
@@ -329,9 +321,9 @@ public final class HeliumTurbineMesh extends ModelMesh {
     // A bearing pedestal across the shaft from u0 to u1, with its bearing cap on top.
     private void pedestal(float u0, float u1) {
         float deck = HeliumTurbineLayout.DECK_TOP, top = HeliumTurbineLayout.SHAFT_Y + 4.5F;
-        cbox(28.0F, deck, u0, 40.0F, top, u1, Paint.PLATE, Paint.PLAIN, null, SKIP_DOWN);
-        cbox(30.0F, top, u0 + 0.4F, 38.0F, top + 1.5F, u1 - 0.4F, Paint.PLAIN, Paint.MID, null, SKIP_DOWN);
-        solidBox(28.0F, deck, u0, 40.0F, top + 1.5F, u1);
+        cbox(29.0F, deck, u0, 43.0F, top, u1, Paint.PLATE, Paint.PLAIN, null, SKIP_DOWN);
+        cbox(31.0F, top, u0 + 0.4F, 41.0F, top + 1.5F, u1 - 0.4F, Paint.PLAIN, Paint.MID, null, SKIP_DOWN);
+        solidBox(29.0F, deck, u0, 43.0F, top + 1.5F, u1);
     }
 
     // The recuperator along the back: a long vessel with domed ends on machine-steel saddles, a girth flange at its
@@ -341,7 +333,7 @@ public final class HeliumTurbineMesh extends ModelMesh {
         HeliumTurbineLayout.Span span = layout.recuperator();
         float u0 = span.u0(), u1 = span.u1(), y = HeliumTurbineLayout.RECUPERATOR_Y, r = HeliumTurbineLayout.RECUPERATOR_RADIUS;
         float deck = HeliumTurbineLayout.DECK_TOP, cx = HeliumTurbineLayout.RECUPERATOR_X, x = x(cx);
-        prismU(x, y, new float[][] { { u0, 4.0F }, { u0 + 3.0F, 7.0F }, { u0 + 6.0F, r }, { u1 - 6.0F, r }, { u1 - 3.0F, 7.0F }, { u1, 4.0F } }, 16, 0.0,
+        prismU(x, y, new float[][] { { u0, 3.2F }, { u0 + 3.0F, r - 1.2F }, { u0 + 6.0F, r }, { u1 - 6.0F, r }, { u1 - 3.0F, r - 1.2F }, { u1, 3.2F } }, 16, 0.0,
                 Paint.ENAMEL, Paint.EN_PLAIN, Paint.EN_PLAIN, null);
         solidCylinders.add(new float[] { x, y, r, u0, u1 });
         float mid = span.middle();
@@ -357,9 +349,36 @@ public final class HeliumTurbineMesh extends ModelMesh {
         int saddles = span.length() > 150.0F ? 3 : 2;
         for (int i = 0; i < saddles; i++) {
             float s = u0 + 12.0F + (span.length() - 24.0F) * i / (saddles - 1);
-            cbox(cx - 6.0F, deck, s - 2.5F, cx + 6.0F, y - r + 3.0F, s + 2.5F, Paint.PLAIN, Paint.PLAIN, null, SKIP_DOWN);
-            cbox(cx - 7.0F, deck, s - 3.5F, cx + 7.0F, deck + 1.2F, s + 3.5F, Paint.PLAIN, Paint.MID, null, SKIP_DOWN);
+            cbox(cx - 5.0F, deck, s - 2.5F, cx + 5.0F, y - r + 3.0F, s + 2.5F, Paint.PLAIN, Paint.PLAIN, null, SKIP_DOWN);
+            cbox(cx - 6.0F, deck, s - 3.5F, cx + 6.0F, deck + 1.2F, s + 3.5F, Paint.PLAIN, Paint.MID, null, SKIP_DOWN);
         }
+    }
+
+    // A casing's split flange along both sides of it at the shaft's height, from u0 to u1, standing off the casing whose
+    // radius runs from rA at uA to rB at uB: short lengths each at the casing's radius where it is (so it follows a
+    // taper), w px deep, and bolts on its top every 4 px when bolted.
+    private void splitFlange(float u0, float u1, float uA, float rA, float uB, float rB, float sy, float w, boolean bolted) {
+        float step = 2.0F;
+        for (float s0 = u0; s0 < u1 - 0.01F; s0 += step) {
+            float s1 = Math.min(u1, s0 + step), r = radiusAt((s0 + s1) / 2.0F, uA, rA, uB, rB);
+            float lip = HeliumTurbineLayout.SHAFT_X - r - 1.5F, far = HeliumTurbineLayout.SHAFT_X + r + 1.5F;
+            cbox(lip, sy - 1.0F, s0, lip + w, sy + 1.0F, s1, Paint.EN_PLAIN, Paint.EN_PLAIN, Paint.EN_PLAIN, 0);
+            cbox(far - w, sy - 1.0F, s0, far, sy + 1.0F, s1, Paint.EN_PLAIN, Paint.EN_PLAIN, Paint.EN_PLAIN, 0);
+        }
+        if (bolted) {
+            for (float u = u0 + 2.0F; u <= u1 - 1.0F; u += 4.0F) {
+                float r = radiusAt(u, uA, rA, uB, rB);
+                float lip = HeliumTurbineLayout.SHAFT_X - r - 1.5F, far = HeliumTurbineLayout.SHAFT_X + r + 1.5F;
+                bolt(lip + 0.3F, sy + 1.0F, u, 1.0F);
+                bolt(far - 1.3F, sy + 1.0F, u, 1.0F);
+            }
+        }
+    }
+
+    // A casing's radius at u, running straight from rA at uA to rB at uB.
+    private static float radiusAt(float u, float uA, float rA, float uB, float rB) {
+        float k = Math.max(0.0F, Math.min(1.0F, (u - uA) / (uB - uA)));
+        return rA + (rB - rA) * k;
     }
 
     // A crossover duct from a power turbine's exhaust neck, arching back over into the recuperator's top: a cubic curve
@@ -461,27 +480,30 @@ public final class HeliumTurbineMesh extends ModelMesh {
         solidCylinders.add(new float[] { sx, sy, r, g.u0(), g.u1() });
         float far = g.u1() - shield - 7.0F, near = layout.terminalBox().u1() + 1.5F;
         for (float u : near + 9.0F <= far ? new float[] { near, far } : new float[] { far }) {
-            cbox(22.0F, deck, u, 46.0F, sy - r + 3.0F, u + 6.0F, Paint.PLAIN, Paint.PLAIN, null, SKIP_DOWN);
+            cbox(21.0F, deck, u, 51.0F, sy - r + 3.0F, u + 6.0F, Paint.PLAIN, Paint.PLAIN, null, SKIP_DOWN);
         }
         // The cooler on top, and its water lines on the back.
         float length = g.length() - 2.0F * shield, c0 = g.u0() + shield + length * 0.12F, c1 = g.u1() - shield - length * 0.12F;
-        cbox(27.0F, sy + 10.0F, c0, 41.0F, sy + 21.0F, c1, Paint.EN_PLAIN, Paint.EN_PLAIN, null, SKIP_DOWN);
-        cbox(28.0F, sy + 21.0F, c0 + 1.2F, 40.0F, sy + 22.5F, c1 - 1.2F, Paint.EN_PLAIN, Paint.EN_PLAIN, null, SKIP_DOWN);
-        pipeX(c1 - 2.5F, sy + 13.5F, 22.0F, 27.0F, 1.2F, Paint.BANDED, Paint.PLAIN);
-        pipeX(c1 - 2.5F, sy + 18.0F, 22.0F, 27.0F, 1.2F, Paint.BANDED, Paint.PLAIN);
-        solidBox(27.0F, sy + 10.0F, c0, 41.0F, sy + 22.5F, c1);
+        cbox(26.0F, sy + 16.0F, c0, 46.0F, sy + 26.0F, c1, Paint.EN_PLAIN, Paint.EN_PLAIN, null, SKIP_DOWN);
+        cbox(27.0F, sy + 26.0F, c0 + 1.2F, 45.0F, sy + 27.5F, c1 - 1.2F, Paint.EN_PLAIN, Paint.EN_PLAIN, null, SKIP_DOWN);
+        // Heat-sink fins down both its long sides: thin plates every 2 px, 2 px out from it.
+        for (float u = c0 + 1.5F; u + 0.5F <= c1 - 1.0F; u += 2.0F) {
+            cbox(24.0F, sy + 17.0F, u, 26.0F, sy + 25.0F, u + 0.5F, Paint.EN_PLAIN, Paint.EN_PLAIN, Paint.EN_PLAIN, SKIP_POS_X);
+            cbox(46.0F, sy + 17.0F, u, 48.0F, sy + 25.0F, u + 0.5F, Paint.EN_PLAIN, Paint.EN_PLAIN, Paint.EN_PLAIN, SKIP_NEG_X);
+        }
+        solidBox(26.0F, sy + 16.0F, c0, 46.0F, sy + 27.5F, c1);
         HeliumTurbineLayout.Span box = layout.terminalBox();
-        cbox(31.0F, 10.0F, box.u0(), 49.0F, 28.0F, box.u1(), Paint.FE, Paint.FE_LIT, Paint.FE_DARK, 0);
+        cbox(31.0F, 10.0F, box.u0(), 49.0F, 28.0F, box.u1(), Paint.FE_BAND, Paint.FE_BAND, Paint.FE_DARK, 0);
         float bus = HeliumTurbineLayout.BUS_X, half = HeliumTurbineLayout.BUS_HALF;
         cbox(bus - half, 0.0F, layout.busU() - half, bus + half, 10.0F, layout.busU() + half, Paint.PLAIN, null, Paint.PLAIN, SKIP_UP);
         solidBox(bus - half, 0.0F, layout.busU() - half, bus + half, 28.0F, layout.busU() + half);
         // The slip-ring housing and the exciter beyond it.
         HeliumTurbineLayout.Span slip = layout.slipRing(), ex = layout.exciter();
-        cbox(28.0F, deck, slip.u0(), 40.0F, 50.0F, slip.u1(), Paint.EN_PLAIN, Paint.EN_PLAIN, null, SKIP_DOWN | SKIP_POS_U);
-        cbox(26.0F, deck, ex.u0(), 42.0F, 53.0F, ex.u1(), Paint.EN_PLAIN, Paint.EN_PLAIN, null, SKIP_DOWN);
-        cbox(27.5F, 53.0F, ex.u0() + 1.2F, 40.5F, 54.5F, ex.u1() - 1.2F, Paint.EN_PLAIN, Paint.EN_PLAIN, null, SKIP_DOWN);
-        cbox(29.0F, 32.0F, ex.u1(), 39.0F, 45.0F, ex.u1() + 0.5F, Paint.VENT, Paint.PLAIN, Paint.PLAIN, SKIP_NEG_U);
-        solidBox(26.0F, deck, slip.u0(), 42.0F, 54.5F, ex.u1());
+        cbox(28.0F, deck, slip.u0(), 44.0F, 58.0F, slip.u1(), Paint.EN_PLAIN, Paint.EN_PLAIN, null, SKIP_DOWN | SKIP_POS_U);
+        cbox(26.0F, deck, ex.u0(), 46.0F, 61.0F, ex.u1(), Paint.EN_PLAIN, Paint.EN_PLAIN, null, SKIP_DOWN);
+        cbox(27.5F, 61.0F, ex.u0() + 1.2F, 44.5F, 62.5F, ex.u1() - 1.2F, Paint.EN_PLAIN, Paint.EN_PLAIN, null, SKIP_DOWN);
+        cbox(30.0F, 36.0F, ex.u1(), 42.0F, 52.0F, ex.u1() + 0.5F, Paint.VENT, Paint.PLAIN, Paint.PLAIN, SKIP_NEG_U);
+        solidBox(26.0F, deck, slip.u0(), 46.0F, 62.5F, ex.u1());
     }
 
     // --- The turning parts ---
@@ -517,13 +539,13 @@ public final class HeliumTurbineMesh extends ModelMesh {
 
     // A coupling at u: a 12-sided disc pair with six bolt heads on each face.
     private void coupling(float sx, float sy, float u) {
-        float r = 5.0F, c0 = u - 1.5F, c1 = u + 1.5F;
+        float r = 7.0F, c0 = u - 1.5F, c1 = u + 1.5F;
         prismU(sx, sy, new float[][] { { c0, r }, { u - 0.25F, r } }, 12, 0.0, Paint.BANDED, Paint.PLAIN, Paint.SHADE, null);
         prismU(sx, sy, new float[][] { { u + 0.25F, r }, { c1, r } }, 12, 0.0, Paint.BANDED, Paint.PLAIN, Paint.SHADE, null);
         prismU(sx, sy, new float[][] { { u - 0.25F, r - 1.2F }, { u + 0.25F, r - 1.2F } }, 12, 0.0, Paint.BANDED, null, null, null);
         for (int b = 0; b < 6; b++) {
             double a = 2.0 * Math.PI * (b + 0.5) / 6.0;
-            float bx = sx + (float) Math.cos(a) * 3.3F, by = sy + (float) Math.sin(a) * 3.3F;
+            float bx = sx + (float) Math.cos(a) * 4.8F, by = sy + (float) Math.sin(a) * 4.8F;
             box(bx - 0.5F, by - 0.5F, c0 - 0.6F, bx + 0.5F, by + 0.5F, c0, Paint.RIVET, Paint.RIVET, Paint.RIVET, SKIP_POS_U);
             box(bx - 0.5F, by - 0.5F, c1, bx + 0.5F, by + 0.5F, c1 + 0.6F, Paint.RIVET, Paint.RIVET, Paint.RIVET, SKIP_NEG_U);
         }

@@ -92,6 +92,8 @@ public final class PlasmaSim {
     public double impurity;
     // Share of the exhaust the cryopumps take (the rest recycles into the plasma).
     public double pumping = 1.0;
+    // The share of the power in that radiation may take before the fuelling holds the density back (see fuelDemand).
+    public static final double RADIATED_SHARE = 0.6;
     // Whether the vessel is at vacuum and the magnets at field, so breakdown can happen.
     public boolean ready;
     public boolean fastShutdown;
@@ -225,6 +227,13 @@ public final class PlasmaSim {
         double betaRatio = stellarator ? beta() / p.stellaratorBeta : betaN / p.betaNLimit;
         if (betaRatio > 0.8) {
             target = Math.min(target, ne * 0.8 / betaRatio);
+        }
+        // Radiation control: hold the density where radiation takes at most RADIATED_SHARE of the power in (heating,
+        // ohmic and alpha). Line radiation grows with the density squared and as the plasma cools, so fuelling on past
+        // that point would collapse the plasma into a cold, radiating state that burns through the solenoid's flux.
+        double powerIn = pHeating + pAlpha, radiated = pBrems + pImpurity;
+        if (powerIn > 0.0 && radiated > RADIATED_SHARE * powerIn) {
+            target = Math.min(target, ne * Math.sqrt(RADIATED_SHARE * powerIn / radiated));
         }
         double pumped = Math.max(0.0, Math.min(1.0, pumping));
         double ions = (target - ne) * volume * 0.2 + ne * volume * pumped / Math.max(p.tauPRatio * tauE, 0.5);
@@ -440,6 +449,9 @@ public final class PlasmaSim {
             return Event.DISRUPTION_COLLAPSE;
         }
         if (flux <= 0.0 && ip <= 0.05) {
+            // The pulse is over: the plasma goes out (what's left of it to the pumps), so the solenoid can recharge for
+            // the next one.
+            quench();
             return Event.PULSE_END;
         }
         return Event.NONE;

@@ -10,7 +10,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Meters sit in a line and measure what flows through them: in on the left side (as you face the screen), out on the right.\n- Energy Meter: FE, up to 262,144 FE/t.\n- Heat Meter: heat, up to 51,200 HU/t.\n- Fluid Meter: liquids only, up to 12,800 mB/t.\n- Gas Meter: gases only, through Pressurized Conduits, up to 25,600 mB/t.\nThe front screen shows the live rate.\n# Redstone\nIn the GUI, set a threshold and a mode:\n- Above: signal while the rate is above the threshold.\n- Below: signal while the rate is below it.\nThe meter outputs a signal of 15 on every side while the condition holds, and its LED lights. A comparator reads the rate on its own: 0 when idle, 15 at the meter's maximum."
+      "text": "Meters sit in a line and measure what flows through them (however much, the Heat Meter aside): in on the left side (as you face the screen), out on the right. The Flip button in the GUI turns them round (in on the right), and the arrow on the front points the way they flow.\n- Energy Meter: FE.\n- Heat Meter: heat, up to 51,200 HU/t (an Arcforged Thermal Conduit's rate; set in the config).\n- Fluid Meter: liquids only.\n- Gas Meter: gases only, through Pressurized Conduits.\nThe front screen shows the live rate.\n# Redstone\nIn the GUI, set a threshold and a mode:\n- Above: signal while the rate is above the threshold.\n- Below: signal while the rate is below it.\nThe meter outputs a signal of 15 on every side while the condition holds, and its LED lights. A comparator reads the rate on its own: 0 when idle, 15 at the meter's full scale (an Arcforged conduit's rate: 262,144 FE/t, 51,200 HU/t, 12,800 mB/t of liquid, 25,600 mB/t of gas; set in the config) or above."
     }
   ]
 }
