@@ -78,6 +78,15 @@ public final class FusionGameTests {
         PlasmaSim r4 = new PlasmaSim(new TokamakLayout(4).majorRadiusMetres(), false, new PlasmaSim.Params());
         PlasmaSim.Event rampEnd = run(r4, 7.5, 30.0, 0.85, 3_000, ramped);
         helper.assertTrue(rampEnd == PlasmaSim.Event.PULSE_END, "An R4 pulse on 30 MW ended with " + rampEnd);
+        // A weakly pumped vessel (one Cryopump: a quarter of the exhaust taken, the rest recycling back in) holds its density
+        // setpoint instead of being fuelled past the Greenwald limit, at the full field and at Liquid Nitrogen's.
+        for (double field : new double[] { 8.0, 3.2 }) {
+            double[] pumped = { 0.0 };
+            PlasmaSim weak = new PlasmaSim(new TokamakLayout(3).majorRadiusMetres(), false, new PlasmaSim.Params());
+            weak.pumping = 0.25;
+            PlasmaSim.Event weakEnd = run(weak, field, 50.0, 0.85, 900, pumped);
+            helper.assertTrue(!weakEnd.name().contains("DISRUPTION"), "An R3 on one Cryopump at " + field + " T ended with " + weakEnd);
+        }
         helper.succeed();
     }
 

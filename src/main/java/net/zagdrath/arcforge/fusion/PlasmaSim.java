@@ -209,8 +209,9 @@ public final class PlasmaSim {
     }
 
     // Particles (10^20) of fuel a second that bring the electron density toward a share of the density limit, for a fuel mix
-    // carrying electronsPerIon electrons per ion (1 for D-T, 1.5 for an even D-He3 mix). Replaces what is lost and closes a
-    // fifth of the gap each second, holds back as the pressure nears the beta limit, and stops during a ramp-down.
+    // carrying electronsPerIon electrons per ion (1 for D-T, 1.5 for an even D-He3 mix). Replaces what the pumps take (the
+    // rest of what's lost recycles back in, so replacing it too would overfill the plasma on a weakly pumped vessel) and
+    // closes a fifth of the gap each second, holds back as the pressure nears the beta limit, and stops during a ramp-down.
     public double fuelDemand(double fraction, double electronsPerIon) {
         if (!alive) {
             return 0.0;
@@ -225,7 +226,8 @@ public final class PlasmaSim {
         if (betaRatio > 0.8) {
             target = Math.min(target, ne * 0.8 / betaRatio);
         }
-        double ions = (target - ne) * volume * 0.2 + ne * volume / Math.max(p.tauPRatio * tauE, 0.5);
+        double pumped = Math.max(0.0, Math.min(1.0, pumping));
+        double ions = (target - ne) * volume * 0.2 + ne * volume * pumped / Math.max(p.tauPRatio * tauE, 0.5);
         return Math.max(0.0, ions / Math.max(1.0, electronsPerIon));
     }
 

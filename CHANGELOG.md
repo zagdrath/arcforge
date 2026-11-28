@@ -170,6 +170,17 @@ Battery charging, the Quantum Tunnel Upgrades tab and the NPK and Nutrient Solut
   reactor.
 - The Fusion Reactor's Control page fits its setpoint values between the − and + buttons, and the Fast Shutdown button
   is wide enough for its label. The Plant page's module counts no longer run together.
+- A Fusion Reactor with few Cryopumps no longer disrupts on the density limit a few seconds into every pulse. Its
+  fuelling replaced every particle the plasma lost, though only the pumped share leaves (the rest recycles back in),
+  so one Cryopump overfilled it four times over. Fully pumped reactors run as before.
+- With Liquid Helium in the tank, the Fusion Reactor waits for its coils to reach 20 K before it lights, so the pulse
+  starts on the full field. It used to light at 85 K on the Liquid Nitrogen field partway through the cool-down. The
+  start-up checklist's "Magnets cold" step and the Handbook say so (allow a couple of minutes from warm).
+- Fusion Reactor disruptions say in chat which limit was passed and what to change, instead of a raw lang key.
+- Looking into a Fusion Reactor's viewport: no sky shows through a crack round the top and foot of the centre column; a
+  window across the plasma chamber's top or bottom row shows a solid ledge with a lip where the blanket meets the
+  chamber, not a paper-thin sheet; and the control desk's lid no longer flickers against a window's sill right above
+  the controller.
 - Formed Fluid and Gas Reservoirs show the frame on their far side (back corners and edges) through the glass, not just
   the near edges.
 - Gas Reservoirs show the gas they hold: it fills the vessel as tinted vapour in the gas's own texture, denser the

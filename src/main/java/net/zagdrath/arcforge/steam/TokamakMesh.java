@@ -36,6 +36,9 @@ public final class TokamakMesh extends VesselMesh {
     // The cryostat's wall, the viewports' frames (width round an opening, how far they stand out), the tint pane's
     // depth behind the glass rim, the girth bands and coil ribs (how far out, how tall or wide).
     static final float WALL = 2.0F, FRAME = 2.0F, FRAME_OUT = 1.5F, TINT_IN = 0.1F;
+    // Where a viewport spans a chamber row and a blanket row, the blanket's duct floor (or ceiling) stands this far off
+    // the chamber's roof (or floor), a ledge with a lip at the shell's inner face.
+    static final float LEDGE = 2.0F;
     static final float BAND_OUT = 2.0F, BAND_H = 3.0F, RIB_OUT = 1.5F, RIB_W = 6.0F, HELIX_W = 9.0F;
     // The skirt's top, the base flange's top (the shell starts there), the head's rise.
     static final float SKIRT = 9.0F, BASE = 12.0F, FLANGE_H = 3.0F;
@@ -654,7 +657,8 @@ public final class TokamakMesh extends VesselMesh {
     private void desk() {
         float a = frontAngle(), y = (controller[1] + 0.5F) * PX;
         boss(a, rs, y, 12.0F, 14.0F, 1.0F, 3.0F, Paint.GEN_PLAIN, Paint.GEN_PLAIN);
-        boss(a, rs, y + 7.5F, 13.0F, 1.0F, 1.0F, 3.5F, Paint.GEN_MID, Paint.GEN_LIT);
+        // Its lid half a pixel under the block's top, clear of a viewport's sill right over the controller.
+        boss(a, rs, y + 7.0F, 13.0F, 1.0F, 1.0F, 3.5F, Paint.GEN_MID, Paint.GEN_LIT);
         bossFace(a, rs, y - 4.0F, 10.0F, 3.0F, 3.05F, Paint.VENT, false);
         boss(a, rs, y + 2.0F, 10.0F, 8.0F, 0.2F, 3.4F, Paint.DARK, Paint.MID);
         bossFace(a, rs, y + 2.0F, 8.0F, 6.0F, 3.45F, Paint.M_SCREEN, true);
@@ -684,11 +688,26 @@ public final class TokamakMesh extends VesselMesh {
                 if (!open[Math.floorMod(f - 1, sides)][j]) {
                     ductWall(new float[][] { polar(a0, rin, t0), polar(a0, rend, t0), polar(a0, rend, t1), polar(a0, rin, t1), neg(in) }, chamber);
                 }
+                // Against a duct into the chamber in the next row, a blanket row's floor (or ceiling) stands LEDGE off the
+                // chamber's roof (or floor), so the two read as a ledge with a lip, not one sheet seen from both sides.
+                boolean ledgeBelow = !chamber && j > 0 && open[f][j - 1] && inChamber(j - 1);
+                boolean ledgeAbove = !chamber && j + 1 < blocksHigh && open[f][j + 1] && inChamber(j + 1);
+                float floor = ledgeBelow ? t0 + LEDGE : t0, ceiling = ledgeAbove ? t1 - LEDGE : t1;
                 if (j == 0 || !open[f][j - 1] || inChamber(j - 1) != chamber) {
-                    ductWall(new float[][] { polar(a0, rin, t0), polar(a1, rin, t0), polar(a1, rend, t0), polar(a0, rend, t0), { 0, 1, 0 } }, chamber);
+                    ductWall(new float[][] { polar(a0, rin, floor), polar(a1, rin, floor), polar(a1, rend, floor), polar(a0, rend, floor), { 0, 1, 0 } },
+                            chamber);
                 }
                 if (j + 1 >= blocksHigh || !open[f][j + 1] || inChamber(j + 1) != chamber) {
-                    ductWall(new float[][] { polar(a0, rin, t1), polar(a1, rin, t1), polar(a1, rend, t1), polar(a0, rend, t1), { 0, -1, 0 } }, chamber);
+                    ductWall(new float[][] { polar(a0, rin, ceiling), polar(a1, rin, ceiling), polar(a1, rend, ceiling), polar(a0, rend, ceiling),
+                            { 0, -1, 0 } }, chamber);
+                }
+                double out = (a0 + a1) / 2.0;
+                float[] facing = { (float) Math.cos(out), 0, (float) Math.sin(out) };
+                if (ledgeBelow) {
+                    orient(polar(a0, rin, t0), polar(a1, rin, t0), polar(a1, rin, floor), polar(a0, rin, floor), facing, Paint.MID);
+                }
+                if (ledgeAbove) {
+                    orient(polar(a0, rin, ceiling), polar(a1, rin, ceiling), polar(a1, rin, t1), polar(a0, rin, t1), facing, Paint.MID);
                 }
                 if (!chamber) {
                     double mid = (a0 + a1) / 2.0;
@@ -743,12 +762,15 @@ public final class TokamakMesh extends VesselMesh {
             double a0 = f * innerStep, a1 = a0 + innerStep;
             tiledWall(polar(a1, ri, y0), polar(a0, ri, y0), polar(a0, ri, y1), polar(a1, ri, y1), (innerSides - 1 - f) * fwIn, fwIn, y1 - y0, y0, FW_X);
         }
-        // The roof and floor: wedges between the two walls, each its own polygon (the inner wall has fewer facets).
+        // The roof and floor: wedges between the two walls, each its own polygon (the inner wall has fewer facets), run
+        // in under the centre column's flat facets (whose middles sit inside ri), so no crack shows round its top or
+        // foot.
+        float rc = ri * (float) Math.cos(innerStep / 2.0) - 0.5F;
         for (int f = 0; f < sides; f++) {
             double a0 = start + f * step, a1 = a0 + step;
-            List<float[]> roof = List.of(polar(a0, rw, y1), polar(a1, rw, y1), polar(a1, ri, y1), polar(a0, ri, y1));
+            List<float[]> roof = List.of(polar(a0, rw, y1), polar(a1, rw, y1), polar(a1, rc, y1), polar(a0, rc, y1));
             tiledFlat(roof, new float[] { 0, -1, 0 }, FW_X);
-            List<float[]> floor = List.of(polar(a0, rw, y0), polar(a1, rw, y0), polar(a1, ri, y0), polar(a0, ri, y0));
+            List<float[]> floor = List.of(polar(a0, rw, y0), polar(a1, rw, y0), polar(a1, rc, y0), polar(a0, rc, y0));
             tiledFlat(floor, new float[] { 0, 1, 0 }, DIVERTOR_X);
         }
     }

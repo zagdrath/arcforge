@@ -7,7 +7,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "The controller's GUI has three pages: Plasma (its readings and trends), Plant (temperatures, wear, tanks, fuel cycle) and Control (setpoints and the start-up checklist).\n# Start-up checklist\n1. Vacuum: the Cryopumps pump the vessel to 10^-5 atm. One pump takes 30 seconds on the smallest vessel; bigger vessels take longer, more pumps less.\n2. Cold: the coils below 85 K (Liquid Helium or Nitrogen flowing).\n3. Field: energised to the field setpoint.\n4. Solenoid: the Central Solenoid charged with FE (not on a stellarator).\n5. Heating: a Gyrotron or Neutral Beam Injector fitted and a heating setpoint.\n6. Fuel: a Pellet Injector or Gas Puff Valve fitted.\nThen press Run."
+      "text": "The controller's GUI has three pages: Plasma (its readings and trends), Plant (temperatures, wear, tanks, fuel cycle) and Control (setpoints and the start-up checklist).\n# Start-up checklist\n1. Vacuum: the Cryopumps pump the vessel to 10^-5 atm. One pump takes 30 seconds on the smallest vessel; bigger vessels take longer, more pumps less.\n2. Cold: the coils below 20 K on Liquid Helium (85 K on Liquid Nitrogen alone). From warm, Liquid Helium takes about two and a half minutes.\n3. Field: energised to the field setpoint.\n4. Solenoid: the Central Solenoid charged with FE (not on a stellarator).\n5. Heating: a Gyrotron or Neutral Beam Injector fitted and a heating setpoint.\n6. Fuel: a Pellet Injector or Gas Puff Valve fitted.\nThen press Run."
     },
     {
       "type": "text",

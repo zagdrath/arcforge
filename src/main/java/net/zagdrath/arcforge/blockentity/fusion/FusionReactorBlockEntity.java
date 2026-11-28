@@ -249,6 +249,13 @@ public class FusionReactorBlockEntity extends MachineBlockEntity implements Mult
         return shape != null ? shape.radius() : 0;
     }
 
+    // Cold enough to start on: below Liquid Helium's critical temperature while there's Liquid Helium to cool with (so a
+    // pulse doesn't light on the nitrogen-level field partway through the cool-down, then lose its flux to the field's
+    // ramp to full), else below Liquid Nitrogen's.
+    public boolean coldEnough() {
+        return coilTemp <= (liquidHelium.getAmount() > 0 ? TC_FULL : TC_NITROGEN);
+    }
+
     // The field the coils go to now (T): the setpoint's share of full, less for Liquid Nitrogen cooling and a stellarator,
     // and for coil damage.
     public double fieldTarget() {
@@ -612,7 +619,8 @@ public class FusionReactorBlockEntity extends MachineBlockEntity implements Mult
         // Heating: share the setpoint across the heaters, gyrotrons first (they start the plasma).
         double ech = 0.0, nbi = 0.0;
         double heatWanted = wanted ? heatingSetpoint : 0.0;
-        boolean ready = vacuum <= VACUUM_READY && field > 0.2 && field >= fieldTarget() * 0.95 && solenoidCharged() && fwWear < 1.0 && divWear < 1.0;
+        boolean ready = vacuum <= VACUUM_READY && coldEnough() && field > 0.2 && field >= fieldTarget() * 0.95 && solenoidCharged() && fwWear < 1.0
+                && divWear < 1.0;
         if (!plasma.alive && !ready) {
             heatWanted = 0.0;
         }
@@ -1454,7 +1462,7 @@ public class FusionReactorBlockEntity extends MachineBlockEntity implements Mult
         if (vacuum <= VACUUM_READY) {
             bits |= 1;
         }
-        if (coilTemp <= TC_NITROGEN) {
+        if (coldEnough()) {
             bits |= 2;
         }
         if (field > 0.2 && field >= fieldTarget() * 0.95) {
