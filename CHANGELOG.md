@@ -49,6 +49,7 @@ Suggested version: **2.11.0** (minor: nine natural stones and Quicklime, and the
 ### Changed
 
 - The Long Fall Boots Curios slot's outline is a pair of boots.
+- Gas in a Gas Reservoir is a darker shade of its colour and less see-through.
 
 ### Fixed
 
@@ -56,6 +57,8 @@ Suggested version: **2.11.0** (minor: nine natural stones and Quicklime, and the
 - Heat Pipes can no longer be seen through their core slots at a shallow angle: the slots now have walls.
 - Glass conduits and other see-through blocks behind a Fluid or Gas Reservoir now show tinted through its contents.
   Before, they were drawn crisp on top of the contents.
+- The frame along the floor of a Fluid or Gas Reservoir standing on solid ground shows from inside the tank
+  (it was culled with the bottom face), and a conduit connected to a Reservoir no longer flickers when seen from inside.
 
 ### Upgrading
 

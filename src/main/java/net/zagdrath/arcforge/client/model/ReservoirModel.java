@@ -37,10 +37,11 @@ import net.zagdrath.arcforge.block.storage.ItemReservoirBlock;
 // A face edge carries the frame unless the block beyond it is a Reservoir whose same face is also open (an edge where
 // two Reservoirs join drops out); at a concave edge (the block beyond is a Reservoir but the block diagonally out in
 // front of the face is one too) it stays. Faces toward another Reservoir are left out; the others are culled like glass.
-// Each drawn face of a Fluid or Gas Reservoir also gets its back: the same quadrant, mirrored, on the same plane but facing
-// into the tank. A tank is solid Reservoir blocks with no faces between them, so without the backs the far walls' frame
-// (the back corner posts and edges) didn't show through the near glass. A back is culled from the front, so the two
-// never z-fight, and like the face it is cutout, so it sits behind the contents rather than over them.
+// Each face of a Fluid or Gas Reservoir not toward another Reservoir also gets its back: the same quadrant, mirrored, just
+// inside the face's plane (BACK_INSET) and facing into the tank. A tank is solid Reservoir blocks with no faces between
+// them, so without the backs the far walls' frame (the back corner posts and edges) didn't show through the near glass.
+// Backs are never culled, so the floor's frame shows from inside a tank standing on solid ground. A back is culled from
+// the front, so the two never z-fight, and like the face it is cutout, so it sits behind the contents rather than over them.
 // ReservoirRenderer draws the fluid or gas inside.
 //
 // The Item Reservoir ("connect": "item_reservoir") is the same quadrant scheme on a solid block: panel / rim / rim_h /
@@ -52,6 +53,10 @@ final class ReservoirModel implements DynamicBlockStateModel {
 
     // Bands sit just outside the face, like ConnectedModel's lip overlays, so they never z-fight with it.
     private static final float BAND_OFFSET = 0.02F;
+    // Backs sit this far (in pixels) inside the face: still outside the contents (ReservoirRenderer.INSET, 0.16 px), but
+    // off the block boundary, where the top of a floor block or a conduit's end cap facing into the tank lay on the same
+    // plane, facing the same way, and z-fought with them.
+    private static final float BACK_INSET = 0.08F;
     static final String[] FLUID_TEXTURES = { "glass", "frame", "frame_h", "frame_v", "frame_corners" };
     static final String[] STORE_TEXTURES = { "panel", "rim", "rim_h", "rim_v", "rim_corners", "band_top", "band_bottom", "band_left",
             "band_right" };
@@ -117,9 +122,9 @@ final class ReservoirModel implements DynamicBlockStateModel {
         float u1 = u0 + 8, v1 = v0 + 8;
         Direction inward = face.getOpposite();
         if (face.getAxis() == Direction.Axis.Y) {
-            return ConnectedModel.Baked.bake(baker, inward, u0, 16 - v1, u1, 16 - v0, -16, texture, u0, v1, u1, v0, Quadrant.R0);
+            return ConnectedModel.Baked.bake(baker, inward, u0, 16 - v1, u1, 16 - v0, BACK_INSET - 16, texture, u0, v1, u1, v0, Quadrant.R0);
         }
-        return ConnectedModel.Baked.bake(baker, inward, 16 - u1, v0, 16 - u0, v1, -16, texture, u1, v0, u0, v1, Quadrant.R0);
+        return ConnectedModel.Baked.bake(baker, inward, 16 - u1, v0, 16 - u0, v1, BACK_INSET - 16, texture, u1, v0, u0, v1, Quadrant.R0);
     }
 
     // Another block of the same Reservoir (a Fluid Reservoir joins only Fluid Reservoirs, a Gas Reservoir Gas Reservoirs).
@@ -170,8 +175,10 @@ final class ReservoirModel implements DynamicBlockStateModel {
                     piece = !isReservoir(level, diagonal, state) || isReservoir(level, diagonal.relative(face), state) ? Piece.CORNERS : Piece.GLASS;
                 }
                 builder.addCulledFace(face, faceQuads[piece.ordinal()][quadrant]);
+                // Never culled: a face against a solid block (the floor under a tank) is hidden from outside, but from
+                // inside the tank its frame still shows.
                 if (backQuads != null) {
-                    builder.addCulledFace(face, backQuads[piece.ordinal()][quadrant]);
+                    builder.addUnculledFace(backQuads[piece.ordinal()][quadrant]);
                 }
             }
             if (store && face.getAxis() != length) {

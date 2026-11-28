@@ -47,7 +47,9 @@ public class ReservoirRenderer implements BlockEntityRenderer<ReservoirBlockEnti
     private static final float SAME_LEVEL = 0.001F;
     // Times the texture's own alpha (0.25 to 0.7 for the vapour), so even an almost empty vessel stays above the volume
     // pipeline's 0.1 alpha cutout and shows its wisps.
-    private static final float GAS_ALPHA_EMPTY = 0.6F, GAS_ALPHA_FULL = 1.0F;
+    private static final float GAS_ALPHA_EMPTY = 0.85F, GAS_ALPHA_FULL = 1.0F;
+    // The gas's tint darkened by this, so a vessel of it reads as a body of gas rather than a pale haze over the floor.
+    private static final float GAS_SHADE = 0.72F;
 
     public static class State extends BlockEntityRenderState {
         public @Nullable TextureAtlasSprite sprite;
@@ -163,10 +165,13 @@ public class ReservoirRenderer implements BlockEntityRenderer<ReservoirBlockEnti
         return Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(gas.getFluid().defaultFluidState()).stillMaterial().sprite();
     }
 
-    // A gas's tint, more opaque the fuller the block is (share, 0..1).
+    // A gas's tint, shaded darker, more opaque the fuller the block is (share, 0..1).
     public static int gasColor(int tint, float share) {
         int alpha = Math.round(255 * (GAS_ALPHA_EMPTY + (GAS_ALPHA_FULL - GAS_ALPHA_EMPTY) * share));
-        return (tint & 0x00FFFFFF) | alpha << 24;
+        int red = Math.round((tint >> 16 & 0xFF) * GAS_SHADE);
+        int green = Math.round((tint >> 8 & 0xFF) * GAS_SHADE);
+        int blue = Math.round((tint & 0xFF) * GAS_SHADE);
+        return alpha << 24 | red << 16 | green << 8 | blue;
     }
 
     // The fluid's surface in a block holding amount of capacity (every block of a tank's surface layer holds the same).
