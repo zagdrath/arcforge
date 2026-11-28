@@ -2159,62 +2159,43 @@ which made many fluids the same pattern in different colours.
 
 ## Natural stones
 
-Cody's own stone textures, recoloured per stone by `tools/stone_texture_gen.py` into `block/stone/` (Limestone, Dolomite,
-Slate, Serpentine, Sylvinite, Kimberlite, Pumice, Scoria, Travertine), the same method as his ores and raw blocks.
+Cody's own stone textures (his arc-stone set), recoloured per stone by `tools/stone_texture_gen.py` into `block/stone/`
+(Limestone, Dolomite, Slate, Serpentine, Sylvinite, Kimberlite, Pumice, Scoria, Travertine), the same method as his ores
+and raw blocks.
 
-- **Sources:** `tools/stone_refs/` holds his 16×16 tiles, recovered from his reference sheets (including his two
-  labelled stone families, `bl_*` and `dk_*`, and his mixed block sheet, `x<row><col>`) by sampling each sheet on
-  its own pixel grid (the centre of every texel; on the JPEG sheets the median of the texel's middle, clustered back to
-  at most 8 brightness levels). The tile ids name the sheet and its place on it.
-- **One set per stone, nothing shared:** each stone takes its natural, polished and bricks faces from one column of his
-  sheets where a column has them, and its cobble, small bricks, pillar, pillar end and chiseled faces from his other
-  sheets; no tile is used by two stones (`PLAN`). The 8-wide pillar halves are laid twice across; two layered faces are
-  stood on end to read as a column's grain.
-- **Bricks are large, small bricks small:** every stone's bricks are one of his large-brick tiles, and its small bricks
-  a smaller course: one of his 4 px-course tiles (Limestone, Serpentine, Sylvinite), his small tiles (Dolomite), or
-  the stone's own large bricks at half size (Slate, Kimberlite, Pumice, Scoria, Travertine: each 2x2 cell takes its
-  darkest pixel where it holds mortar and its top-left pixel elsewhere, laid 2x2). Kimberlite's, Scoria's and
-  Travertine's are laid in bond (every other 4 px course slid half a brick) and get their grout drawn in crisp: a
-  mortar row under every course and a vertical joint every 8 px, staggered course to course, the pixel right of each
-  joint lit as the brick's left edge. Dolomite's small tiles are laid in bond (every other course slid 2 px) with their
-  grout redrawn crisp on the new joints. Crisp mortar sits a third of the tile's spread under its darkest pixel, so it
-  always lands on the ramp's darkest tones; Sylvinite's large bricks have their mortar set the same way.
-- **Grout:** light grout (Serpentine's and Sylvinite's small bricks) is taken down below the darkest brick, so it reads
-  as a dark joint. Then every small-brick grout (the tile's darkest level) is lifted two half tones (Limestone's three)
-  and Sylvinite's large-brick mortar two, so grout reads as grout and never as a black line.
-- **Pillars:** every pillar side reads as a column. Slate's, Pumice's and Scoria's are his own pillar tiles (the
-  blue-grey family's, the grey fluted one, the dark family's); the rest have a column cut into their tile. All carry a
-  border: a capital band lit over shade at the top, a base band lit over darkest at the bottom, a lit left edge and
-  shaded right edge (each step at least about two half tones). Dolomite's, Sylvinite's and Kimberlite's add two flutes
-  (a darkest groove with a lit edge beside it) at columns 5 and 10; the others keep their tile's own vertical lines.
-  Travertine's is his gold pillar with the bright slots between its bars taken down.
+- **Sources:** `tools/stone_refs/arc_<kind>_<n>.png`, his 36 tiles: 4 natural, 5 cobble, 7 polished, 6 bricks, 3 small
+  bricks, 3 pillars, 4 pillar ends and 4 chiseled. All but one (a true 16×16) were recovered from scaled screenshots:
+  each image's texel grid fitted per axis (the screenshots aren't always scaled the same across and down), slivers of
+  a neighbouring tile at the edges dropped, and each texel read as the most common colour in its middle. Two crops had
+  lost a column, rebuilt from the tile's own pixels: pillar_3's last (its stripes repeat every 4 columns) and
+  pillar_end_4's first (its frame's outer border).
+- **Varied across the stones:** with 36 tiles for 9 stones × 8 faces, tiles are shared, but each stone's set mixes
+  different ones, and two stones that look alike in colour (Limestone and Pumice) share none of their natural, cobble,
+  polished, bricks or chiseled tiles. Every tile is used but natural_1 (Limestone took natural_3, as Dolomite, Slate
+  and Travertine have, at Cody's pick). `PLAN` lists every face's tile.
+- **Pillars:** his three pillar tiles are plain vertical stripes; each stone's pillar side takes one with the border
+  cut into it (a capital band lit over shade at the top, a base band lit over darkest at the bottom, a lit left edge
+  and shaded right edge, each step at least about two half tones), no extra flutes. pillar_3 is lit at its top and
+  shaded at its bottom, which showed a band at every join, so its middle eight rows are laid twice down the face and
+  each row brought to the tile's mean (`band:4:12:` then `level:`).
 - **Joined pillars:** every pillar side comes in four textures for how it joins the same pillar on its axis
   (StonePillarBlock): `<stone>_pillar` alone (capital and base), `_upper` the capital end of a stack (capital only),
-  `_lower` the base end (base only) and `_middle` the shaft (neither), so a stack reads as one column. Tiles with their
-  own edge bands lose them first (Pumice's top band; Sylvinite's edge rows), so the joins show no line.
-- **Pillar ends:** a framed or ringed face: Limestone his cream framed slab, Serpentine his concentric squares,
-  Kimberlite his rayed square, Travertine his gold concentric squares; Dolomite, Slate, Sylvinite, Pumice and Scoria
-  have the carved column end cut into one of his tiles (a 1 px rim lit top/left and dark bottom/right, a recessed ring
-  3 px in, the centre raised; at least about two half tones each way, so it reads on a soft tile).
-- **Chiseled:** a carved emblem panel: Limestone his raised squares, Dolomite his Greek-key band, Slate his blue-grey
-  family's chiseled block, Serpentine his carved maze, Sylvinite his lattice, Kimberlite his faceted diamond, Pumice
-  his line panel, Scoria his mauve squares, Travertine his gold spiral.
-- **Polished Travertine:** his wavy tile ground smooth: twice half-blended with its neighbourhood, its contrast halved,
-  and a 1 px bevel round the block.
-- **Worked tiles:** Polished Sylvinite carries the bevelled border of his framed polished tile (its outer 2 px, as
-  brightness offsets from its field; only the border is borrowed); Chiseled Kimberlite is his carved panel with the face
-  filled by the panel's own fluting; Serpentine's pillar end is his concentric-square panel and its chiseled face his
-  framed-tile panel.
+  `_lower` the base end (base only) and `_middle` the shaft (neither), so a stack reads as one column. All four are
+  fitted to the ramp from the lone pillar's brightness range, so the capital or base of one doesn't shift its whole
+  shaft lighter or darker than the next block's.
+- **Worked tiles:** cobble_4 and cobble_5 (Dolomite, Sylvinite, Kimberlite, Pumice) get shading inside their mortar
+  (`stones:`): each stone lit a half tone along its top and left edges, shaded along its bottom and right, and a fixed
+  scatter of lighter and darker pixels. pillar_end_3 (Sylvinite, Scoria) has its dark grooves and centre raised two half
+  tones (`lift:`). pillar_end_4 (Slate, Serpentine, Kimberlite) has its flat outer 2 px ring shaded (`rim:`): lit along
+  the top and left, shaded along the bottom and right, with a fixed scatter.
 - **Recolouring:** every pixel kept. Each brightness level goes onto the stone's ramp (stepped to 13 half tones),
-  centred on the ramp's middle and keeping the tile's own contrast, so a soft polished face stays soft and a crisp cobble
-  uses the whole ramp. Limestone's natural face is softened (a third blended with its neighbourhood, contrast down by a
-  third, lone pixels merged); it and Cobbled Limestone (his grey cobblestone, kept crisp) use a greyer ramp
-  `#4A4842 #67645C #827E75 #9B988C #B0AEA2 #C5C2B7 #DAD8CE`.
+  centred on the ramp's middle and keeping the tile's own contrast. Limestone's natural and cobbled faces use a greyer
+  ramp `#4A4842 #67645C #827E75 #9B988C #B0AEA2 #C5C2B7 #DAD8CE`. natural_3's darkest specks are raised two half tones
+  (`LIFT`) on all four stones that use it (Limestone, Dolomite, Slate, Travertine); `SHIFT` and `FLOOR` are empty.
 - **Ramps** (7 tones, darkest to lightest): Limestone cream-grey `#4E4A3E → #E0DCC8`; Dolomite pinkish white
   `#5A4A48 → #EADFD8`; Slate blue-black `#14171D → #58626F`; Serpentine muted green
   `#17221B #202F24 #2A3D2F #364D3B #445E49 #57745A #738D6F`; Sylvinite deep red with no whites
-  `#2A0F0F #3E1616 #531E1C #6A2824 #82332D #9A4037 #B04F43` (its natural face held four half tones off the darkest, its
-  large bricks moved three half tones down the ramp so they sit with the rest of the family); Kimberlite blue-green-black `#151B1C → #5F726D` (its natural face his dark rock with pale chips, read as clasts); Pumice
+  `#2A0F0F #3E1616 #531E1C #6A2824 #82332D #9A4037 #B04F43`; Kimberlite blue-green-black `#151B1C → #5F726D`; Pumice
   light grey `#5E5C58 → #DAD8D2`; Scoria near-black with a faint red cast `#0D0A09 #141010 #1B1615 #231C1A #2C2320 #372B27 #443430`;
   Travertine muted tan `#594A35 #746348 #8F7B5C #A79472 #BCAA8A #CEBEA2 #DFD3BB`.
 - **Quicklime** (item): Cody's dust (as Salt) on a warm chalky white `#7A7466 #AEA796 #CFC9B8 #E6E1D2 #F4F1E6 #FCFAF2`,

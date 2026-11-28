@@ -56,18 +56,24 @@ ROUGH_LIMESTONE = hexes("#4A4842", "#67645C", "#827E75", "#9B988C", "#B0AEA2", "
 #                         no line at its joins
 #   "shaft:<spec>"        a pillar tile with its own top band (rows 0-2) replaced by the shaft below it
 #   "inside:<spec>"       Travertine's pillar with the bright slots between its bars (rows 4-11) taken down
+#   "band:<a>:<b>:<spec>" rows a to b-1 of the tile repeated down the face (a pillar even top to bottom)
+#   "level:<spec>"        each row's mean brought to the tile's (a pillar lit evenly top to bottom)
+#   "stones:<max>:<spec>" cobbles shaded inside their mortar (brightness at or under max): lit top and left edges, shaded
+#                         bottom and right, a fixed scatter inside
+#   "lift:<max>:<n>:<spec>" every pixel inside the outer ring at or under max raised n half tones
+#   "rim:<spec>"          a column end's flat outer 2 px ring shaded: lit top and left, shaded bottom and right, a scatter
 #   "polish:<spec>"       a rough tile ground smooth: blended with its neighbourhood, its contrast halved, a 1 px bevel
 # Bricks are always a large-brick tile and small bricks a smaller course than the stone's own bricks.
 PLAN = {
-    "limestone": dict(natural="k13", cobbled="k40", polished="k23", bricks="k33", small="e_g", pillar="border:mv_b", pillar_top="x0603", chiseled="lt_d"),
-    "dolomite": dict(natural="f00", cobbled="f21", polished="f12", bricks="f20", small="bond:m44", pillar="column:k30", pillar_top="rings:a0_3", chiseled="f02"),
-    "slate": dict(natural="b01", cobbled="m02", polished="b11", bricks="b21", small="half:b21", pillar="border:bl_pillar", pillar_top="rings:f05", chiseled="bl_chiseled"),
-    "serpentine": dict(natural="k12", cobbled="e_e", polished="k22", bricks="k32", small="grout:m41", pillar="border:g_c", pillar_top="g_e", chiseled="x0112"),
-    "sylvinite": dict(natural="p_salt", cobbled="a1_1", polished="frame:f01:f12", bricks="mortar:112:b23", small="grout:e_c", pillar="column:seamless:f10", pillar_top="rings:s_d", chiseled="d_3"),
-    "kimberlite": dict(natural="p_d2", cobbled="r0_0", polished="b14", bricks="b24", small="joints:half:b24", pillar="column:t_p2", pillar_top="d_2", chiseled="x1014"),
-    "pumice": dict(natural="gr_a", cobbled="k05", polished="gr_c", bricks="gr_b", small="half:gr_b", pillar="border:shaft:x0402", pillar_top="rings:k10", chiseled="gr_d"),
-    "scoria": dict(natural="b05", cobbled="f35", polished="mv_c", bricks="b25", small="joints:half:b25", pillar="border:dk_pillar", pillar_top="rings:k25", chiseled="mv_d"),
-    "travertine": dict(natural="r0_3", cobbled="e_a", polished="polish:b32", bricks="b33", small="joints:half:b33", pillar="border:inside:d_1", pillar_top="b42", chiseled="b34"),
+    "limestone": dict(natural="arc_natural_3", cobbled="arc_cobble_1", polished="arc_polished_6", bricks="arc_bricks_5", small="arc_small_bricks_1", pillar="border:level:band:4:12:arc_pillar_3", pillar_top="arc_pillar_end_1", chiseled="arc_chiseled_2"),
+    "dolomite": dict(natural="arc_natural_3", cobbled="stones:152:arc_cobble_4", polished="arc_polished_5", bricks="arc_bricks_4", small="arc_small_bricks_1", pillar="border:level:band:4:12:arc_pillar_3", pillar_top="arc_pillar_end_1", chiseled="arc_chiseled_1"),
+    "slate": dict(natural="arc_natural_3", cobbled="arc_cobble_3", polished="arc_polished_7", bricks="arc_bricks_1", small="arc_small_bricks_2", pillar="border:arc_pillar_1", pillar_top="rim:arc_pillar_end_4", chiseled="arc_chiseled_4"),
+    "serpentine": dict(natural="arc_natural_2", cobbled="arc_cobble_2", polished="arc_polished_2", bricks="arc_bricks_2", small="arc_small_bricks_2", pillar="border:level:band:4:12:arc_pillar_3", pillar_top="rim:arc_pillar_end_4", chiseled="arc_chiseled_4"),
+    "sylvinite": dict(natural="arc_natural_2", cobbled="stones:152:arc_cobble_4", polished="arc_polished_3", bricks="arc_bricks_6", small="arc_small_bricks_3", pillar="border:arc_pillar_2", pillar_top="lift:91:2:arc_pillar_end_3", chiseled="arc_chiseled_1"),
+    "kimberlite": dict(natural="arc_natural_4", cobbled="stones:52:arc_cobble_5", polished="arc_polished_4", bricks="arc_bricks_6", small="arc_small_bricks_2", pillar="border:arc_pillar_1", pillar_top="rim:arc_pillar_end_4", chiseled="arc_chiseled_4"),
+    "pumice": dict(natural="arc_natural_4", cobbled="stones:52:arc_cobble_5", polished="arc_polished_5", bricks="arc_bricks_6", small="arc_small_bricks_1", pillar="border:arc_pillar_1", pillar_top="arc_pillar_end_2", chiseled="arc_chiseled_1"),
+    "scoria": dict(natural="arc_natural_4", cobbled="arc_cobble_3", polished="arc_polished_1", bricks="arc_bricks_1", small="arc_small_bricks_3", pillar="border:arc_pillar_2", pillar_top="lift:91:2:arc_pillar_end_3", chiseled="arc_chiseled_3"),
+    "travertine": dict(natural="arc_natural_3", cobbled="arc_cobble_2", polished="arc_polished_5", bricks="arc_bricks_3", small="arc_small_bricks_3", pillar="border:arc_pillar_2", pillar_top="arc_pillar_end_2", chiseled="arc_chiseled_2"),
 }
 # A few tiles need turning or repeating to be a block face: the 8-wide pillar halves are laid twice across, and two
 # layered faces are stood on end to read as a column's grain.
@@ -79,23 +85,16 @@ EXTRA = {
     "magnesia_bricks": ("pick_bricks", hexes("#6A6660", "#86827A", "#A09C93", "#B7B3AA", "#CAC7BF", "#DBD8D1", "#EAE8E2")),
 }
 
-TRANSFORM = {"t_p1": "twice", "t_p2": "twice", "f10": "rot90", "b15": "rot90"}
+TRANSFORM = {}
 # Faces given softer contrast and a light smoothing (no lone pixels, a soft blend), and the ramp they use instead.
-# Limestone's cobble keeps its crisp stones (only its ramp changes); its natural face is softened too.
-SOFT = {("limestone", "natural"): ROUGH_LIMESTONE}
-RAMP_FOR = {("limestone", "cobbled"): ROUGH_LIMESTONE}
-# Faces whose darkest level (the grout) is lifted this many half tones, so the grout is a touch less dark.
-# Every small-brick grout is lifted two half tones (Limestone's three, its tile's grout being darkest), and Sylvinite's
-# large-brick mortar two, so the grout reads as grout, not a black line.
-LIFT = {(stone, "small"): 2 for stone in ("dolomite", "slate", "serpentine", "sylvinite", "kimberlite", "pumice", "scoria",
-                                          "travertine")}
-LIFT[("limestone", "small")] = 3
-LIFT[("sylvinite", "bricks")] = 2
-# Faces moved down the ramp this many half tones (Sylvinite's large bricks, so they sit with the rest of the family
-# rather than reading bright red), and faces whose darkest levels are held at least this far up the ramp (Sylvinite's
-# natural rock, its deepest reds a touch lighter).
-SHIFT = {("sylvinite", "bricks"): -3}
-FLOOR = {("sylvinite", "natural"): 4}
+# None now: Limestone's natural and cobbled faces keep their tiles crisp and only take its greyer ramp.
+SOFT = {}
+RAMP_FOR = {("limestone", "natural"): ROUGH_LIMESTONE, ("limestone", "cobbled"): ROUGH_LIMESTONE}
+# Per-face nudges on the ramp: LIFT raises a face's darkest level (its grout) this many half tones, SHIFT moves the
+# whole face up or down, FLOOR holds its darkest levels at least this far up.
+LIFT = {(s, "natural"): 2 for s in ("limestone", "dolomite", "slate", "travertine")}
+SHIFT = {}
+FLOOR = {}
 PILLAR_JOINS = {"": (True, True), "_upper": (True, False), "_lower": (False, True), "_middle": (False, False)}
 
 FACES = {
@@ -283,6 +282,65 @@ def polish(lum):
     return lum
 
 
+# "band:<a>:<b>:<spec>" (rows a to b-1 of the tile repeated down the face, for a pillar whose own top and bottom rows
+# differ, so every block of a stack and every join between them carry the same stripes) is in load().
+def level(lum):
+    """A pillar tile lit evenly top to bottom: each row's mean brought to the tile's, so its stripes run on unbroken
+    when pillars stack (Cody's pillar_3 is lit at the top and shaded at the bottom, which left a band at every join)."""
+    return lum - (lum.mean(axis=1, keepdims=True) - lum.mean())
+
+
+def _step(lum):
+    """One half tone of the tile once recoloured (see recolour)."""
+    lo, hi = lum.min(), lum.max()
+    return max((hi - lo) / 12.0, 7.0)
+
+
+def stones(lum, limit):
+    """Cobbles shaded inside their mortar (brightness at or under limit): each stone lit a half tone along its top edge
+    and shaded a half tone along its bottom edge, with a fixed scatter of lighter and darker pixels inside it."""
+    out = lum.copy()
+    d = _step(lum)
+    mortar = lum <= limit
+    rng = np.random.default_rng(16)
+    noise = rng.choice([-1.0, 0.0, 0.0, 1.0], size=lum.shape)
+    for y in range(16):
+        for x in range(16):
+            if mortar[y, x]:
+                continue
+            v = noise[y, x]
+            if mortar[(y - 1) % 16, x] or mortar[y, (x - 1) % 16]:
+                v = 1.0
+            elif mortar[(y + 1) % 16, x] or mortar[y, (x + 1) % 16]:
+                v = -1.0
+            out[y, x] += v * d
+    return out
+
+
+def lift(lum, limit, steps):
+    """Inside the tile's outer 1 px ring, every pixel at or under limit raised this many half tones (lighter grooves)."""
+    out = lum.copy()
+    inner = out[1:15, 1:15]
+    inner[inner <= limit] += steps * _step(lum)
+    return out
+
+
+def rim(lum):
+    """A column end's flat outer 2 px ring given shading: lit along the top and left, shaded along the bottom and
+    right, and a fixed scatter of lighter and darker pixels."""
+    out = lum.copy()
+    d = _step(lum)
+    rng = np.random.default_rng(4)
+    ring = np.zeros((16, 16), bool)
+    ring[:2, :] = ring[14:, :] = ring[:, :2] = ring[:, 14:] = True
+    out[ring] += rng.choice([-1.0, 0.0, 0.0, 1.0, 2.0], size=int(ring.sum())) * d
+    out[0, :15] += d
+    out[:15, 0] += d
+    out[15, 1:] -= d
+    out[1:, 15] -= d
+    return out
+
+
 def load(spec, caps=(True, True)):
     """The tile's brightness, worked as the spec says. caps: whether a pillar side shows its capital (top) and its
     base (bottom); a pillar joined to the next one along its axis leaves that end plain."""
@@ -300,6 +358,18 @@ def load(spec, caps=(True, True)):
         lum = load(spec[len("shaft:"):], caps)
         lum[0:3] = lum[3:6]
         return lum
+    if parts[0] == "band":
+        a, b = int(parts[1]), int(parts[2])
+        lum = load(":".join(parts[3:]), caps)
+        return np.concatenate([lum[a:b]] * (16 // (b - a)), axis=0)
+    if parts[0] == "level":
+        return level(load(spec[len("level:"):], caps))
+    if parts[0] == "stones":
+        return stones(load(":".join(parts[2:])), float(parts[1]))
+    if parts[0] == "lift":
+        return lift(load(":".join(parts[3:])), float(parts[1]), float(parts[2]))
+    if parts[0] == "rim":
+        return rim(load(spec[len("rim:"):]))
     if parts[0] == "bond":
         return bond(load(spec[len("bond:"):]))
     if parts[0] == "mortar":
@@ -365,15 +435,16 @@ def despeckle(pos):
     return out
 
 
-def recolour(lum, ramp, soft=False, lift=0, shift=0, floor=0):
+def recolour(lum, ramp, soft=False, lift=0, shift=0, floor=0, scale=None):
     """Every pixel kept, its brightness level placed on the stone's ramp (stepped to 13 half tones), centred on the
     ramp's middle with the tile's own contrast: a soft tile stays soft, a crisp one uses the whole ramp. A soft face is
-    blended a little first, its contrast taken down by a third and its lone pixels merged."""
+    blended a little first, its contrast taken down by a third and its lone pixels merged. scale: the (darkest,
+    lightest) brightness to fit to the ramp in place of the tile's own, so a pillar's four joins share one mapping."""
     if soft:
         lum = soften(lum)
     idx, centres = levels(lum)
     half_tones = np.array([ramp[i // 2] if i % 2 == 0 else (ramp[i // 2] + ramp[i // 2 + 1]) / 2 for i in range(13)])
-    lo, hi = centres.min(), centres.max()
+    lo, hi = scale if scale is not None else (centres.min(), centres.max())
     span = max(hi - lo, 1.0)
     per_step = max(span / 12.0, 7.0) * (1.5 if soft else 1.0)
     mid = (lo + hi) / 2
@@ -399,9 +470,13 @@ def build():
             if face == "pillar":
                 # The pillar side in its four joins: alone (capital and base), the top of a stack (capital only), the
                 # bottom of a stack (base only) and the middle (neither); see StonePillarBlock.
+                # All four are fitted to the ramp from the lone pillar's range, so a stack is one even tone top to bottom.
+                _, c = levels(load(tile))
+                scale = (c.min(), c.max())
                 for suffix, caps in PILLAR_JOINS.items():
                     out[FACES[face].format(stone) + suffix] = Image.fromarray(
-                            recolour(load(tile, caps), ramp, soft is not None, LIFT.get(key, 0), SHIFT.get(key, 0), FLOOR.get(key, 0)))
+                            recolour(load(tile, caps), ramp, soft is not None, LIFT.get(key, 0), SHIFT.get(key, 0),
+                                     FLOOR.get(key, 0), scale))
                 continue
             out[FACES[face].format(stone)] = Image.fromarray(
                     recolour(load(tile), ramp, soft is not None, LIFT.get(key, 0), SHIFT.get(key, 0), FLOOR.get(key, 0)))
